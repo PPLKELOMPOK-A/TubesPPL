@@ -9,6 +9,11 @@ use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Models\Donation;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DonasiMakananController;
+use App\Http\Controllers\KegiatanDonasiController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +55,18 @@ Route::middleware('auth')->group(function () {
         ));
     })->name('dashboard');
 
-    
+    // Route yang hanya bisa diakses oleh Admin
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/admin/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('admin.kegiatan.create');
+        Route::post('/admin/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('admin.kegiatan.store');
+    });
+
+    // Route untuk menampilkan halaman donasi
+    Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
+
+    // Route untuk submit form donasi
+    Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
+
     // --- Logout ---
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -116,6 +132,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('admin.retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('admin.retur.store');
+        Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     });
 
 });
