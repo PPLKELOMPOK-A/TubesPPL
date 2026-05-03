@@ -12,12 +12,12 @@
         
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR USER (KEMBALI KE VERSI USER AWAL) --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
         
         .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; letter-spacing: -0.5px; }
         
-        .nav-group { flex-grow: 1; padding: 0 15px; /* Memberikan jarak agar tidak full ke pinggir */ }
+        .nav-group { flex-grow: 1; padding: 0 15px; }
         
         .nav-item { 
             display: flex; 
@@ -30,16 +30,14 @@
             transition: 0.2s; 
             gap: 15px; 
             margin-bottom: 6px; 
-            border-radius: 10px; /* Bentuk kotak yang elegan */
+            border-radius: 10px; 
         }
         
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         
-        /* Status Active (Kotak Melayang) */
         .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; }
         .nav-item.active i { color: #FFFFFF; }
         
-        /* Status Hover (Kotak Melayang) */
         .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
 
         .logout-section { padding: 0 15px; margin-top: auto; }
@@ -74,7 +72,8 @@
         
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
 
-        .container { padding: 30px 50px; max-width: 1100px; width: 100%; margin: 0 auto; }
+        /* KONTEN MERAPAT KE KIRI */
+        .container { padding: 30px 50px; max-width: 1100px; width: 100%; margin-left: 0; }
         
         .announcement { background-color: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 12px; padding: 25px; text-align: center; color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 30px; }
 
@@ -88,24 +87,23 @@
         
         .btn-filter { padding: 0 20px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: #444; }
 
-        .donation-card { display: flex; align-items: center; background: white; padding: 15px 0; border-bottom: 1px solid #F0F0F0; gap: 20px; }
+        /* --- DONASI LIST --- */
+        .donasi-item { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1.5px solid #eee; transition: 0.2s; }
+        .donasi-item:hover { background-color: #fafafa; }
         
-        .donation-thumb { width: 110px; height: 80px; border-radius: 8px; object-fit: cover; background-color: #f5f5f5; }
+        .donasi-content { display: flex; align-items: center; flex: 1; text-decoration: none; color: inherit; cursor: pointer; }
+        .donasi-img { width: 110px; height: 80px; border-radius: 10px; object-fit: cover; margin-right: 25px; background-color: #f5f5f5; }
         
-        .donation-detail { flex: 1; }
-        
-        .donation-detail .category { font-size: 12px; color: #6B4F2A; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        
-        .donation-detail h3 { font-size: 16px; color: #1A1A1A; margin-bottom: 4px; font-weight: 600; }
-        
-        .donation-detail .meta { font-size: 12px; color: #999; }
+        .donasi-info { flex: 1; }
+        .donasi-info h3 { font-size: 17px; font-weight: 700; color: #000; margin-bottom: 5px; }
+        .donasi-info .category { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: block; }
+        .donasi-info .date { font-size: 13px; color: #999; }
 
         .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
         
+        /* --- PAGINATION --- */
         .pagination-footer { display: flex; justify-content: flex-end; align-items: center; margin-top: 30px; gap: 10px; font-size: 12px; color: #888; }
-        
         .page-node { padding: 5px 10px; border: 1px solid #E0E0E0; border-radius: 4px; text-decoration: none; color: #444; }
-        
         .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
     </style>
 </head>
@@ -142,8 +140,8 @@
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
             <div class="profile-section">
-                <span style="font-size: 13px; font-weight: 600; color: #444;">{{ Auth::user()->name }}</span>
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name }}&background=6B4F2A&color=fff" class="user-avatar" alt="User">
+                <span style="font-size: 13px; font-weight: 600; color: #444;">{{ Auth::user()->name ?? 'User' }}</span>
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User">
             </div>
         </div>
 
@@ -161,24 +159,34 @@
             </div>
 
             @php
-                $donations = [
-                    ['judul' => 'Hari Anak Nasional - Panti Bunda Kasih', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Kamis, 30 Mei 2025'],
-                    ['judul' => 'Program Makan Sehat - Yayasan Peduli Sesama', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Kamis, 30 Mei 2025'],
-                    ['judul' => 'Donasi Kasih Natal - Gereja Santo Paulus', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Kamis, 30 Mei 2025'],
-                    ['judul' => 'Jumat Berkah - Masjid Agung Jakarta', 'org' => 'Kegiatan Keagamaan', 'tgl' => 'Kamis, 30 Mei 2025'],
-                    ['judul' => 'Santunan Anak Yatim - Yayasan Sejahtera', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Kamis, 30 Mei 2025'],
-                ];
+                $donations = \Illuminate\Support\Facades\Cache::get('donasi_db', [
+                    1 => ['id' => 1, 'judul' => 'Hari Anak Nasional - Panti Bunda Kasih', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-13', 'foto' => null],
+                    2 => ['id' => 2, 'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
+                    3 => ['id' => 3, 'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
+                    4 => ['id' => 4, 'judul' => 'Jumat Berkah - Masjid Agung', 'kategori' => 'Kegiatan Keagamaan', 'tanggal' => '2026-05-30', 'foto' => null],
+                    5 => ['id' => 5, 'judul' => 'Santunan Anak Yatim - Yayasan Sejahtera', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
+                ]);
             @endphp
 
             @foreach($donations as $item)
-            <div class="donation-card">
-                <div class="donation-thumb"></div> 
-                <div class="donation-detail">
-                    <span class="category">{{ $item['org'] }}</span>
-                    <h3>{{ $item['judul'] }}</h3>
-                    <div class="meta">{{ $item['tgl'] }}</div>
+            <div class="donasi-item">
+                <a href="{{ route('user.donasi.detail', ['id' => $item['id']]) }}" class="donasi-content">
+                    @if(!empty($item['foto']))
+                        <img src="{{ asset('storage/' . $item['foto']) }}" class="donasi-img" alt="Foto Donasi">
+                    @else
+                        <div class="donasi-img"></div> 
+                    @endif
+                    
+                    <div class="donasi-info">
+                        <span class="category">{{ $item['kategori'] }}</span>
+                        <h3>{{ $item['judul'] }}</h3>
+                        <div class="date">{{ \Carbon\Carbon::parse($item['tanggal'])->translatedFormat('l, d F Y') }}</div>
+                    </div>
+                </a>
+                
+                <div>
+                    <button class="btn-action">Daftar Donasi</button>
                 </div>
-                <button class="btn-action">Daftar Donasi</button>
             </div>
             @endforeach
 
