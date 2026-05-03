@@ -158,29 +158,20 @@
                 <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
             </div>
 
-            @php
-                $donations = \Illuminate\Support\Facades\Cache::get('donasi_db', [
-                    1 => ['id' => 1, 'judul' => 'Hari Anak Nasional - Panti Bunda Kasih', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-13', 'foto' => null],
-                    2 => ['id' => 2, 'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
-                    3 => ['id' => 3, 'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
-                    4 => ['id' => 4, 'judul' => 'Jumat Berkah - Masjid Agung', 'kategori' => 'Kegiatan Keagamaan', 'tanggal' => '2026-05-30', 'foto' => null],
-                    5 => ['id' => 5, 'judul' => 'Santunan Anak Yatim - Yayasan Sejahtera', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null],
-                ]);
-            @endphp
-
-            @foreach($donations as $item)
+            <!-- LOOPING DATA DARI DATABASE (DIUBAH KE -> ) -->
+            @forelse($donations as $item)
             <div class="donasi-item">
-                <a href="{{ route('user.donasi.detail', ['id' => $item['id']]) }}" class="donasi-content">
-                    @if(!empty($item['foto']))
-                        <img src="{{ asset('storage/' . $item['foto']) }}" class="donasi-img" alt="Foto Donasi">
+                <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
+                    @if(!empty($item->foto))
+                        <img src="{{ asset('storage/' . $item->foto) }}" class="donasi-img" alt="Foto Donasi">
                     @else
                         <div class="donasi-img"></div> 
                     @endif
                     
                     <div class="donasi-info">
-                        <span class="category">{{ $item['kategori'] }}</span>
-                        <h3>{{ $item['judul'] }}</h3>
-                        <div class="date">{{ \Carbon\Carbon::parse($item['tanggal'])->translatedFormat('l, d F Y') }}</div>
+                        <span class="category">{{ $item->kategori }}</span>
+                        <h3>{{ $item->judul }}</h3>
+                        <div class="date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</div>
                     </div>
                 </a>
                 
@@ -188,7 +179,11 @@
                     <button class="btn-action">Daftar Donasi</button>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div style="text-align: center; padding: 40px; color: #888;">
+                Belum ada donasi yang tersedia di Database.
+            </div>
+            @endforelse
 
             <div class="pagination-footer">
                 <span>1-5 dari 200</span>
