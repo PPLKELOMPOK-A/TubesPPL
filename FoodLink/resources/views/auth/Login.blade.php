@@ -40,7 +40,7 @@
         }
 
         p {
-            font-size: 14px; /* diperbaiki (tadi kegedean) */
+            font-size: 14px; 
             color: #666;
             margin-bottom: 25px;
             text-align: center;
@@ -113,6 +113,11 @@
                 <h2>Welcome back</h2>
                 <p>Take a moment. Let's continue.</p>
 
+                {{-- Notifikasi Error Jika Login Gagal --}}
+                @if($errors->any())
+                    <p style="color: red; font-size: 12px; text-align: center;">{{ $errors->first() }}</p>
+                @endif
+
                 <form method="POST" action="/login">
                     @csrf
                     <input type="email" name="email" placeholder="Enter your email" required>
@@ -120,7 +125,7 @@
 
                     <div class="remember">
                         <label>
-                            <input type="checkbox"> Remember me
+                            <input type="checkbox" name="remember"> Remember me
                         </label>
                         <a href="#">Forgot Password</a>
                     </div>
@@ -129,7 +134,7 @@
                 </form>
 
                 <div class="register">
-                    New here? <a href="#">Create an account</a>
+                    New here? <a href="{{ route('register') }}">Create an account</a>
                 </div>
             </div>
         </div>
