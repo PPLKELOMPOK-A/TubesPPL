@@ -97,7 +97,8 @@
         </div>
 
         <div class="container">
-            <form action="/admin/donasi/edit" method="POST" enctype="multipart/form-data">
+            <!-- REVISI 1: FORM ACTION SEKARANG MENGARAH KE ROUTE UPDATE DENGAN ID -->
+            <form action="{{ route('admin.donasi.update', ['id' => $data['id']]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label>Judul</label>
@@ -125,7 +126,7 @@
                 <div class="form-group">
                     <div class="image-container">
                         <div class="preview-box">
-                            <img id="img-preview" src="{{ $data['foto'] ? asset('storage/' . $data['foto']) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
+                            <img id="img-preview" src="{{ !empty($data['foto']) ? asset('storage/' . $data['foto']) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
                         </div>
                         <input type="file" id="file-input" name="foto" accept="image/*">
                         <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
@@ -145,7 +146,8 @@
                 </div>
 
                 <div class="footer-actions">
-                    <a href="{{ route('admin.donasi.detail') }}" class="btn-base btn-kembali">Kembali</a>
+                    <!-- REVISI 2: TOMBOL KEMBALI MENGARAH KE DETAIL DONASI DENGAN ID YANG SESUAI -->
+                    <a href="{{ route('admin.donasi.detail', ['id' => $data['id']]) }}" class="btn-base btn-kembali">Kembali</a>
                     <button type="submit" class="btn-simpan btn-base">Simpan</button>
                 </div>
             </form>

@@ -27,6 +27,9 @@ class AuthController extends Controller {
         ]);
 
         Auth::login($user);
+
+        // Ini akan memicu pengecekan di web.php 
+        // User akan masuk ke dashboard user biasa sesuai logic role 'user' di atas.
         return redirect('/dashboard');
     }
 
