@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Http\Controllers;
-
 // app/Http/Controllers/DonasiMakananController.php
 
 namespace App\Http\Controllers;
@@ -42,9 +40,9 @@ class DonasiMakananController extends Controller
         }
 
         // 3. Simpan data ke database
-        DonasiMakanan::create($validatedData);
+        DonasiMakananController::create($validatedData);
 
         // 4. Redirect kembali dengan pesan sukses
-        return redirect()->back()->with('success', 'Donasi makanan berhasil diajukan! Menunggu kurasi admin.');
+        return redirect()->route('dashboard')->with('success', 'Berhasil! Donasi baru telah ditambahkan dan sedang menunggu kurasi.');
     }
 }

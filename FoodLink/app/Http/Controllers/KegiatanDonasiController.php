@@ -14,7 +14,7 @@ class KegiatanDonasiController extends Controller
     public function create()
     {
         // Pastikan file blade-nya bernama 'buat-kegiatan.blade.php' di dalam folder 'resources/views/admin/'
-        return view('admin.buat-kegiatan');
+        return view('admin.create');
     }
 
     // Memproses data yang di-submit

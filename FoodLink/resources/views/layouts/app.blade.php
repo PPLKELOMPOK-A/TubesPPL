@@ -53,18 +53,44 @@
         <div class="nav-group">
             <div class="brand">Foodlink</div>
             
-            <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-house"></i> Beranda
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
-            </a>
+            {{-- CEK APAKAH USER SUDAH LOGIN DAN MEMILIKI ROLE ADMIN --}}
+            @if(Auth::check() && Auth::user()->role == 'admin')
+                
+                {{-- MENU KHUSUS ADMIN --}}
+                <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
+                    <i class="fa-solid fa-house"></i> Beranda Admin
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
+                </a>
+
+            {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
+            @else
+                
+                {{-- MENU KHUSUS USER --}}
+                <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
+                    <i class="fa-solid fa-house"></i> Beranda
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
+                </a>
+
+            @endif
+
+            {{-- MENU GLOBAL (BISA DIAKSES ADMIN & USER) --}}
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
-            <a href="{{ route('donasi.create') }}" class="nav-item {{ Request::is('donasi/baru') ? 'active' : '' }}">
-                <i class="fa-solid fa-plus"></i> Buat Donasi Baru
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-comments"></i> Chat
             </a>
+
         </div>
         
         <div class="logout-section">

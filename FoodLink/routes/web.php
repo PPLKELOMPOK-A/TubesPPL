@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\AuthController;
@@ -13,126 +14,121 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
 
-
-
 /*
 |--------------------------------------------------------------------------
-| Web Routes - Foodlink Project (Tanpa check blok)
+| Web Routes - Foodlink Project
 |--------------------------------------------------------------------------
 */
 
-// --- Homepage ---
+// --- HOMEPAGE ---
 Route::get('/', function () {
     return view('welcome');
 });
 
-// --- Guest Routes ---
-Route::middleware('guest')->group(function () {
+// --- GUEST AREA (Hanya untuk yang belum login) ---
+Route::middleware(['guest'])->group(function () {
     Route::get('/login', [Controller::class, 'showLogin'])->name('login');
     Route::post('/login', [Controller::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-// --- Authenticated Routes ---
-Route::middleware('auth')->group(function () {
-
+// --- AUTH AREA (Harus Login) ---
+Route::middleware(['auth'])->group(function () {
+    
+// --- AREA USER BIASA ---
     Route::get('/dashboard', function (Request $request) {
-        $user = $request->user(); // <-- tipe user jelas
-        $donations = Donation::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Redirect jika admin nyasar ke dashboard user
+        if (Auth::user()->role === 'admin') { 
+            return redirect()->route('admin.dashboard'); 
+        }
+        
+        // Ambil semua data kegiatan donasi yang tersedia (Tanpa filter user_id)
+        $donations = Donation::orderBy('created_at', 'desc')->get();
 
-        $totalDonations = $donations->count();
-        $sentDonations = $donations->where('status', 'terkirim')->count();
-        $inTransitDonations = $donations->where('status', 'dalam_perjalanan')->count();
-
-        return view('dashboard', compact(
-            'donations',
-            'totalDonations',
-            'sentDonations',
-            'inTransitDonations'
-        ));
+        return view('dashboard', compact('donations'));
     })->name('dashboard');
 
-    // Route yang hanya bisa diakses oleh Admin
-    Route::middleware(['auth', 'admin'])->group(function () {
-        Route::get('/admin/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('admin.kegiatan.create');
-        Route::post('/admin/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('admin.kegiatan.store');
-    });
+    // Detail Donasi untuk User
+    Route::get('/donasi/detail/{id}', function ($id) {
+        if (Auth::user()->role === 'admin') { 
+            return redirect()->route('admin.dashboard'); 
+        }
+        $data = Donation::findOrFail($id);
+        return view('detail-donasi-user', compact('data')); 
+    })->name('user.donasi.detail');
 
-    // Route untuk menampilkan halaman donasi
+    // Fitur Pengajuan Donasi (Oleh User)
     Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
-
-    // Route untuk submit form donasi
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
-
-    // --- Logout ---
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    // --- Bukti Donasi ---
-    Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
-
-    Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])
-    ->name('bukti.donasi.detail');
-
+    
+    // Tracking & Bukti Donasi
     Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking');
+    Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
+    Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
 
-    // --- Admin Routes ---
-   Route::prefix('admin')->middleware('auth')->group(function () {
 
+    // --- AREA KHUSUS ADMIN ---
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+        // Dashboard Admin
         Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            $semuaDonasi = Donation::all();
+            return view('admin.dashboardAdmin', compact('semuaDonasi'));
+        })->name('dashboard');
 
-        Route::get('/donasi/detail', function () {
-            $data = session('donasi_data', [
-                'judul'     => 'Hari Anak Nasional - Panti Bunda Kasih',
-                'kategori'  => 'Organisasi (Yayasan)',
-                'tanggal'   => '2026-05-13',
-                'foto'      => null,
-                'deskripsi' => 'Tersedia 20 paket nasi kotak ayam bakar sisa acara syukuran siang ini...',
-                'alamat'    => 'Jl. Bougenville Timur No. 22'
-            ]);
+        // --- MANAJEMEN KEGIATAN DONASI (Menggunakan Controller) ---
+        Route::get('/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('kegiatan.create');
+        Route::post('/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('kegiatan.store');
+
+        // --- CRUD DONASI LAINNYA ---
+        
+        // Detail Donasi (Admin)
+        Route::get('/donasi/detail/{id}', function ($id) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            $data = Donation::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
-        })->name('admin.donasi.detail');
+        })->name('donasi.detail');
 
-        Route::get('/donasi/edit', function () {
-            $data = session('donasi_data', [
-                'judul'     => 'Hari Anak Nasional - Panti Bunda Kasih',
-                'kategori'  => 'Organisasi (Yayasan)',
-                'tanggal'   => '2026-05-13',
-                'foto'      => null,
-                'deskripsi' => 'Tersedia 20 paket nasi kotak ayam bakar sisa acara syukuran siang ini...',
-                'alamat'    => 'Jl. Bougenville Timur No. 22'
-            ]);
+        // Form Edit Donasi
+        Route::get('/donasi/edit/{id}', function ($id) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            $data = Donation::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
-        })->name('admin.donasi.edit');
+        })->name('donasi.edit');
 
-        Route::post('/donasi/edit', function (Request $request) {
-            $oldData = session('donasi_data', []);
-            $fotoPath = $oldData['foto'] ?? null;
+        // Proses Update Donasi
+        Route::post('/donasi/edit/{id}', function (Request $request, $id) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+
+            $donasi = Donation::findOrFail($id);
+            $fotoPath = $donasi->foto_kegiatan;
 
             if ($request->hasFile('foto')) {
-                if ($fotoPath) Storage::disk('public')->delete($fotoPath);
+                if ($fotoPath) { Storage::disk('public')->delete($fotoPath); }
                 $fotoPath = $request->file('foto')->store('donasi', 'public');
             }
 
-            session(['donasi_data' => [
-                'judul'     => $request->judul,
-                'kategori'  => $request->kategori,
-                'tanggal'   => $request->tanggal,
-                'foto'      => $fotoPath,
-                'deskripsi' => $request->deskripsi,
-                'alamat'    => $request->alamat,
-            ]]);
+            $donasi->update([
+                'judul_donasi'      => $request->judul,
+                'kategori_penerima' => $request->kategori,
+                'tanggal_kegiatan'  => $request->tanggal,
+                'foto_kegiatan'     => $fotoPath,
+                'deskripsi'         => $request->deskripsi,
+                'alamat_penyaluran' => $request->alamat
+            ]);
+            
+            return redirect()->route('admin.donasi.detail', ['id' => $id])->with('success', 'Donasi berhasil diperbarui!');
+        })->name('donasi.update');
 
-            return redirect()->route('admin.donasi.detail')->with('success', 'Donasi berhasil diperbarui!');
-        })->name('admin.donasi.update');
-
-        Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('admin.retur.index');
-        Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('admin.retur.store');
+        // --- FITUR ADMIN LAINNYA ---
+        Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
+        Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
-    });
 
+    }); // End Prefix Admin Group
+
+    // GLOBAL LOGOUT
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
