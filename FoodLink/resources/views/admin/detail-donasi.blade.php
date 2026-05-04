@@ -126,7 +126,13 @@
             </div>
 
             <div class="footer-actions">
-                <button class="btn btn-hapus">Hapus</button>
+                
+                <!-- PERUBAHAN: Tombol Hapus dibungkus Form agar berfungsi ke route hapus -->
+                <form action="{{ route('admin.donasi.delete', ['id' => $data->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
+                    @csrf
+                    <button type="submit" class="btn btn-hapus">Hapus</button>
+                </form>
+
                 <!-- DIUBAH: Menggunakan ->id -->
                 <a href="{{ route('admin.donasi.edit', ['id' => $data->id]) }}" class="btn btn-edit">Edit</a>
             </div>

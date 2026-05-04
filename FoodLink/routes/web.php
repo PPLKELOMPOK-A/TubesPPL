@@ -27,12 +27,25 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     
     // --- AREA USER BIASA ---
-    Route::get('/dashboard', function () {
+    Route::get('/dashboard', function (Request $request) { // <-- PERUBAHAN: Tambah Request untuk Filter
         if (auth()->user()->role === 'admin') { 
             return redirect()->route('admin.dashboard'); 
         }
+        
+        $query = Donation::query();
+
+        // Logika Pencarian (Search)
+        if ($request->has('search') && $request->search != '') {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        // Logika Filter Kategori
+        if ($request->has('kategori') && !empty($request->kategori)) {
+            $query->whereIn('kategori', $request->kategori);
+        }
+
         // Menambahkan pengambilan data donasi agar bisa di-looping di dashboard user
-        $donations = Donation::all();
+        $donations = $query->get();
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
@@ -51,11 +64,23 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->group(function () {
 
         // DASHBOARD ADMIN
-        Route::get('/dashboard', function () {
+        Route::get('/dashboard', function (Request $request) { // <-- PERUBAHAN: Tambah Request untuk Filter
             if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
             
-            // Mengambil semua data dari Database
-            $semuaDonasi = Donation::all();
+            $query = Donation::query();
+
+            // Logika Pencarian (Search)
+            if ($request->has('search') && $request->search != '') {
+                $query->where('judul', 'like', '%' . $request->search . '%');
+            }
+
+            // Logika Filter Kategori
+            if ($request->has('kategori') && !empty($request->kategori)) {
+                $query->whereIn('kategori', $request->kategori);
+            }
+
+            // Mengambil semua data dari Database berdasarkan filter
+            $semuaDonasi = $query->get();
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('admin.dashboard');
 
@@ -130,6 +155,23 @@ Route::middleware(['auth'])->group(function () {
             
             return redirect()->route('admin.dashboard')->with('success', 'Donasi baru berhasil ditambahkan!');
         })->name('admin.donasi.store');
+
+        // HAPUS DONASI
+        Route::post('/donasi/hapus/{id}', function ($id) {
+            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+            
+            $donasi = App\Models\Donation::findOrFail($id);
+            
+            // Hapus foto dari folder storage jika fotonya ada
+            if ($donasi->foto) {
+                Illuminate\Support\Facades\Storage::disk('public')->delete($donasi->foto);
+            }
+            
+            // Hapus datanya dari Database
+            $donasi->delete();
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
+        })->name('admin.donasi.delete');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

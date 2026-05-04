@@ -40,6 +40,45 @@
         .search-wrapper input { width: 100%; padding: 12px 12px 12px 45px; border: 1px solid #ddd; border-radius: 10px; outline: none; font-size: 14px; background: #fafafa; }
         .filter-btn { padding: 12px 25px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; color: #444; }
 
+        /* --- FILTER DROPDOWN UI --- */
+        .filter-wrapper { position: relative; }
+        
+        .filter-dropdown {
+            display: none; 
+            position: absolute;
+            top: 115%;
+            right: 0;
+            width: 250px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 100;
+            overflow: hidden;
+        }
+        .filter-dropdown.show { display: block; }
+        .filter-header {
+            background-color: #563e21; 
+            color: #ffffff;
+            text-align: center;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .filter-options { padding: 10px 0; }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            gap: 12px;
+            font-size: 13px;
+            color: #444;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filter-option:hover { background-color: #f9f9f9; }
+        .filter-option input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A; }
+
         /* --- DONASI LIST --- */
         .donasi-item { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1.5px solid #eee; transition: 0.2s; }
         .donasi-item:hover { background-color: #fafafa; }
@@ -52,7 +91,7 @@
         .donasi-info .category { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: block; }
         .donasi-info .date { font-size: 13px; color: #999; }
         
-        .action-icons { display: flex; gap: 20px; padding: 0 10px; }
+        .action-icons { display: flex; gap: 20px; padding: 0 10px; align-items: center; } /* Tambah align-items agar sejajar */
         .action-icons a, .action-icons i { font-size: 20px; color: #333; cursor: pointer; text-decoration: none; }
 
         /* --- FLOATING ACTION BUTTON --- */
@@ -94,19 +133,60 @@
         </div>
 
         <div class="container">
+            <!-- Alert jika ada pesan sukses -->
+            @if(session('success'))
+                <div style="background-color: #E6F4EA; border: 1px solid #1E8E3E; color: #1E8E3E; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px;">
+                    <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
+                </div>
+            @endif
+
             <div class="info-box">
                 Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konformasi dan penjemputan oleh relawan tersedia setiap hari SENIN s.d. MINGGU Pukul 08.00 - 20.00 WIB. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
             </div>
 
-            <div class="search-filter-row">
+            <!-- FORM FILTER & SEARCH -->
+            <form action="{{ route('admin.dashboard') }}" method="GET" class="search-filter-row" id="filterForm">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search">
+                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
                 </div>
-                <button class="filter-btn">Filter <i class="fa-solid fa-chevron-down"></i></button>
-            </div>
+                
+                <div class="filter-wrapper">
+                    <button type="button" class="filter-btn" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
+                    
+                    <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
+                        <div class="filter-header">-Pilihan-</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                                Organisasi (Yayasan)
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                                Kegiatan Keagamaan
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Individu/Umum" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                                Individu/Umum
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Individu" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Individu', request('kategori', [])) ? 'checked' : '' }}> 
+                                Individu
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
-            <!-- LOOPING DATA DARI DATABASE (Menggantikan 5 blok manual sebelumnya) -->
+            <!-- LOOPING DATA DARI DATABASE -->
             @forelse($semuaDonasi as $item)
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
@@ -123,13 +203,21 @@
                     </div>
                 </a>
                 <div class="action-icons">
-                    <i class="fa-regular fa-trash-can"></i>
+                    
+                    <!-- PERUBAHAN: Ikon Hapus dibungkus Form agar berfungsi -->
+                    <form action="{{ route('admin.donasi.delete', ['id' => $item->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
+                        @csrf
+                        <button type="submit" style="background: none; border: none; cursor: pointer; padding: 0; color: #333;">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </form>
+
                     <a href="{{ route('admin.donasi.edit', ['id' => $item->id]) }}" style="color: inherit;"><i class="fa-regular fa-pen-to-square"></i></a>
                 </div>
             </div>
             @empty
             <div style="text-align: center; padding: 40px; color: #888;">
-                Belum ada data donasi di database.
+                Belum ada data donasi di database yang sesuai.
             </div>
             @endforelse
 
@@ -148,9 +236,28 @@
         </div>
     </div>
 
-<a href="{{ route('admin.donasi.create') }}" class="fab">
+    <a href="{{ route('admin.donasi.create') }}" class="fab">
         <i class="fa-solid fa-plus"></i>
     </a>
 
+    <!-- SCRIPT UNTUK MENGATUR MUNCUL/HILANGNYA KOTAK FILTER -->
+    <script>
+        function toggleFilter() {
+            document.getElementById("filterDropdown").classList.toggle("show");
+        }
+
+        // Menutup dropdown jika user melakukan klik di luar kotak filter
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-wrapper')) {
+                var dropdowns = document.getElementsByClassName("filter-dropdown");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

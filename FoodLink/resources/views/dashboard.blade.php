@@ -85,7 +85,47 @@
         
         .search-wrapper i { position: absolute; left: 15px; top: 14px; color: #A0A0A0; }
         
-        .btn-filter { padding: 0 20px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: #444; }
+        /* --- DIPERBAIKI: Padding diubah agar tingginya sejajar --- */
+        .btn-filter { padding: 12px 25px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: #444; }
+
+        /* --- FILTER DROPDOWN UI (TAMBAHAN BARU) --- */
+        .filter-wrapper { position: relative; }
+        
+        .filter-dropdown {
+            display: none; /* Disembunyikan secara default */
+            position: absolute;
+            top: 115%;
+            right: 0;
+            width: 250px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 100;
+            overflow: hidden;
+        }
+        .filter-dropdown.show { display: block; /* Ditampilkan saat diklik */ }
+        .filter-header {
+            background-color: #563e21; /* Cokelat gelap */
+            color: #ffffff;
+            text-align: center;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .filter-options { padding: 10px 0; }
+        .filter-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            gap: 12px;
+            font-size: 13px;
+            color: #444;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filter-option:hover { background-color: #f9f9f9; }
+        .filter-option input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A; }
 
         /* --- DONASI LIST --- */
         .donasi-item { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1.5px solid #eee; transition: 0.2s; }
@@ -150,15 +190,41 @@
                 Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari <strong>SENIN s.d. MINGGU Pukul 08.00 - 20.00 WIB</strong>. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
             </div>
 
-            <div class="action-bar">
+            <form action="{{ route('dashboard') }}" method="GET" class="action-bar" id="filterForm">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search">
+                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
                 </div>
-                <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
-            </div>
+                
+                <div class="filter-wrapper">
+                    <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
+                    
+                    <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
+                        <div class="filter-header">-Pilihan-</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)"
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                                Organisasi (Yayasan)
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan"
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                                Kegiatan Keagamaan
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Individu/Umum"
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                                Individu/Umum
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
-            <!-- LOOPING DATA DARI DATABASE (DIUBAH KE -> ) -->
             @forelse($donations as $item)
             <div class="donasi-item">
                 <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
@@ -197,5 +263,22 @@
         </div>
     </div>
 
+    <script>
+        function toggleFilter() {
+            document.getElementById("filterDropdown").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-wrapper')) {
+                var dropdowns = document.getElementsByClassName("filter-dropdown");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
