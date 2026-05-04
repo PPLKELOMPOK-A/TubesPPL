@@ -36,7 +36,7 @@ Route::middleware(['guest'])->group(function () {
 // --- AUTH AREA (Harus Login) ---
 Route::middleware(['auth'])->group(function () {
     
-// --- AREA USER BIASA ---
+    // --- AREA USER BIASA ---
     Route::get('/dashboard', function (Request $request) {
         // Redirect jika admin nyasar ke dashboard user
         if (Auth::user()->role === 'admin') { 
@@ -78,7 +78,7 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
-        // --- MANAJEMEN KEGIATAN DONASI (Menggunakan Controller) ---
+        // --- MANAJEMEN KEGIATAN DONASI ---
         Route::get('/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('kegiatan.create');
         Route::post('/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('kegiatan.store');
 
@@ -125,6 +125,8 @@ Route::middleware(['auth'])->group(function () {
         // --- FITUR ADMIN LAINNYA ---
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
+        
+        // INTEGRASI FITUR DASHBOARD LAPORAN
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
     }); // End Prefix Admin Group
