@@ -129,49 +129,49 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // FORM TAMBAH DONASI
-        Route::get('/donasi/tambah', function () {
-            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
-            return view('admin.tambah-donasi');
-        })->name('admin.donasi.create');
+    Route::get('/donasi/tambah', function () {
+        if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+        return view('admin.tambah-donasi');
+    })->name('admin.donasi.create');
 
-        // PROSES SIMPAN DONASI KE DATABASE
-        Route::post('/donasi/tambah', function (Request $request) {
-            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+    // PROSES SIMPAN DONASI KE DATABASE
+    Route::post('/donasi/tambah', function (Request $request) {
+        if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
 
-            $fotoPath = null;
-            if ($request->hasFile('foto')) {
-                $fotoPath = $request->file('foto')->store('donasi', 'public');
-            }
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('donasi', 'public');
+        }
 
-            // Syntax bawaan Laravel untuk Create Data
-            Donation::create([
-                'judul' => $request->judul,
-                'kategori' => $request->kategori,
-                'tanggal' => $request->tanggal,
-                'foto' => $fotoPath,
-                'deskripsi' => $request->deskripsi,
-                'alamat' => $request->alamat
-            ]);
-            
-            return redirect()->route('admin.dashboard')->with('success', 'Donasi baru berhasil ditambahkan!');
-        })->name('admin.donasi.store');
+        // Syntax bawaan Laravel untuk Create Data
+        Donation::create([
+            'judul' => $request->judul,
+            'kategori' => $request->kategori,
+            'tanggal' => $request->tanggal,
+            'foto' => $fotoPath,
+            'deskripsi' => $request->deskripsi,
+            'alamat' => $request->alamat
+        ]);
+        
+        return redirect()->route('admin.dashboard')->with('success', 'Donasi baru berhasil ditambahkan!');
+    })->name('admin.donasi.store');
 
-        // HAPUS DONASI
-        Route::post('/donasi/hapus/{id}', function ($id) {
-            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
-            
-            $donasi = App\Models\Donation::findOrFail($id);
-            
-            // Hapus foto dari folder storage jika fotonya ada
-            if ($donasi->foto) {
-                Illuminate\Support\Facades\Storage::disk('public')->delete($donasi->foto);
-            }
-            
-            // Hapus datanya dari Database
-            $donasi->delete();
-            
-            return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
-        })->name('admin.donasi.delete');
+    // HAPUS DONASI
+    Route::post('/donasi/hapus/{id}', function ($id) {
+        if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+        
+        $donasi = Donation::findOrFail($id);
+        
+        // Hapus foto dari folder storage jika fotonya ada
+        if ($donasi->foto) {
+            Storage::disk('public')->delete($donasi->foto);
+        }
+        
+        // Hapus datanya dari Database
+        $donasi->delete();
+        
+        return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
+    })->name('admin.donasi.delete');
 
 
     // ==========================================

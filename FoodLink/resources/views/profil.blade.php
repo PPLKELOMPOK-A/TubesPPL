@@ -56,14 +56,13 @@
 <body>
 
     <div class="sidebar">
-        <!-- Sidebar Content Tetap Sama -->
+        <!-- Sidebar KEMBALI KE ASLI TANPA PROFIL SAYA -->
         <div class="nav-group">
             <div class="brand">Foodlink</div>
             <a href="{{ route('dashboard') }}" class="nav-item"><i class="fa-solid fa-house"></i> Beranda</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Riwayat Koordinasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
-            <a href="{{ route('profil') }}" class="nav-item active"><i class="fa-solid fa-user"></i> Profil Saya</a>
         </div>
         <div class="logout-section">
             <form action="{{ route('logout') }}" method="POST">
@@ -81,7 +80,7 @@
                 @if(!empty(Auth::user()->foto_profil))
                     <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar-small" alt="Foto">
                 @else
-                    <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'Sumanto' }}&background=6B4F2A&color=fff" class="user-avatar-small" alt="Foto">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Sumanto') }}&background=6B4F2A&color=fff" class="user-avatar-small" alt="Foto">
                 @endif
             </a>
         </div>
@@ -102,7 +101,7 @@
                 @if(!empty(Auth::user()->foto_profil))
                     <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar-large" alt="Foto">
                 @else
-                    <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'Sumanto' }}&background=2C3E50&color=fff&size=200" class="user-avatar-large" alt="Foto">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Sumanto') }}&background=2C3E50&color=fff&size=200" class="user-avatar-large" alt="Foto">
                 @endif
                 <div class="hero-text">
                     <h2>{{ Auth::user()->name ?? 'Sumanto' }}</h2>
