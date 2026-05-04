@@ -32,8 +32,8 @@
 
             <!-- Info -->
             <div class="info">
-                <h4>{{ $item->nama_makanan }}</h4>
-                <p>{{ $item->donatur }}</p>
+                <h4>{{ $item->judul }}</h4>
+                <p>{{ $item->kategori }}</p>
                 <small>{{ $item->created_at->format('d M Y H:i') }}</small>
 
                 <br><br>
@@ -64,7 +64,7 @@
 
         <!-- Info jumlah data -->
         <div class="pagination">
-            <span>Total: {{ count($donations) }} data</span>
+            <span>Total: {{ $donations->count() }} data</span>
         </div>
 
     </div>

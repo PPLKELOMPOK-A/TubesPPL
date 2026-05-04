@@ -21,6 +21,17 @@ class DonationController extends Controller
         return view('tracking', compact('donations', 'total', 'terkirim', 'dalamPerjalanan'));
     }
 
+    public function show($id)
+{
+    $donation = Donation::find($id);
+
+    if (!$donation) {
+        return redirect()->route('donation.tracking')
+            ->with('error', 'Data tidak ditemukan');
+    }
+    return view('trackingdetail', compact('donation'));
+}
+
     /**
      * Menyimpan donasi baru
      */
@@ -63,4 +74,21 @@ class DonationController extends Controller
         $donations = Donation::orderByDesc('created_at')->get();
         return response()->json($donations);
     }
+    public function up(): void
+{
+    Schema::table('donations', function (Blueprint $table) {
+        $table->foreignId('courier_id')
+              ->nullable()
+              ->constrained('couriers')
+              ->onDelete('set null');
+    });
+}
+
+public function down(): void
+{
+    Schema::table('donations', function (Blueprint $table) {
+        $table->dropForeign(['courier_id']);
+        $table->dropColumn('courier_id');
+    });
+}
 }
