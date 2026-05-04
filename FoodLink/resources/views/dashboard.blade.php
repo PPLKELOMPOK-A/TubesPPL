@@ -111,22 +111,17 @@
 </head>
 <body>
 
+    <div class="container">
+    <!-- Sidebar -->
     <div class="sidebar">
-        <div class="nav-group">
-            <div class="brand">Foodlink</div>
-            <a href="#" class="nav-item active">
-                <i class="fa-solid fa-house"></i> Beranda
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
-            </a>
-        </div>
+        <ul class="sidebar-menu">
+            <li><i class="fas fa-home"></i> Beranda</li>
+            <li class="active"><i class="fas fa-history"></i> Riwayat Donasi</li>
+            <li><i class="fas fa-handshake"></i> Riwayat Koordinasi</li>
+            <li><i class="fas fa-file-alt"></i> Bukti Donasi</li>
+        </ul>
+        <div class="logout"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
         
         <div class="logout-section">
             <form action="{{ route('logout') }}" method="POST">

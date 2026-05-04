@@ -31,87 +31,99 @@
         <h2>Validasi Proses Donasi</h2>
         <p class="sub">Kelola dan verifikasi donasi yang masuk</p>
 
-        <!-- 🔥 STATISTIK -->
-        <div style="display:flex; gap:20px; margin:20px 0;">
-            <div style="background:#f3e5d0; padding:15px; border-radius:10px; text-align:center;">
+        <!-- NOTIFIKASI -->
+        @if(session('success'))
+            <div style="color:green">{{ session('success') }}</div>
+        @endif
+
+        @if(session('error'))
+            <div style="color:red">{{ session('error') }}</div>
+        @endif
+
+        <!-- STATISTIK -->
+        <div class="stats">
+            <div class="stat-card">
                 <h2>{{ \App\Models\Donation::where('status','menunggu')->count() }}</h2>
                 <p>Menunggu</p>
             </div>
 
-            <div style="background:#d4edda; padding:15px; border-radius:10px; text-align:center;">
+            <div class="stat-card success">
                 <h2>{{ \App\Models\Donation::where('status','disetujui')->count() }}</h2>
                 <p>Disetujui</p>
             </div>
 
-            <div style="background:#f8d7da; padding:15px; border-radius:10px; text-align:center;">
+            <div class="stat-card danger">
                 <h2>{{ \App\Models\Donation::where('status','ditolak')->count() }}</h2>
                 <p>Ditolak</p>
             </div>
         </div>
 
-        <!-- Search -->
-        <input type="text" class="search" placeholder="Search">
-
-        <!-- List -->
+        <!-- LIST DATA (REAL DATABASE) -->
         @forelse($donations as $item)
-        <div class="card">
+        <div class="card-donasi">
 
             <!-- Gambar -->
-            <img src="{{ asset('images/default.png') }}" class="thumb">
+            <div class="thumb"></div>
 
             <!-- Info -->
             <div class="info">
-                <h4>{{ $item->nama_makanan }}</h4>
-                <p>{{ $item->donatur }}</p>
+                <h4>{{ $item->judul }}</h4>
+                <p>{{ $item->kategori }}</p>
                 <small>{{ $item->created_at->format('d M Y H:i') }}</small>
 
-                <br><br>
+                <div class="badge-group">
+                    <span class="badge">{{ $item->quantity ?? 0 }} Porsi</span>
+                    <span class="badge gray">Layak konsumsi</span>
+                </div>
+            </div>
 
-                <!-- Badge -->
-                <span style="background:orange;color:white;padding:4px 10px;border-radius:5px;">
-                    MENUNGGU
-                </span>
+            <!-- Status DINAMIS -->
+            <div class="status">
+                {{ strtoupper($item->status) }}
             </div>
 
             <!-- Action -->
             <div class="action">
 
-                <!-- Setujui -->
+                <!-- SETUJUI -->
                 <form action="{{ route('validasi.setujui', $item->id) }}" method="POST">
                     @csrf
-                    <button onclick="return confirm('Setujui donasi ini?')" class="btn-primary">
+                    <button type="submit" class="btn green"
+                        onclick="return confirm('Setujui donasi ini?')">
                         Setujui
                     </button>
                 </form>
 
-                <!-- Tolak -->
+                <!-- TOLAK -->
                 <form action="{{ route('validasi.tolak', $item->id) }}" method="POST">
                     @csrf
-                    <button onclick="return confirm('Tolak donasi ini?')" class="btn-danger">
+                    <button type="submit" class="btn red"
+                        onclick="return confirm('Tolak donasi ini?')">
                         Tolak
                     </button>
                 </form>
 
-                <!-- Return -->
+                <!-- RETURN -->
                 <form action="{{ route('validasi.return', $item->id) }}" method="POST">
                     @csrf
-                    <button onclick="return confirm('Kembalikan ke antrian?')" class="btn-secondary">
+                    <button type="submit" class="btn gray"
+                        onclick="return confirm('Kembalikan ke antrian?')">
                         Return
                     </button>
                 </form>
 
             </div>
+
         </div>
 
         @empty
-        <div style="text-align:center; margin-top:30px;">
+        <div class="empty">
             <h4>Tidak ada donasi yang perlu divalidasi</h4>
         </div>
         @endforelse
 
-        <!-- Pagination -->
         <div class="pagination">
-            <span>Total: {{ count($donations) }} data</span>
+            Total: {{ $donations->count() }} data
         </div>
 
     </div>
