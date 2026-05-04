@@ -40,7 +40,7 @@ class DonasiMakananController extends Controller
         }
 
         // 3. Simpan data ke database
-        DonasiMakananController::create($validatedData);
+        DonasiMakanan::create($validatedData);
 
         // 4. Redirect kembali dengan pesan sukses
         return redirect()->route('dashboard')->with('success', 'Berhasil! Donasi baru telah ditambahkan dan sedang menunggu kurasi.');

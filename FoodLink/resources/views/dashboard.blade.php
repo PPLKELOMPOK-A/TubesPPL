@@ -44,11 +44,23 @@
             Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari <strong>SENIN s.d. MINGGU Pukul 08.00 - 20.00 WIB</strong>. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
         </div>
 
-        {{-- KODE NOTIFIKASI SUKSES DITAMBAHKAN DI SINI --}}
+        {{-- KODE NOTIFIKASI SUKSES DENGAN LOGIKA HILANG 5 DETIK --}}
         @if(session('success'))
-            <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #c3e6cb; font-weight: 500;">
+            <div id="success-alert" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #c3e6cb; font-weight: 500; transition: opacity 0.5s ease;">
                 <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> {{ session('success') }}
             </div>
+
+            <script>
+                setTimeout(function() {
+                    var alertBox = document.getElementById('success-alert');
+                    if (alertBox) {
+                        alertBox.style.opacity = '0'; // Animasi memudar
+                        setTimeout(function() {
+                            alertBox.style.display = 'none'; // Menghilangkan elemen dari halaman
+                        }, 500); // Tunggu animasi 0.5 detik selesai
+                    }
+                }, 5000); // 5000 milidetik = 5 detik
+            </script>
         @endif
 
         <div class="action-bar">

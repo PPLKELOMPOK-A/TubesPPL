@@ -1,3 +1,4 @@
+<?php
 // app/Models/DonasiMakanan.php
 
 namespace App\Models;
