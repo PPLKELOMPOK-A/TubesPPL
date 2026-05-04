@@ -68,7 +68,8 @@
         
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
         
-        .profile-section { display: flex; align-items: center; gap: 12px; }
+        .profile-section { display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .profile-section:hover { opacity: 0.8; } /* Sedikit efek hover agar terasa bisa diklik */
         
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
 
@@ -85,14 +86,13 @@
         
         .search-wrapper i { position: absolute; left: 15px; top: 14px; color: #A0A0A0; }
         
-        /* --- DIPERBAIKI: Padding diubah agar tingginya sejajar --- */
         .btn-filter { padding: 12px 25px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: #444; }
 
-        /* --- FILTER DROPDOWN UI (TAMBAHAN BARU) --- */
+        /* --- FILTER DROPDOWN UI --- */
         .filter-wrapper { position: relative; }
         
         .filter-dropdown {
-            display: none; /* Disembunyikan secara default */
+            display: none; 
             position: absolute;
             top: 115%;
             right: 0;
@@ -104,9 +104,9 @@
             z-index: 100;
             overflow: hidden;
         }
-        .filter-dropdown.show { display: block; /* Ditampilkan saat diklik */ }
+        .filter-dropdown.show { display: block; }
         .filter-header {
-            background-color: #563e21; /* Cokelat gelap */
+            background-color: #563e21; 
             color: #ffffff;
             text-align: center;
             padding: 12px;
@@ -179,10 +179,12 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            <div class="profile-section">
+            
+            <!-- PERUBAHAN: Tag <div> diganti jadi <a> dan ditambahkan href agar bisa diklik -->
+            <a href="{{ route('profil') }}" class="profile-section" style="text-decoration: none; cursor: pointer;">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">{{ Auth::user()->name ?? 'User' }}</span>
                 <img src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User">
-            </div>
+            </a>
         </div>
 
         <div class="container">

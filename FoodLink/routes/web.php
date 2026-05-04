@@ -173,5 +173,46 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
         })->name('admin.donasi.delete');
 
+
+    // ==========================================
+    // --- ROUTE PROFIL USER ---
+    // ==========================================
+    Route::get('/profil', function () {
+        // Mengarahkan ke file resources/views/profil.blade.php
+        return view('profil');
+    })->name('profil');
+
+    // ROUTE HALAMAN EDIT PROFIL
+    Route::get('/profil/edit', function () {
+        // Mengarahkan ke file resources/views/edit-profil.blade.php
+        return view('edit-profil'); 
+    })->name('admin.profil.edit');
+
+    // ROUTE PROSES UPDATE PROFIL KESELURUHAN
+    Route::post('/profil/update', function (Request $request) {
+        $user = auth()->user();
+
+        // Cek jika ada foto yang diupload
+        if ($request->hasFile('foto_profil')) {
+            if ($user->foto_profil) { 
+                Storage::disk('public')->delete($user->foto_profil); 
+            }
+            $user->foto_profil = $request->file('foto_profil')->store('profil', 'public');
+        }
+
+        // Simpan data text ke database
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->nik = $request->nik;
+        $user->telepon = $request->telepon;
+        $user->lokasi = $request->lokasi;
+        $user->alamat = $request->alamat;
+
+        $user->save();
+
+        return redirect()->route('profil')->with('success', 'Profil berhasil diperbarui!');
+    })->name('admin.profil.update');
+    // ==========================================
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
