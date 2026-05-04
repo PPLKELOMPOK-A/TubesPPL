@@ -10,16 +10,60 @@ class Donation extends Model
     use HasFactory;
 
     protected $fillable = [
+        // 🔹 DATA LAMA
         'judul',
         'kategori',
         'tanggal',
         'foto',
         'deskripsi',
         'alamat',
-        'status',
         'quantity',
         'food_type',
         'estimated_time',
-        'user_id' // 🔥 WAJIB kalau kamu pakai where user_id
+        'user_id',
+
+        // 🔥 TAMBAHAN UNTUK VALIDASI
+        'status',
+        'validated_by'
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🔥 HELPER VALIDASI (BIAR CLEAN)
+    |--------------------------------------------------------------------------
+    */
+
+    // Scope: data menunggu
+    public function scopeMenunggu($query)
+    {
+        return $query->where('status', 'menunggu');
+    }
+
+    // Scope: disetujui
+    public function scopeDisetujui($query)
+    {
+        return $query->where('status', 'disetujui');
+    }
+
+    // Scope: ditolak
+    public function scopeDitolak($query)
+    {
+        return $query->where('status', 'ditolak');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🔥 RELASI (OPTIONAL)
+    |--------------------------------------------------------------------------
+    */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function validator()
+    {
+        return $this->belongsTo(User::class, 'validated_by');
+    }
 }

@@ -6,52 +6,57 @@ use Illuminate\Http\Request;
 
 class BuktiDonasiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $donasi = collect([
-            (object)[
-                'judul' => 'Hari Anak Nasional - Panti Bunda Kasih',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi1.jpg'
+        $donasiList = collect([
+            [
+                "id" => 1,
+                "judul" => "Hari Anak Nasional - Panti Bunda Kasih",
+                "organisasi" => "Organisasi (Yayasan)",
+                "tanggal" => "Kamis, 30 Mei 2025",
+                "gambar" => "https://via.placeholder.com/72x54?text=Img"
             ],
-            (object)[
-                'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi2.jpg'
+            [
+                "id" => 2,
+                "judul" => "Program Makan Sehat - Yayasan Peduli Sesama",
+                "organisasi" => "Organisasi (Yayasan)",
+                "tanggal" => "Kamis, 30 Mei 2025",
+                "gambar" => "https://via.placeholder.com/72x54?text=Img"
             ],
-            (object)[
-                'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi3.jpg'
+            [
+                "id" => 3,
+                "judul" => "Donasi Kasih Natal - Gereja Santo Paulus",
+                "organisasi" => "Organisasi (Yayasan)",
+                "tanggal" => "Kamis, 30 Mei 2025",
+                "gambar" => "https://via.placeholder.com/72x54?text=Img"
             ],
-            (object)[
-                'judul' => 'Jumat Berkah - Masjid Agung',
-                'kategori' => 'Kegiatan keagamaan',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi4.jpg'
+            [
+                "id" => 4,
+                "judul" => "Jumat Berkah - Masjid Agung",
+                "organisasi" => "Kegiatan keagamaan",
+                "tanggal" => "Kamis, 30 Mei 2025",
+                "gambar" => "https://via.placeholder.com/72x54?text=Img"
+            ],
+            [
+                "id" => 5,
+                "judul" => "Hari Anak Nasional - Yayasan Sejahtera",
+                "organisasi" => "Organisasi (Yayasan)",
+                "tanggal" => "Kamis, 30 Mei 2025",
+                "gambar" => "https://via.placeholder.com/72x54?text=Img"
             ],
         ]);
 
-        return view('bukti-donasi.index', compact('donasi'));
+        $search = $request->get('search');
+
+        if ($search) {
+            $donasiList = $donasiList->filter(function ($item) use ($search) {
+                return str_contains(strtolower($item['judul']), strtolower($search)) ||
+                       str_contains(strtolower($item['organisasi']), strtolower($search)) ||
+                       str_contains(strtolower($item['tanggal']), strtolower($search));
+            })->values();
+        }
+
+        return view('bukti-donasi', compact('donasiList', 'search'));
+        return view('detail-bukti-donasi', compact('data'));
     }
-
-    public function show($id)
-{
-    $data = (object)[
-        'judul' => 'Bukti Penyelesaian Donasi',
-        'deskripsi' => 'Penyaluran donasi dilakukan kepada anak-anak panti asuhan dalam rangka Hari Anak Nasional',
-        'foto_utama' => 'donasi-utama.jpg',
-        'galeri' => [
-            'donasi1.jpg',
-            'donasi2.jpg',
-            'donasi3.jpg',
-            'donasi4.jpg'
-        ]
-    ];
-
-    return view('detailbuktipenyelesaiandonasi', compact('data'));
-}
 }

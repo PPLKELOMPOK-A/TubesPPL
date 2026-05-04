@@ -8,8 +8,37 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
+
+    public function showLogin() {
+        return view('auth.login');
+    }
+
     public function showRegister() {
         return view('auth.register');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials, $request->has('remember'))) {
+
+            $request->session()->regenerate();
+
+            // === PERBAIKAN DI SINI ===
+            // Jika role adalah admin, arahkan ke dashboard admin
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Jika user biasa, arahkan ke dashboard user
+            return redirect('/dashboard');
+        }
+
+        return back()->with('error', 'Email atau password salah');
     }
 
     public function register(Request $request) {
@@ -23,7 +52,7 @@ class AuthController extends Controller {
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', 
+            'role' => 'user',
         ]);
 
         Auth::login($user);
