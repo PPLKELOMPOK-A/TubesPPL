@@ -98,14 +98,16 @@
             </a>
 
             <div class="header-info">
-                <h1>{{ $data['judul'] }}</h1>
-                <span class="category">{{ $data['kategori'] }}</span>
-                <p class="date">{{ \Carbon\Carbon::parse($data['tanggal'])->translatedFormat('l, d F Y') }}</p>
+                <!-- DIUBAH: Menggunakan ->judul -->
+                <h1>{{ $data->judul }}</h1>
+                <span class="category">{{ $data->kategori }}</span>
+                <p class="date">{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}</p>
             </div>
 
             <div class="image-container">
-                @if(!empty($data['foto']))
-                    <img src="{{ asset('storage/' . $data['foto']) }}" alt="Foto Donasi">
+                <!-- DIUBAH: Menggunakan ->foto -->
+                @if(!empty($data->foto))
+                    <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto Donasi">
                 @else
                     <img src="https://via.placeholder.com/450x300/f5f5f5/cccccc?text=Belum+Ada+Foto" alt="Donasi">
                 @endif
@@ -113,18 +115,26 @@
 
             <div class="content-section">
                 <h3 class="section-title">Deskripsi Kegiatan</h3>
-                <p class="section-text">{{ $data['deskripsi'] }}</p>
+                <!-- DIUBAH: Menggunakan ->deskripsi -->
+                <p class="section-text">{{ $data->deskripsi }}</p>
             </div>
 
             <div class="content-section">
                 <h3 class="section-title">Alamat</h3>
-                <p class="section-text">{{ $data['alamat'] }}</p>
+                <!-- DIUBAH: Menggunakan ->alamat -->
+                <p class="section-text">{{ $data->alamat }}</p>
             </div>
 
             <div class="footer-actions">
-                <button class="btn btn-hapus">Hapus</button>
-                <!-- MEMBAWA ID AGAR EDIT MENGARAH KE DATA YANG BENAR -->
-                <a href="{{ route('admin.donasi.edit', ['id' => $data['id']]) }}" class="btn btn-edit">Edit</a>
+                
+                <!-- PERUBAHAN: Tombol Hapus dibungkus Form agar berfungsi ke route hapus -->
+                <form action="{{ route('admin.donasi.delete', ['id' => $data->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
+                    @csrf
+                    <button type="submit" class="btn btn-hapus">Hapus</button>
+                </form>
+
+                <!-- DIUBAH: Menggunakan ->id -->
+                <a href="{{ route('admin.donasi.edit', ['id' => $data->id]) }}" class="btn btn-edit">Edit</a>
             </div>
         </div>
     </div>
