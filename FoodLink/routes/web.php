@@ -190,6 +190,8 @@ Route::middleware(['auth'])->group(function () {
         // --- FITUR ADMIN LAINNYA ---
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
+        
+        // INTEGRASI FITUR DASHBOARD LAPORAN
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
     }); // End Prefix Admin Group

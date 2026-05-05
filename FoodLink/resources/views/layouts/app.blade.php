@@ -69,6 +69,11 @@
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
+                
+                {{-- MENU DASHBOARD LAPORAN (BARU DITAMBAHKAN) --}}
+                <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
+                </a>
 
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
             @else
