@@ -1,29 +1,5 @@
 <?php
 
-// namespace App\Models;
-
-// use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Illuminate\Database\Eloquent\Model;
-
-// class Donation extends Model
-// {
-//     use HasFactory;
-
-//     protected $fillable = [
-//         'judul',
-//         'kategori',
-//         'tanggal',
-//         'foto',
-//         'deskripsi',
-//         'alamat',
-//         'status',
-//         'quantity',
-//         'food_type',
-//         'estimated_time',
-//         'user_id' // 🔥 WAJIB kalau kamu pakai where user_id
-//     ];
-// }
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,7 +13,6 @@ class Donation extends Model {
 
     // 2. Sesuaikan nama kolom persis seperti yang ada di phpMyAdmin
     protected $fillable = [
-<<<<<<< HEAD
         // 🔹 DATA LAMA
         'judul',
         'kategori',
@@ -52,15 +27,14 @@ class Donation extends Model {
 
         // 🔥 TAMBAHAN UNTUK VALIDASI
         'status',
-        'validated_by'
-=======
+        'validated_by',
+
+        // 🔹 DATA BARU
         'judul_donasi', 
         'kategori_penerima', 
         'tanggal_kegiatan', 
         'foto_kegiatan', 
-        'deskripsi', 
-        'alamat_penyaluran'
->>>>>>> 4a2a289fba580d83b2e5be2144b22ed64b8402ff
+        'alamat_penyaluran',
     ];
 
     /*
@@ -89,7 +63,7 @@ class Donation extends Model {
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 RELASI (OPTIONAL)
+    | 🔥 RELASI
     |--------------------------------------------------------------------------
     */
 
