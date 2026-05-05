@@ -55,10 +55,7 @@ Route::middleware('auth')->group(function () {
         // DASHBOARD ADMIN
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            
-            // PERBAIKAN: Gunakan nama variabel $semuaDonasi agar cocok dengan file Blade
             $semuaDonasi = Donation::orderBy('created_at', 'desc')->get();
-            
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
@@ -73,6 +70,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/donasi/tambah', function () {
             return view('admin.tambah-donasi');
         })->name('donasi.tambah');
+
+        // 🔥 PERBAIKAN: Tambahkan route detail agar tidak error RouteNotFound
+        Route::get('/donasi/detail/{id}', function ($id) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            $data = Donation::findOrFail($id);
+            return view('admin.detail-donasi', compact('data'));
+        })->name('donasi.detail');
 
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : null;
