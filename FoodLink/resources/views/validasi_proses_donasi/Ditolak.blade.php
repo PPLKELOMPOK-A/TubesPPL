@@ -1,74 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Donasi Ditolak</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container">
+@section('title', 'Donasi Ditolak')
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h3>Admin</h3>
-        <ul>
-            <li><a href="{{ route('validasi.index') }}">Validasi Donasi</a></li>
-            <li><a href="{{ route('validasi.disetujui') }}">Disetujui</a></li>
-            <li class="active">Ditolak</li>
-        </ul>
+@section('content')
+<div class="max-w-7xl mx-auto">
+
+    <h1 class="text-2xl font-bold mb-8 text-gray-800">
+        Validasi Proses Donasi
+    </h1>
+
+    <!-- TABS -->
+    <div class="flex space-x-2 mb-6">
+        <a href="{{ route('validasi.index') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Menunggu Validasi
+        </a>
+
+        <a href="{{ route('validasi.disetujui') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Disetujui
+        </a>
+
+        <a href="{{ route('validasi.ditolak') }}"
+           class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold">
+            Ditolak
+        </a>
     </div>
 
-    <!-- Content -->
-    <div class="content">
-        <h2>Donasi Ditolak</h2>
-        <p class="sub">Daftar donasi yang ditolak</p>
-
+    <!-- LIST -->
+    <div class="space-y-4">
         @forelse($donations as $item)
-        <div class="card">
 
-            <!-- Gambar -->
-            <img src="{{ asset('images/default.png') }}" class="thumb">
+        <div class="bg-white p-5 rounded-2xl flex gap-6 shadow-sm border">
 
-            <!-- Info -->
-            <div class="info">
-                <h4>{{ $item->judul }}</h4>
-                <p>{{ $item->kategori }}</p>
-                <small>{{ $item->created_at->format('d M Y H:i') }}</small>
-
-                <br><br>
-
-                <!-- Badge -->
-                <span style="background:red;color:white;padding:4px 10px;border-radius:5px;">
-                    DITOLAK
-                </span>
+            <!-- IMAGE -->
+            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl overflow-hidden">
+                <img src="{{ $item->foto ? asset('storage/'.$item->foto) : 'https://cdn-icons-png.flaticon.com/512/3081/3081840.png' }}"
+                     class="w-full h-full object-cover">
             </div>
 
-            <!-- Action -->
-            <div class="action">
-                <form action="{{ route('validasi.return', $item->id) }}" method="POST">
+            <!-- INFO -->
+            <div class="flex-1">
+
+                <div class="flex justify-between">
+                    <h2 class="font-bold text-gray-800">
+                        {{ $item->judul }}
+                    </h2>
+
+                    <span class="bg-red-400 text-white text-xs px-4 py-1 rounded-full">
+                        DITOLAK
+                    </span>
+                </div>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Donatur: {{ $item->kategori ?? 'Umum' }}
+                </p>
+
+                <p class="text-xs text-gray-400">
+                    {{ optional($item->created_at)->format('d M Y H:i') }}
+                </p>
+
+                <!-- BADGE -->
+                <div class="flex gap-2 mt-3">
+                    <span class="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded">
+                        {{ $item->quantity }} Porsi
+                    </span>
+
+                    <span class="bg-gray-400 text-white text-xs px-3 py-1 rounded">
+                        Layak konsumsi
+                    </span>
+                </div>
+
+                <!-- KETERANGAN PENOLAKAN -->
+                <div class="bg-red-50 border border-red-200 p-3 rounded-lg mt-4 text-sm text-red-600">
+                    {{ $item->keterangan_tolak ?? 'Donasi tidak memenuhi standar kelayakan atau sudah kadaluarsa.' }}
+                </div>
+
+                <!-- ACTION -->
+                <form action="{{ route('validasi.return', $item->id) }}" method="POST" class="mt-4">
                     @csrf
-                    <button onclick="return confirm('Kembalikan ke antrian?')" class="btn-secondary">
+                    <button onclick="return confirm('Kembalikan ke antrian?')"
+                            class="bg-gray-600 text-white px-4 py-1 rounded text-sm">
                         Return
                     </button>
                 </form>
-            </div>
 
+            </div>
         </div>
 
         @empty
-        <div style="text-align:center; margin-top:30px;">
-            <h4>Tidak ada donasi yang ditolak</h4>
-        </div>
+            <p class="text-center text-gray-400 py-10">
+                Tidak ada donasi yang ditolak
+            </p>
         @endforelse
-
-        <!-- Info jumlah data -->
-        <div class="pagination">
-            <span>Total: {{ $donations->count() }} data</span>
-        </div>
-
     </div>
-</div>
 
-</body>
-</html>
+</div>
+@endsection

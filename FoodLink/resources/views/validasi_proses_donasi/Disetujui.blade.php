@@ -1,74 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Donasi Disetujui</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container">
+@section('title', 'Donasi Disetujui')
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h3>Admin</h3>
-        <ul>
-            <li><a href="{{ route('validasi.index') }}">Validasi Donasi</a></li>
-            <li class="active">Disetujui</li>
-            <li><a href="{{ route('validasi.ditolak') }}">Ditolak</a></li>
-        </ul>
+@section('content')
+<div class="max-w-7xl mx-auto">
+
+    <h1 class="text-2xl font-bold mb-8 text-gray-800">
+        Validasi Proses Donasi
+    </h1>
+
+    <!-- TABS -->
+    <div class="flex space-x-2 mb-6">
+        <a href="{{ route('validasi.index') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Menunggu Validasi
+        </a>
+
+        <a href="{{ route('validasi.disetujui') }}"
+           class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold">
+            Disetujui
+        </a>
+
+        <a href="{{ route('validasi.ditolak') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Ditolak
+        </a>
     </div>
 
-    <!-- Content -->
-    <div class="content">
-        <h2>Donasi Disetujui</h2>
-        <p class="sub">Daftar donasi yang telah disetujui</p>
-
+    <!-- LIST -->
+    <div class="space-y-4">
         @forelse($donations as $item)
-        <div class="card">
 
-            <!-- Gambar -->
-            <img src="{{ asset('images/default.png') }}" class="thumb">
+        <div class="bg-white p-5 rounded-2xl flex gap-6 shadow-sm border">
 
-            <!-- Info -->
-            <div class="info">
-                <h4>{{ $item->nama_makanan }}</h4>
-                <p>{{ $item->donatur }}</p>
-                <small>{{ $item->created_at->format('d M Y H:i') }}</small>
-
-                <br><br>
-
-                <!-- Badge -->
-                <span style="background:green;color:white;padding:4px 10px;border-radius:5px;">
-                    DISETUJUI
-                </span>
+            <!-- IMAGE -->
+            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl overflow-hidden">
+                <img src="{{ $item->foto ? asset('storage/'.$item->foto) : 'https://cdn-icons-png.flaticon.com/512/3081/3081840.png' }}"
+                     class="w-full h-full object-cover">
             </div>
 
-            <!-- Action -->
-            <div class="action">
-                <form action="{{ route('validasi.return', $item->id) }}" method="POST">
+            <!-- INFO -->
+            <div class="flex-1">
+                <div class="flex justify-between">
+                    <h2 class="font-bold text-gray-800">
+                        {{ $item->judul }}
+                    </h2>
+
+                    <span class="bg-green-400 text-white text-xs px-4 py-1 rounded-full">
+                        DISETUJUI
+                    </span>
+                </div>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Donatur: {{ $item->kategori ?? 'Umum' }}
+                </p>
+
+                <p class="text-xs text-gray-400">
+                    {{ optional($item->created_at)->format('d M Y H:i') }}
+                </p>
+
+                <!-- BADGE -->
+                <div class="flex gap-2 mt-3">
+                    <span class="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded">
+                        {{ $item->quantity }} Porsi
+                    </span>
+
+                    <span class="bg-gray-400 text-white text-xs px-3 py-1 rounded">
+                        Layak konsumsi
+                    </span>
+                </div>
+
+                <!-- ACTION -->
+                <form action="{{ route('validasi.return', $item->id) }}" method="POST" class="mt-4">
                     @csrf
-                    <button onclick="return confirm('Kembalikan ke antrian?')" class="btn-secondary">
+                    <button onclick="return confirm('Kembalikan ke antrian?')"
+                            class="bg-gray-600 text-white px-4 py-1 rounded text-sm">
                         Return
                     </button>
                 </form>
-            </div>
 
+            </div>
         </div>
 
         @empty
-        <div style="text-align:center; margin-top:30px;">
-            <h4>Tidak ada donasi yang disetujui</h4>
-        </div>
+            <p class="text-center text-gray-400 py-10">
+                Tidak ada donasi yang disetujui
+            </p>
         @endforelse
-
-        <!-- Info jumlah data -->
-        <div class="pagination">
-            <span>Total: {{ count($donations) }} data</span>
-        </div>
-
     </div>
-</div>
 
-</body>
-</html>
+</div>
+@endsection

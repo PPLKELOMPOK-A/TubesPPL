@@ -11,30 +11,18 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR (DISESUAIKAN) --- */
+        /* --- SIDEBAR --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
         .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
-        
-        .nav-group { flex-grow: 1; padding: 0 15px; /* Memberi jarak agar tidak penuh ke pinggir */ }
-        
+        .nav-group { flex-grow: 1; padding: 0 15px; }
         .nav-item { 
-            display: flex; 
-            align-items: center; 
-            padding: 12px 20px; 
-            text-decoration: none; 
-            color: #4A4A4A; 
-            font-size: 14px; 
-            font-weight: 500; 
-            gap: 15px; 
-            margin-bottom: 6px; 
-            border-radius: 10px; /* Sudut kotak sewajarnya */
-            transition: 0.2s;
+            display: flex; align-items: center; padding: 12px 20px; text-decoration: none; 
+            color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; 
+            margin-bottom: 6px; border-radius: 10px; transition: 0.2s;
         }
-        
         .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; font-weight: 600; }
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         .nav-item.active i { color: #FFFFFF; }
-        
         .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
 
         .logout-section { padding: 25px 30px; margin-top: auto; }
@@ -73,6 +61,7 @@
         
         .btn-kembali { background: white; border: 1px solid #D0D0D0; color: #444; }
         .btn-hapus { background: #fdfdfd; border: 1px solid #d9534f; color: #d9534f; }
+        .btn-hapus:hover { background: #d9534f; color: white; }
         .btn-edit { background: #6B4F2A; color: white; border: none; }
         .btn-edit:hover { background-color: #563e21; }
     </style>
@@ -98,8 +87,8 @@
 
     <div class="main-panel">
         <div class="top-bar">
-            <i class="fa-regular fa-bell"></i>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            <i class="fa-regular fa-bell" style="cursor: pointer;"></i>
+            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar" alt="User">
         </div>
 
         <div class="container">
@@ -137,7 +126,12 @@
             <div class="footer-actions">
                 <a href="{{ route('admin.dashboard') }}" class="btn btn-kembali">Kembali</a>
                 
-                <button class="btn btn-hapus">Hapus</button>
+                <!-- Gunakan form untuk hapus demi keamanan (CSRF protection) -->
+                <form action="#" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus donasi ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-hapus">Hapus</button>
+                </form>
                 
                 <a href="{{ route('admin.donasi.edit') }}" class="btn btn-edit">Edit</a>
             </div>
