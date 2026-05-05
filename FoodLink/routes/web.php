@@ -55,8 +55,11 @@ Route::middleware('auth')->group(function () {
         // DASHBOARD ADMIN
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $donations = Donation::orderBy('created_at', 'desc')->get();
-            return view('admin.dashboardAdmin', compact('donations'));
+            
+            // PERBAIKAN: Gunakan nama variabel $semuaDonasi agar cocok dengan file Blade
+            $semuaDonasi = Donation::orderBy('created_at', 'desc')->get();
+            
+            return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
         // VALIDASI DONASI
@@ -66,7 +69,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{id}/tolak', [ValidasiProsesDonasiController::class, 'tolak'])->name('validasi.tolak');
         });
 
-        // CRUD DONASI ADMIN (Gunakan nama 'tambah' agar tidak bentrok dengan user)
+        // CRUD DONASI ADMIN
         Route::get('/donasi/tambah', function () {
             return view('admin.tambah-donasi');
         })->name('donasi.tambah');
@@ -88,7 +91,7 @@ Route::middleware('auth')->group(function () {
         // MODUL ADMIN LAINNYA
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
-        Route::get('/kerjasama-mitra', [DonationController::class, 'index'])->name('mitra.index'); // Sesuaikan controller mitra asli kamu
+        Route::get('/kerjasama-mitra', [DonationController::class, 'index'])->name('mitra.index');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     });
 
