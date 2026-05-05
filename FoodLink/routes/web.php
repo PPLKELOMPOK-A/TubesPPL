@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Cache; // TAMBAHAN BARU: Memanggil fitur Cache
+use App\Models\Donation; // <-- TAMBAHAN: Memanggil Model Database Asli
 
 /*
 |--------------------------------------------------------------------------
@@ -26,85 +26,152 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     
-    Route::get('/dashboard', function () {
+    // --- AREA USER BIASA ---
+    Route::get('/dashboard', function (Request $request) { // <-- PERUBAHAN: Tambah Request untuk Filter
         if (auth()->user()->role === 'admin') { 
             return redirect()->route('admin.dashboard'); 
         }
-        return view('dashboard');
+        
+        $query = Donation::query();
+
+        // Logika Pencarian (Search)
+        if ($request->has('search') && $request->search != '') {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        // Logika Filter Kategori
+        if ($request->has('kategori') && !empty($request->kategori)) {
+            $query->whereIn('kategori', $request->kategori);
+        }
+
+        // Menambahkan pengambilan data donasi agar bisa di-looping di dashboard user
+        $donations = $query->get();
+        return view('dashboard', compact('donations'));
     })->name('dashboard');
+
+    // --- ROUTE DETAIL DONASI UNTUK USER BIASA ---
+    Route::get('/donasi/detail/{id}', function ($id) {
+        if (auth()->user()->role === 'admin') { return redirect('/admin/dashboard'); }
+        
+        // Mengambil data dari Database berdasarkan ID
+        $data = Donation::findOrFail($id);
+        
+        return view('detail-donasi-user', compact('data')); 
+    })->name('user.donasi.detail');
+
 
     // --- AREA KHUSUS ADMIN ---
     Route::prefix('admin')->group(function () {
 
-        // --- FUNGSI BANTUAN UNTUK SIMULASI DATABASE MENGGUNAKAN CACHE ---
-        // Cache tidak akan terhapus saat user logout
-        $initDonasiDB = function() {
-            if (!Cache::has('donasi_db')) {
-                Cache::forever('donasi_db', [
-                    1 => ['id' => 1, 'judul' => 'Hari Anak Nasional - Panti Bunda Kasih', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-13', 'foto' => null, 'deskripsi' => 'Tersedia 20 paket nasi kotak ayam bakar sisa acara syukuran siang ini. Kondisi masih sangat baik, bersih, dan higienis. Lengkap dengan sayur urap dan sambal.', 'alamat' => 'Jl. Bougenville Timur No. 22'],
-                    2 => ['id' => 2, 'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null, 'deskripsi' => 'Tersedia donasi sayur dan lauk pauk sehat bernutrisi tinggi untuk anak-anak.', 'alamat' => 'Jl. Melati No. 10'],
-                    3 => ['id' => 3, 'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null, 'deskripsi' => 'Paket sembako dan makanan ringan siap konsumsi untuk menyambut perayaan.', 'alamat' => 'Jl. Gereja Lama No. 5'],
-                    4 => ['id' => 4, 'judul' => 'Jumat Berkah - Masjid Agung', 'kategori' => 'Kegiatan Keagamaan', 'tanggal' => '2026-05-30', 'foto' => null, 'deskripsi' => '100 porsi nasi bungkus untuk dibagikan kepada masyarakat yang membutuhkan ba\'da jumat.', 'alamat' => 'Jl. Masjid Raya No. 1'],
-                    5 => ['id' => 5, 'judul' => 'Hari Anak Nasional - Yayasan Sejahtera', 'kategori' => 'Organisasi (Yayasan)', 'tanggal' => '2026-05-30', 'foto' => null, 'deskripsi' => 'Kue kering dan susu kotak utuh untuk anak-anak yayasan sejahtera.', 'alamat' => 'Jl. Kesejahteraan No. 99']
-                ]);
-            }
-            return Cache::get('donasi_db');
-        };
-
         // DASHBOARD ADMIN
-        Route::get('/dashboard', function () use ($initDonasiDB) {
+        Route::get('/dashboard', function (Request $request) { // <-- PERUBAHAN: Tambah Request untuk Filter
             if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
-            $semuaDonasi = $initDonasiDB();
+            
+            $query = Donation::query();
+
+            // Logika Pencarian (Search)
+            if ($request->has('search') && $request->search != '') {
+                $query->where('judul', 'like', '%' . $request->search . '%');
+            }
+
+            // Logika Filter Kategori
+            if ($request->has('kategori') && !empty($request->kategori)) {
+                $query->whereIn('kategori', $request->kategori);
+            }
+
+            // Mengambil semua data dari Database berdasarkan filter
+            $semuaDonasi = $query->get();
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('admin.dashboard');
 
-        // DETAIL DONASI (Berdasarkan ID)
-        Route::get('/donasi/detail/{id}', function ($id) use ($initDonasiDB) {
+        // DETAIL DONASI
+        Route::get('/donasi/detail/{id}', function ($id) {
             if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
-            $db = $initDonasiDB();
-            if (!isset($db[$id])) abort(404);
             
-            $data = $db[$id];
+            $data = Donation::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
         })->name('admin.donasi.detail');
 
-        // EDIT DONASI (Berdasarkan ID)
-        Route::get('/donasi/edit/{id}', function ($id) use ($initDonasiDB) {
+        // EDIT DONASI
+        Route::get('/donasi/edit/{id}', function ($id) {
             if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
-            $db = $initDonasiDB();
-            if (!isset($db[$id])) abort(404);
             
-            $data = $db[$id];
+            $data = Donation::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
         })->name('admin.donasi.edit');
 
         // UPDATE DONASI
-        Route::post('/donasi/edit/{id}', function (Request $request, $id) use ($initDonasiDB) {
+        Route::post('/donasi/edit/{id}', function (Request $request, $id) {
             if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
             
-            $db = $initDonasiDB();
-            if (!isset($db[$id])) abort(404);
+            // Mencari data yang akan di-update di Database
+            $donasi = Donation::findOrFail($id);
 
-            $fotoPath = $db[$id]['foto'];
+            $fotoPath = $donasi->foto;
 
             if ($request->hasFile('foto')) {
                 if ($fotoPath) { Storage::disk('public')->delete($fotoPath); }
                 $fotoPath = $request->file('foto')->store('donasi', 'public');
             }
 
-            $db[$id]['judul'] = $request->judul;
-            $db[$id]['kategori'] = $request->kategori;
-            $db[$id]['tanggal'] = $request->tanggal;
-            $db[$id]['foto'] = $fotoPath;
-            $db[$id]['deskripsi'] = $request->deskripsi;
-            $db[$id]['alamat'] = $request->alamat;
-
-            // MENGGANTI SESSION MENJADI CACHE AGAR PERMANEN
-            Cache::forever('donasi_db', $db);
+            // Menyimpan perubahan ke Database
+            $donasi->update([
+                'judul' => $request->judul,
+                'kategori' => $request->kategori,
+                'tanggal' => $request->tanggal,
+                'foto' => $fotoPath,
+                'deskripsi' => $request->deskripsi,
+                'alamat' => $request->alamat
+            ]);
             
             return redirect()->route('admin.donasi.detail', ['id' => $id])->with('success', 'Donasi berhasil diperbarui!');
         })->name('admin.donasi.update');
     });
+
+    // FORM TAMBAH DONASI
+        Route::get('/donasi/tambah', function () {
+            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+            return view('admin.tambah-donasi');
+        })->name('admin.donasi.create');
+
+        // PROSES SIMPAN DONASI KE DATABASE
+        Route::post('/donasi/tambah', function (Request $request) {
+            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('donasi', 'public');
+            }
+
+            // Syntax bawaan Laravel untuk Create Data
+            Donation::create([
+                'judul' => $request->judul,
+                'kategori' => $request->kategori,
+                'tanggal' => $request->tanggal,
+                'foto' => $fotoPath,
+                'deskripsi' => $request->deskripsi,
+                'alamat' => $request->alamat
+            ]);
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Donasi baru berhasil ditambahkan!');
+        })->name('admin.donasi.store');
+
+        // HAPUS DONASI
+        Route::post('/donasi/hapus/{id}', function ($id) {
+            if (auth()->user()->role !== 'admin') { return redirect('/dashboard'); }
+            
+            $donasi = App\Models\Donation::findOrFail($id);
+            
+            // Hapus foto dari folder storage jika fotonya ada
+            if ($donasi->foto) {
+                Illuminate\Support\Facades\Storage::disk('public')->delete($donasi->foto);
+            }
+            
+            // Hapus datanya dari Database
+            $donasi->delete();
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
+        })->name('admin.donasi.delete');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
