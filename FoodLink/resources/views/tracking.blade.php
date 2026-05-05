@@ -61,8 +61,44 @@
 
      <!-- Main Content -->
     <main class="flex-1 p-8">
+<<<<<<< HEAD
 
         {{-- ================= HEADER ================= --}}
+=======
+        @php
+            use Illuminate\Pagination\LengthAwarePaginator;
+
+            // === DATA DUMMY ===
+            $allDonations = [
+                (object)['status'=>'menunggu','judul'=>'Nasi Kotak A','quantity'=>50,'food_type'=>'Nasi + Ayam','alamat'=>'Jl. Merpati No. 12','estimated_time'=>30],
+                (object)['status'=>'dalam_perjalanan','judul'=>'Snack Box B','quantity'=>20,'food_type'=>'Snack + Minuman','alamat'=>'Jl. Kenari No. 7','estimated_time'=>15],
+                (object)['status'=>'terkirim','judul'=>'Makanan Siap Saji C','quantity'=>10,'food_type'=>'Mie + Telur','alamat'=>'Jl. Anggrek No. 21','estimated_time'=>0],
+                (object)['status'=>'menunggu','judul'=>'Paket Lauk D','quantity'=>25,'food_type'=>'Ayam + Sayur','alamat'=>'Jl. Melati No. 3','estimated_time'=>20],
+                (object)['status'=>'dalam_perjalanan','judul'=>'Bento E','quantity'=>15,'food_type'=>'Bento + Buah','alamat'=>'Jl. Cempaka No. 9','estimated_time'=>10],
+                (object)['status'=>'terkirim','judul'=>'Makanan Siap Saji F','quantity'=>30,'food_type'=>'Nasi + Ikan','alamat'=>'Jl. Flamboyan No. 5','estimated_time'=>5]
+            ];
+
+            // === PAGINATION MANUAL ===
+            $page = request()->get('page', 1);
+            $perPage = 2;
+            $offset = ($page - 1) * $perPage;
+            $itemsForCurrentPage = array_slice($allDonations, $offset, $perPage);
+
+            $donations = new LengthAwarePaginator(
+                $itemsForCurrentPage,
+                count($allDonations),
+                $perPage,
+                $page,
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+
+            // Statistik
+            $total = count($allDonations);
+            $terkirim = count(array_filter($allDonations, fn($d) => $d->status === 'terkirim'));
+            $dalamPerjalanan = count(array_filter($allDonations, fn($d) => $d->status === 'dalam_perjalanan'));
+        @endphp
+
+>>>>>>> 1702c37bbe994028f2c3cee2b01135d95a34769d
         <header class="mb-8">
             <h1 class="text-2xl font-semibold mb-2">Tracking Pengiriman</h1>
             <p class="text-gray-600">Monitor pengiriman donasi makanan secara Real-Time</p>
@@ -95,6 +131,7 @@
         <div class="grid grid-cols-3 gap-4 mb-8">
             <div class="p-4 rounded-xl shadow text-center" style="background-color: #FFF2E0;">
                 <p class="text-sm text-gray-600">TOTAL DONASI</p>
+<<<<<<< HEAD
                 <p class="text-xl font-bold">{{ $total }}</p>
             </div>
 
@@ -106,6 +143,17 @@
             <div class="p-4 rounded-xl shadow text-center" style="background-color: #FFF2E0;">
                 <p class="text-sm text-gray-600">DALAM PERJALANAN</p>
                 <p class="text-xl font-bold">{{ $dalamPerjalanan }}</p>
+=======
+                <p class="text-xl font-bold" id="total-donasi">{{ $total }}</p>
+            </div>
+            <div class="p-4 rounded-xl shadow text-center" style="background-color: #FFF2E0;">
+                <p class="text-sm text-gray-600">TERKIRIM</p>
+                <p class="text-xl font-bold" id="terkirim">{{ $terkirim }}</p>
+            </div>
+            <div class="p-4 rounded-xl shadow text-center" style="background-color: #FFF2E0;">
+                <p class="text-sm text-gray-600">DALAM PERJALANAN</p>
+                <p class="text-xl font-bold" id="dalam-perjalanan">{{ $dalamPerjalanan }}</p>
+>>>>>>> 1702c37bbe994028f2c3cee2b01135d95a34769d
             </div>
         </div>
 

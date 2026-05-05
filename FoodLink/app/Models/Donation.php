@@ -5,26 +5,37 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Donation extends Model
-{
+class Donation extends Model {
     use HasFactory;
 
+    // 1. Kasih tahu Laravel untuk pakai tabel ini
+    protected $table = 'kegiatan_donasis';
+
+    // 2. Sesuaikan nama kolom persis seperti yang ada di phpMyAdmin
     protected $fillable = [
-    'judul',
-    'kategori',
-    'tanggal',
-    'foto',
-    'deskripsi',
-    'alamat',
-    'quantity',
-    'food_type',
-    'estimated_time',
-    'user_id',
-    'status',
-    'validated_by',
-    'latitude',  // Tambahkan ini
-    'longitude', // Tambahkan ini
-];
+        // 🔹 DATA LAMA
+        'judul',
+        'kategori',
+        'tanggal',
+        'foto',
+        'deskripsi',
+        'alamat',
+        'quantity',
+        'food_type',
+        'estimated_time',
+        'user_id',
+
+        // 🔥 TAMBAHAN UNTUK VALIDASI
+        'status',
+        'validated_by',
+
+        // 🔹 DATA BARU
+        'judul_donasi', 
+        'kategori_penerima', 
+        'tanggal_kegiatan', 
+        'foto_kegiatan', 
+        'alamat_penyaluran',
+    ];
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +63,7 @@ class Donation extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 RELASI (OPTIONAL)
+    | 🔥 RELASI
     |--------------------------------------------------------------------------
     */
 
@@ -65,8 +76,4 @@ class Donation extends Model
     {
         return $this->belongsTo(User::class, 'validated_by');
     }
-    public function courier()
-{
-    return $this->belongsTo(Courier::class);
-}
 }
