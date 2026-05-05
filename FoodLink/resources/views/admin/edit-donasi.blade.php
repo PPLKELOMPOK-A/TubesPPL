@@ -115,27 +115,32 @@
         </div>
 
         <div class="container">
-            <form action="{{ route('admin.donasi.update') }}" method="POST" enctype="multipart/form-data">
+            <!-- REVISI 1: FORM ACTION SEKARANG MENGARAH KE ROUTE UPDATE DENGAN ID -->
+            <!-- DIUBAH: $data['id'] -> $data->id -->
+            <form action="{{ route('admin.donasi.update', ['id' => $data->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label>Judul</label>
-                    <input type="text" name="judul" value="{{ $data['judul'] }}">
+                    <!-- DIUBAH: $data['judul'] -> $data->judul -->
+                    <input type="text" name="judul" value="{{ $data->judul }}">
                 </div>
 
                 <div class="form-group">
                     <label>Kategori Penerima</label>
                     <select name="kategori">
-                        <option value="Organisasi (Yayasan)" {{ $data['kategori'] == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
-                        <option value="Kegiatan Keagamaan" {{ $data['kategori'] == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
-                        <option value="Individu" {{ $data['kategori'] == 'Individu' ? 'selected' : '' }}>Individu</option>
+                        <!-- DIUBAH: $data['kategori'] -> $data->kategori -->
+                        <option value="Organisasi (Yayasan)" {{ $data->kategori == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
+                        <option value="Kegiatan Keagamaan" {{ $data->kategori == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
+                        <option value="Individu" {{ $data->kategori == 'Individu' ? 'selected' : '' }}>Individu</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Tanggal</label>
                     <div class="date-container">
-                        <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data['tanggal'] }}">
-                        <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data['tanggal'])->translatedFormat('l, d F Y') }}" readonly>
+                        <!-- DIUBAH: $data['tanggal'] -> $data->tanggal -->
+                        <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data->tanggal }}">
+                        <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}" readonly>
                         <i class="fa-regular fa-calendar-days calendar-icon"></i>
                     </div>
                 </div>
@@ -143,7 +148,8 @@
                 <div class="form-group">
                     <div class="image-container">
                         <div class="preview-box">
-                            <img id="img-preview" src="{{ $data['foto'] ? asset('storage/' . $data['foto']) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
+                            <!-- DIUBAH: $data['foto'] -> $data->foto -->
+                            <img id="img-preview" src="{{ !empty($data->foto) ? asset('storage/' . $data->foto) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
                         </div>
                         <input type="file" id="file-input" name="foto" accept="image/*">
                         <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
@@ -154,16 +160,20 @@
 
                 <div class="form-group">
                     <label>Deskripsi Kegiatan</label>
-                    <textarea name="deskripsi" rows="4">{{ $data['deskripsi'] }}</textarea>
+                    <!-- DIUBAH: $data['deskripsi'] -> $data->deskripsi -->
+                    <textarea name="deskripsi" rows="4">{{ $data->deskripsi }}</textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat</label>
-                    <input type="text" name="alamat" value="{{ $data['alamat'] }}">
+                    <!-- DIUBAH: $data['alamat'] -> $data->alamat -->
+                    <input type="text" name="alamat" value="{{ $data->alamat }}">
                 </div>
 
                 <div class="footer-actions">
-                    <a href="javascript:void(0)" onclick="history.back();" class="btn-base btn-kembali">Kembali</a>
+                    <!-- REVISI 2: TOMBOL KEMBALI MENGARAH KE DETAIL DONASI DENGAN ID YANG SESUAI -->
+                    <!-- DIUBAH: $data['id'] -> $data->id -->
+                    <a href="{{ route('admin.donasi.detail', ['id' => $data->id]) }}" class="btn-base btn-kembali">Kembali</a>
                     <button type="submit" class="btn-simpan btn-base">Simpan</button>
                 </div>
             </form>
