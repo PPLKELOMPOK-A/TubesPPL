@@ -44,7 +44,7 @@ public function updateRating(Request $request, $id)
     // 1. Validasi input
     $request->validate([
         'rating' => 'required|integer|min:1|max:5',
-        'komentar' => 'nullable|string|max:255',
+        'comment' => 'nullable|string|max:255',
     ]);
 
     // 2. Cari data donasinya
@@ -53,11 +53,17 @@ public function updateRating(Request $request, $id)
     // 3. Update datanya
     $donasi->update([
         'rating' => $request->rating,
-        'comment' => $request->komentar,
+        'comment' => $request->comment,
     ]);
 
     // 4. Redirect kembali agar tidak loading terus
     return redirect()->back()->with('success', 'Penilaian berhasil disimpan!');
+}
+public function showBukti($id)
+{
+    $item = \App\Models\Donation::findOrFail($id);
+    // Logika untuk menampilkan bukti, misalnya:
+    return view('bukti-donasi', compact('item'));
 }
 }
        

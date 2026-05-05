@@ -61,20 +61,31 @@ Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])
 Route::get('/bukti-donasi/{id}', [BuktiDonasiController::class, 'show'])
     ->name('bukti-donasi.show');
 
-Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'bukti'])
+Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])
     ->name('bukti-donasi.bukti');
 
 Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti-donasi.index');
 Route::get('/bukti-donasi/{id}', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
 
-Route::get('/riwayat-donasi', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
 Route::post('/donation/rate/{id}', [RiwayatDonationController::class, 'storeRating'])->name('donation.rate');
 
 Route::post('/riwayat-donation/rate', [RiwayatDonationController::class, 'storeRating'])->name('riwayat-donasi.rate');
 Route::get('/tracking', [RiwayatDonationController::class, 'index'])->name('donation.tracking');
 
-Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('donasi.rating');
+Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])
+    ->name('riwayat-donasi.show-bukti');
 
+Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+
+// Rute untuk menampilkan halaman riwayat
+Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+
+// Rute untuk menangani pengiriman rating (Ini yang bikin 404 kalau tidak ada)
+Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+
+// Rute untuk bukti donasi (Agar tidak error 500 seperti sebelumnya)
+Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
     // ================== ADMIN ==================
     Route::prefix('admin')->group(function () {
 

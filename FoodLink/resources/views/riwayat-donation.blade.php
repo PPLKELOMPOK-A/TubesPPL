@@ -135,10 +135,10 @@
                             @endfor
                         </div>
 
-                    @if($item->comment)    
-                        <p class="comment-text">"{{ $item->comment }}"</p>
+                    @if($item->komentar)    
+                        <p class="komentar-text">"{{ $item->komentar }}"</p>
                     @else
-                        <p class="comment-text" style="color: #bbb;">(Tidak ada pesan tambahan)</p>
+                        <p class="komentar-text" style="color: #bbb;">(Tidak ada pesan tambahan)</p>
                     @endif  
                     @else
                         <div class="btn-group">
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Perbaikan Link ke Bukti Donasi -->
-            <a href="{{ route('bukti-donasi.show', $item->id) }}" class="btn-view-proof">Lihat Bukti</a>
+            <a href="#" class="btn-view-proof">Lihat Bukti</a>
         </div>
         @empty
         <div style="text-align: center; padding: 50px; color: #888;">

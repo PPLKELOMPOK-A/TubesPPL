@@ -215,11 +215,7 @@
         <div class="card">
 
             <div class="left">
-                <!-- Gunakan helper asset() untuk mengarah ke folder public/storage -->
-                <img src="{{ asset('storage/' . $item->foto) }}" 
-                alt="Foto Donasi" 
-                style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"
-                onerror="this.src='https://via.placeholder.com/80'">
+                <img src="{{ asset('images/'.$item->foto) }}" class="thumb">
 
                 <div class="info">
                     <h4>{{ $item->judul }}</h4>
@@ -234,7 +230,7 @@
                 </a>
 
                 
-                <a href="{{ route('bukti-donasi.show',$item->id) }}" class="btn btn-secondary">
+                <a href="{{ route('bukti-donasi.show', $item->id) }}" class="btn btn-secondary">
                     Detail
                 </a>
 

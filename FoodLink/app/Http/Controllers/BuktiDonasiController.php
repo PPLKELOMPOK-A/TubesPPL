@@ -68,7 +68,7 @@ class BuktiDonasiController extends Controller
         ]);
     }
 
-public function bukti($id)
+public function showBukti($id)
 {
     $donasi = (object)[
         "id" => $id,
