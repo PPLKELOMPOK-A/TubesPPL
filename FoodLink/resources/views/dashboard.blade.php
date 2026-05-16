@@ -3,9 +3,8 @@
 @section('title', 'Foodlink - Beranda')
 
 @section('content')
-<!-- CSS Khusus untuk Halaman Beranda User -->
 <style>
-    .container { max-width: 1100px; width: 100%; margin-left: 0; }
+    .container { padding: 30px 50px; max-width: 1100px; width: 100%; margin-left: 0; }
     
     .announcement { background-color: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 12px; padding: 25px; text-align: center; color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 30px; }
 
@@ -13,21 +12,29 @@
     .search-wrapper { flex: 1; position: relative; }
     .search-wrapper input { width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #E0E0E0; border-radius: 8px; font-size: 14px; outline: none; }
     .search-wrapper i { position: absolute; left: 15px; top: 14px; color: #A0A0A0; }
-    .btn-filter { padding: 0 20px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: #444; }
+    .btn-filter { padding: 12px 25px; border: 1px solid #E0E0E0; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: #444; }
+
+    /* --- FILTER DROPDOWN UI --- */
+    .filter-wrapper { position: relative; }
+    .filter-dropdown { display: none; position: absolute; top: 115%; right: 0; width: 250px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 100; overflow: hidden; }
+    .filter-dropdown.show { display: block; }
+    .filter-header { background-color: #563e21; color: #ffffff; text-align: center; padding: 12px; font-size: 13px; font-weight: 600; }
+    .filter-options { padding: 10px 0; }
+    .filter-option { display: flex; align-items: center; padding: 12px 20px; gap: 12px; font-size: 13px; color: #444; cursor: pointer; transition: 0.2s; }
+    .filter-option:hover { background-color: #f9f9f9; }
+    .filter-option input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A; }
 
     /* --- DONASI LIST --- */
     .donasi-item { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1.5px solid #eee; transition: 0.2s; }
     .donasi-item:hover { background-color: #fafafa; }
-    
     .donasi-content { display: flex; align-items: center; flex: 1; text-decoration: none; color: inherit; cursor: pointer; }
     .donasi-img { width: 110px; height: 80px; border-radius: 10px; object-fit: cover; margin-right: 25px; background-color: #f5f5f5; }
-    
     .donasi-info { flex: 1; }
     .donasi-info h3 { font-size: 17px; font-weight: 700; color: #000; margin-bottom: 5px; }
     .donasi-info .category { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: block; }
     .donasi-info .date { font-size: 13px; color: #999; }
 
-    .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+    .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-decoration: none; display: inline-block; }
     .btn-action:hover { background-color: #5a4223; }
     
     /* --- PAGINATION --- */
@@ -36,7 +43,6 @@
     .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
 </style>
 
-<!-- Bungkus konten dengan class dari Master Layout -->
 <div class="main-content-canvas">
     <div class="container">
         
@@ -54,29 +60,53 @@
                 setTimeout(function() {
                     var alertBox = document.getElementById('success-alert');
                     if (alertBox) {
-                        alertBox.style.opacity = '0'; // Animasi memudar
+                        alertBox.style.opacity = '0';
                         setTimeout(function() {
-                            alertBox.style.display = 'none'; // Menghilangkan elemen dari halaman
-                        }, 500); // Tunggu animasi 0.5 detik selesai
+                            alertBox.style.display = 'none';
+                        }, 500);
                     }
-                }, 5000); // 5000 milidetik = 5 detik
+                }, 5000);
             </script>
         @endif
 
-        <div class="action-bar">
+        <form action="{{ route('dashboard') }}" method="GET" class="action-bar" id="filterForm">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search">
+                <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
             </div>
-            <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
-        </div>
+            
+            <div class="filter-wrapper">
+                <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
+                
+                <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
+                    <div class="filter-header">-Pilihan-</div>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)"
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                            Organisasi (Yayasan)
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan"
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                            Kegiatan Keagamaan
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Individu/Umum"
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                            Individu/Umum
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
 
-        <!-- LOOPING DATA DARI DATABASE -->
         @forelse($donations as $item)
         <div class="donasi-item">
             <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                
-                {{-- Pengecekan Foto (Nama kolom sudah disesuaikan ke foto_kegiatan) --}}
                 @if(!empty($item->foto_kegiatan))
                     <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
@@ -86,7 +116,6 @@
                 @endif
                 
                 <div class="donasi-info">
-                    {{-- Nama kolom sudah disesuaikan dengan database --}}
                     <span class="category">{{ $item->kategori_penerima }}</span>
                     <h3>{{ $item->judul_donasi }}</h3>
                     <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
@@ -94,7 +123,7 @@
             </a>
             
             <div>
-                <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="btn-action" style="text-decoration: none; display: inline-block;">Daftar Donasi</a>
+                <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="btn-action">Daftar Donasi</a>
             </div>
         </div>
         @empty
@@ -103,7 +132,6 @@
         </div>
         @endforelse
 
-        <!-- PAGINATION DUMMY -->
         <div class="pagination-footer">
             <span>1-5 dari 200</span>
             <a href="#" class="page-node active">1</a>
@@ -113,7 +141,24 @@
             <a href="#" class="page-node">10</a>
             <a href="#" class="page-node"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
-
     </div>
 </div>
+
+<script>
+    function toggleFilter() {
+        document.getElementById("filterDropdown").classList.toggle("show");
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('.filter-wrapper')) {
+            var dropdowns = document.getElementsByClassName("filter-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+</script>
 @endsection

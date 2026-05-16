@@ -43,8 +43,20 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('admin.dashboard'); 
         }
         
-        // Ambil semua data kegiatan donasi yang tersedia (Tanpa filter user_id)
-        $donations = Donation::orderBy('created_at', 'desc')->get();
+        $query = Donation::query();
+
+        // Logika Pencarian (Search)
+        if ($request->has('search') && $request->search != '') {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        // Logika Filter Kategori
+        if ($request->has('kategori') && !empty($request->kategori)) {
+            $query->whereIn('kategori', $request->kategori);
+        }
+
+        // Mengambil data donasi untuk dashboard user
+        $donations = $query->orderBy('created_at', 'desc')->get();
 
         return view('dashboard', compact('donations'));
     })->name('dashboard');
@@ -71,10 +83,23 @@ Route::middleware(['auth'])->group(function () {
     // --- AREA KHUSUS ADMIN ---
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        // Dashboard Admin
-        Route::get('/dashboard', function () {
+        // DASHBOARD ADMIN
+        Route::get('/dashboard', function (Request $request) { 
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $semuaDonasi = Donation::all();
+            
+            $query = Donation::query();
+
+            // Logika Pencarian (Search)
+            if ($request->has('search') && $request->search != '') {
+                $query->where('judul', 'like', '%' . $request->search . '%');
+            }
+
+            // Logika Filter Kategori
+            if ($request->has('kategori') && !empty($request->kategori)) {
+                $query->whereIn('kategori', $request->kategori);
+            }
+
+            $semuaDonasi = $query->orderBy('created_at', 'desc')->get();
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
@@ -87,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
         // Detail Donasi (Admin)
         Route::get('/donasi/detail/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            
             $data = Donation::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
         })->name('donasi.detail');
@@ -94,6 +120,7 @@ Route::middleware(['auth'])->group(function () {
         // Form Edit Donasi
         Route::get('/donasi/edit/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            
             $data = Donation::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
         })->name('donasi.edit');
@@ -103,7 +130,7 @@ Route::middleware(['auth'])->group(function () {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
 
             $donasi = Donation::findOrFail($id);
-            $fotoPath = $donasi->foto_kegiatan;
+            $fotoPath = $donasi->foto;
 
             if ($request->hasFile('foto')) {
                 if ($fotoPath) { Storage::disk('public')->delete($fotoPath); }
@@ -111,16 +138,58 @@ Route::middleware(['auth'])->group(function () {
             }
 
             $donasi->update([
-                'judul_donasi'      => $request->judul,
-                'kategori_penerima' => $request->kategori,
-                'tanggal_kegiatan'  => $request->tanggal,
-                'foto_kegiatan'     => $fotoPath,
-                'deskripsi'         => $request->deskripsi,
-                'alamat_penyaluran' => $request->alamat
+                'judul'     => $request->judul,
+                'kategori'  => $request->kategori,
+                'tanggal'   => $request->tanggal,
+                'foto'      => $fotoPath,
+                'deskripsi' => $request->deskripsi,
+                'alamat'    => $request->alamat
             ]);
             
             return redirect()->route('admin.donasi.detail', ['id' => $id])->with('success', 'Donasi berhasil diperbarui!');
         })->name('donasi.update');
+
+        // FORM TAMBAH DONASI (ADMIN)
+        Route::get('/donasi/tambah', function () {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            return view('admin.create');
+        })->name('donasi.create');
+
+        // PROSES SIMPAN DONASI KE DATABASE (ADMIN)
+        Route::post('/donasi/tambah', function (Request $request) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('donasi', 'public');
+            }
+
+            Donation::create([
+                'judul'     => $request->judul,
+                'kategori'  => $request->kategori,
+                'tanggal'   => $request->tanggal,
+                'foto'      => $fotoPath,
+                'deskripsi' => $request->deskripsi,
+                'alamat'    => $request->alamat
+            ]);
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Donasi baru berhasil ditambahkan!');
+        })->name('donasi.store');
+
+        // HAPUS DONASI
+        Route::post('/donasi/hapus/{id}', function ($id) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            
+            $donasi = Donation::findOrFail($id);
+            
+            if ($donasi->foto) {
+                Storage::disk('public')->delete($donasi->foto);
+            }
+            
+            $donasi->delete();
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
+        })->name('donasi.delete');
 
         // --- FITUR ADMIN LAINNYA ---
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
@@ -129,7 +198,7 @@ Route::middleware(['auth'])->group(function () {
         // INTEGRASI FITUR DASHBOARD LAPORAN
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
-    }); // End Prefix Admin Group
+    });
 
     // GLOBAL LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
