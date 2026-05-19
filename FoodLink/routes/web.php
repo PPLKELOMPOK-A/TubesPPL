@@ -43,19 +43,9 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->route('admin.dashboard'); 
         }
         
-        $query = Donation::query();
+        // Ambil semua data kegiatan donasi yang tersedia (Tanpa filter user_id)
+        $donations = Donation::orderBy('created_at', 'desc')->get();
 
-        // Logika Pencarian (Search) - Disesuaikan dengan kolom PA-11
-        if ($request->has('search') && $request->search != '') {
-            $query->where('judul_donasi', 'like', '%' . $request->search . '%');
-        }
-
-        // Logika Filter Kategori - Disesuaikan dengan kolom PA-11
-        if ($request->has('kategori') && !empty($request->kategori)) {
-            $query->whereIn('kategori_penerima', $request->kategori);
-        }
-
-        $donations = $query->orderBy('created_at', 'desc')->get();
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
@@ -101,11 +91,11 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
-        // --- MANAJEMEN KEGIATAN DONASI DENGAN CONTROLLER (Versi PA-11) ---
+        // --- MANAJEMEN KEGIATAN DONASI (Menggunakan Controller) ---
         Route::get('/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('kegiatan.create');
         Route::post('/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('kegiatan.store');
 
-        // --- CRUD DONASI (Versi main yang digabungkan kolom databasenya) ---
+        // --- CRUD DONASI ---
         
         // Form Tambah Donasi
         Route::get('/donasi/tambah', function () {
@@ -137,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
         // Detail Donasi (Admin)
         Route::get('/donasi/detail/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            
             $data = Donation::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
         })->name('donasi.detail');
@@ -144,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
         // Form Edit Donasi
         Route::get('/donasi/edit/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            
             $data = Donation::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
         })->name('donasi.edit');
@@ -178,10 +170,12 @@ Route::middleware(['auth'])->group(function () {
             
             $donasi = Donation::findOrFail($id);
             
+            // Hapus foto dari folder storage jika fotonya ada
             if ($donasi->foto_kegiatan) {
                 Storage::disk('public')->delete($donasi->foto_kegiatan);
             }
             
+            // Hapus datanya dari Database
             $donasi->delete();
             
             return redirect()->route('admin.dashboard')->with('success', 'Data Donasi berhasil dihapus!');
