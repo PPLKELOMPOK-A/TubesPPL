@@ -43,6 +43,7 @@
     .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
 </style>
 
+<!-- Bungkus konten dengan class dari Master Layout -->
 <div class="main-content-canvas">
     <div class="container">
         
@@ -69,6 +70,7 @@
             </script>
         @endif
 
+        <!-- FORM FILTER & SEARCH -->
         <form action="{{ route('dashboard') }}" method="GET" class="action-bar" id="filterForm">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -132,6 +134,7 @@
         </div>
         @endforelse
 
+        <!-- PAGINATION DUMMY -->
         <div class="pagination-footer">
             <span>1-5 dari 200</span>
             <a href="#" class="page-node active">1</a>
@@ -144,6 +147,7 @@
     </div>
 </div>
 
+<!-- SCRIPT UNTUK MENGATUR MUNCUL/HILANGNYA KOTAK FILTER -->
 <script>
     function toggleFilter() {
         document.getElementById("filterDropdown").classList.toggle("show");
