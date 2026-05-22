@@ -194,7 +194,7 @@
     <h2>Bukti Penyelesaian Donasi</h2>
     <p class="sub">Lihat dan Verifikasi hasil distribusi donasi makanan</p>
 
-    <form method="GET" action="{{ route('bukti-donasi.index') }}">
+    <form method="GET" action="{{ route('bukti.donasi') }}">
         <div class="search-wrapper">
             <input type="text"
                    name="search"

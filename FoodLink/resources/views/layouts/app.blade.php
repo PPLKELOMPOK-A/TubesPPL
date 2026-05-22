@@ -92,7 +92,7 @@
             <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ request()->routeIs('riwayat-donasi.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
             </a>
-            <a href="{{ route('bukti-donasi.index') }}" class="nav-item {{ request()->routeIs('bukti-donasi.*') ? 'active' : '' }}">
+            <a href="{{ route('bukti.donasi') }}" class="nav-item {{ request()->routeIs('bukti.donasi*', 'bukti-donasi.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-file-invoice"></i> Bukti Donasi
             </a>
             <a href="#" class="nav-item">

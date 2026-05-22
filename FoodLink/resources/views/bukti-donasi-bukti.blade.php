@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <a href="{{ route('bukti-donasi.index') }}" class="btn-kembali">
+        <a href="{{ route('bukti.donasi') }}" class="btn-kembali">
             <span>←</span> Kembali 
         </a>
 

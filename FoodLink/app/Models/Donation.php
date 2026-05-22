@@ -9,7 +9,7 @@ class Donation extends Model {
     use HasFactory;
 
     // 1. Kasih tahu Laravel untuk pakai tabel ini
-    protected $table = 'kegiatan_donasis';
+    protected $table = 'donations';
 
     // 2. Sesuaikan nama kolom persis seperti yang ada di phpMyAdmin
     protected $fillable = [
