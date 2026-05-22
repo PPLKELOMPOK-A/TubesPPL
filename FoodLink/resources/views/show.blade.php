@@ -19,84 +19,9 @@
         padding-bottom: 0 !important;
     }
 
-    /* Layout Wrapper */
-    .app-layout {
-        display: flex;
-        min-height: 100vh;
-        width: 100%;
-        background-color: #f5f5f5;
-    }
-
-    /* Sidebar Kiri: Menempel Pojok (Full Height) */
-    .sidebar-left {
-        width: 260px;
-        background: #f7e4bc; /* Warna krem sesuai gambar */
-        display: flex;
-        flex-direction: column;
-        padding: 40px 0;
-        position: fixed; /* Kunci di posisi ini */
-        height: 100vh;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-    }
-
-    .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        flex-grow: 1;
-    }
-
-    .sidebar-menu li {
-        margin-bottom: 8px;
-    }
-
-    .sidebar-menu a, .sidebar-menu .active-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 25px;
-        text-decoration: none;
-        color: #5b3a1e;
-        font-size: 14px;
-        gap: 15px;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-
-    /* Style Aktif: Tombol Cokelat sesuai Gambar 2 */
-    .active-item {
-        background-color: #5b3a1e;
-        color: white !important;
-        font-weight: bold;
-        margin-right: 20px;
-    }
-
-    .sidebar-menu a:hover:not(.active-item) {
-        background: rgba(91, 58, 30, 0.05);
-    }
-
-    /* Logout Section */
-    .logout-box {
-        padding: 20px 25px;
-        margin-top: auto;
-    }
-
-    .logout-box a {
-        color: #5b3a1e;
-        text-decoration: none;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-    }
-
-    /* Konten Kanan: Memberi margin agar tidak tertutup sidebar */
+    /* Konten Utama */
     .main-content {
         flex: 1;
-        margin-left: 260px; 
         padding: 60px 80px;
         background: white;
         min-height: 100vh;
@@ -191,28 +116,7 @@
     }
 </style>
 
-<div class="app-layout">
-    <!-- Sidebar Kiri -->
-    <aside class="sidebar-left">
-        <ul class="sidebar-menu">
-            <li><a href="#"><span></span> Beranda</a></li>
-            <div class="active-item">
-                    <span></span> Bukti Penyelesaian Donasi
-                </div>
-            <li><a href="#"><span></span> Riwayat Donasi</a></li>
-            <li><a href="#"><span></span> Riwayat Koordinasi</a></li>
-            <li>
-                
-            </li>
-        </ul>
-
-        <div class="logout-box">
-            <a href="#"><span>🚪</span> Logout</a>
-        </div>
-    </aside>
-
-    <!-- Konten Utama -->
-    <main class="main-content">
+<main class="main-content">
         <header>
             <h1 class="page-title">{{ $data['judul'] }}</h1>
             <p class="page-subtitle">Lihat dan verifikasi hasil distribusi donasi makanan</p>
@@ -253,7 +157,6 @@
             </a>
         </footer>
     </main>
-</div>
 
 <script>
     document.getElementById('btn-download-bukti').addEventListener('click', function(e) {

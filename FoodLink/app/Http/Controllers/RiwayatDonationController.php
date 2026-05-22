@@ -8,10 +8,15 @@ use Illuminate\Support\Facades\Auth;
 
 class RiwayatDonationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-         // Mengambil data donasi milik user yang sedang login
-        $donations = Donation::where('user_id', Auth::id())->latest()->get();
+        $query = Donation::where('user_id', Auth::id());
+
+        if ($request->search) {
+            $query->where('judul', 'like', '%'.$request->search.'%');
+        }
+
+        $donations = $query->latest()->get();
         return view('riwayat-donation', compact('donations'));
     }
 
@@ -21,17 +26,16 @@ class RiwayatDonationController extends Controller
     $request->validate([
         'donation_id' => 'required',
         'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string'
+        'komentar' => 'nullable|string'
     ]);
 
-    // 2. Cari data donasinya dan update kolom rating & comment
-    // Pastikan di tabel 'donations' kamu sudah ada kolom 'rating' dan 'comment'
+    // 2. Cari data donasinya dan update kolom rating & komentar
     $donation = \App\Models\Donation::findOrFail($request->donation_id);
     
     if($donation) {
         $donation->update([
             'rating' => $request->rating,
-            'comment' => $request->comment
+            'komentar' => $request->komentar
         ]);
     }
 
@@ -44,7 +48,7 @@ public function updateRating(Request $request, $id)
     // 1. Validasi input
     $request->validate([
         'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string|max:255',
+        'komentar' => 'nullable|string|max:255',
     ]);
 
     // 2. Cari data donasinya
@@ -53,7 +57,7 @@ public function updateRating(Request $request, $id)
     // 3. Update datanya
     $donasi->update([
         'rating' => $request->rating,
-        'comment' => $request->comment,
+        'komentar' => $request->komentar,
     ]);
 
     // 4. Redirect kembali agar tidak loading terus
@@ -61,9 +65,8 @@ public function updateRating(Request $request, $id)
 }
 public function showBukti($id)
 {
-    $item = \App\Models\Donation::findOrFail($id);
-    // Logika untuk menampilkan bukti, misalnya:
-    return view('bukti-donasi', compact('item'));
+    $donasi = \App\Models\Donation::findOrFail($id);
+    return view('bukti-donasi-bukti', compact('donasi'));
 }
 }
        

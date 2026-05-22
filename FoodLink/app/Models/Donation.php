@@ -23,7 +23,7 @@ class Donation extends Model
         'user_id',
         'status', 
         'rating',   // Tambahkan ini
-        'comment',
+        'komentar',
 
         // 🔥 TAMBAHAN UNTUK VALIDASI
         'status',
