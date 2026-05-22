@@ -5,29 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Donation extends Model
-{
+class Donation extends Model {
     use HasFactory;
 
-    protected $fillable = [
-        // 🔹 DATA LAMA
-        'judul',
-        'kategori',
-        'tanggal',
-        'foto',
-        'deskripsi',
-        'alamat',
-        'quantity',
-        'food_type',
-        'estimated_time',
-        'user_id',
-        'status', 
-        'rating',   // Tambahkan ini
-        'komentar',
+    // 1. Kasih tahu Laravel untuk pakai tabel ini
+    protected $table = 'kegiatan_donasis';
 
-        // 🔥 TAMBAHAN UNTUK VALIDASI
-        'status',
-        'validated_by'
+    // 2. Sesuaikan nama kolom persis seperti yang ada di phpMyAdmin
+    protected $fillable = [
+        'judul_donasi',
+        'kategori_penerima',
+        'tanggal_kegiatan',
+        'foto_kegiatan',
+        'deskripsi',
+        'alamat_penyaluran',
+        'rating',
+        'komentar'
     ];
 
     /*
