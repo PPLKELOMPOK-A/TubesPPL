@@ -136,7 +136,7 @@
 
         <div class="description-text">
             <strong>Laporan / Deskripsi:</strong><br>
-            {{ $data['deskripsi'] }}
+            {{ $data->deskripsi }}
         </div>
 
         <footer class="action-row">

@@ -1,63 +1,29 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Donation;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DonationSeeder extends Seeder
 {
     public function run(): void
     {
-        // 🔥 Pastikan user ada
-        $user = User::first();
-
-        if (!$user) {
-            $user = User::create([
-                'name' => 'Admin',
-                'email' => 'admin@gmail.com',
-                'password' => bcrypt('123456')
-            ]);
-        }
-
-        Donation::insert([
+        DB::table('donations')->insert([
             [
-                'judul' => 'Nasi Kotak + Lauk',
-                'kategori' => 'Restoran Sederhana',
-                'tanggal' => now(),
-                'deskripsi' => 'Sisa acara syukuran',
-                'alamat' => 'Jakarta',
-                'status' => 'menunggu',
-                'quantity' => 50,
-                'user_id' => $user->id, // 🔥 dinamis, tidak hardcode
+                'judul' => 'Program Makan Sehat - Yayasan Peduli',
+                'kategori' => 'Organisasi (Yayasan)',
+                'tanggal' => '2026-05-30',
+                'foto' => 'makan_sehat.jpg',
+                'deskripsi' => 'Penyaluran donasi dilakukan kepada anak-anak panti asuhan dalam rangka Hari Anak Nasional',
+                'status' => 'Selesai',
+                'user_id' => 1,
+                'rating' => null,
+                'komentar' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'judul' => 'Roti & Pastry',
-                'kategori' => 'Bakery Ananda',
-                'tanggal' => now(),
-                'deskripsi' => 'Donasi roti',
-                'alamat' => 'Bandung',
-                'status' => 'menunggu',
-                'quantity' => 30,
-                'user_id' => $user->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'judul' => 'Mie Ayam & Bakso',
-                'kategori' => 'Warung Pak Budi',
-                'tanggal' => now(),
-                'deskripsi' => 'Makanan siap saji',
-                'alamat' => 'Surabaya',
-                'status' => 'menunggu',
-                'quantity' => 40,
-                'user_id' => $user->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            // tambah data contoh lain jika perlu
         ]);
     }
 }
