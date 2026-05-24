@@ -6,18 +6,16 @@
 <div class="max-w-7xl mx-auto">
     <h1 class="text-2xl font-bold mb-8 text-gray-800">Validasi Proses Donasi</h1>
 
-    <!-- TABS -->
     <div class="flex space-x-2 mb-6">
-        <a href="{{ route('validasi.index') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Menunggu Validasi</a>
-        <a href="{{ route('validasi.disetujui') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Disetujui</a>
-        <a href="{{ route('validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
+        <a href="{{ route('admin.validasi.index') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Menunggu Validasi</a>
+        <a href="{{ route('admin.validasi.disetujui') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Disetujui</a>
+        <a href="{{ route('admin.validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
     </div>
 
     <div class="space-y-4">
         @forelse($donations as $item)
         <div class="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col md:flex-row gap-6 relative shadow-sm">
             
-            <!-- THUMBNAIL -->
             <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex-shrink-0 flex items-center justify-center border border-[#FBEBCE] overflow-hidden">
                 <img src="
                     @if($item->foto)
@@ -45,7 +43,6 @@
                     <span>Dikirim: {{ optional($item->created_at)->format('d M, H:i') }}</span>
                 </div>
 
-                <!-- BARIS BADGES (Sesuai Figma) -->
                 <div class="flex flex-wrap gap-2 mb-6">
                     <span class="bg-[#FDF4E3] text-[#B08933] text-[9px] font-bold px-4 py-1.5 rounded-lg">
                         {{ $item->quantity }} Porsi
@@ -60,7 +57,6 @@
                     @endif
                 </div>
 
-                <!-- PROGRESS TRACKER (Sesuai Figma) -->
                 <div class="flex items-center space-x-2 pt-4 border-t border-gray-50">
                     <div class="flex items-center space-x-1">
                         <span class="w-3 h-3 rounded-full bg-[#E47F3D]"></span>

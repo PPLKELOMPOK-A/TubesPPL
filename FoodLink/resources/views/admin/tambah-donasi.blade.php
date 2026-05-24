@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodlink Admin - Beranda</title>
+    <title>Foodlink Admin - Tambah Donasi</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -13,7 +13,7 @@
 
         /* --- SIDEBAR --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
-        .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
+        .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
         .nav-group { flex-grow: 1; padding: 0 15px; }
         .nav-item { 
             display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; transition: 0.2s;
@@ -90,59 +90,33 @@
         </div>
 
         <div class="container">
-            <div class="announcement">
-                Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari SENIN s.d. MINGGU Pukul 08.00–20.00 WIB. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
-            </div>
+            <h2>Buat Posting Donasi</h2>
+            <br>
+            <form action="{{ route('admin.donasi.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="form-group">
+                    <label>Judul</label>
+                    <input type="text" name="judul" required placeholder="Masukkan judul donasi">
+                </div>
 
-            <div class="action-bar">
-                <div class="search-wrapper">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search">
+                <div class="form-group">
+                    <label>Kategori Penerima</label>
+                    <select name="kategori" required>
+                        <option value="" disabled selected>-- Pilih Kategori --</option>
+                        <option value="Organisasi (Yayasan)">Organisasi (Yayasan)</option>
+                        <option value="Kegiatan Keagamaan">Kegiatan Keagamaan</option>
+                        <option value="Individu">Individu</option>
+                    </select>
                 </div>
                 <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
             </div>
 
-            @php
-                // Mengambil data donasi terbaru dari session
-                $sessionData = session('donasi_data');
-                
-                // Format tanggal dinamis dari session jika ada
-                $tglDinamis = isset($sessionData['tanggal']) 
-                    ? \Carbon\Carbon::parse($sessionData['tanggal'])->translatedFormat('l, d F Y') 
-                    : 'Kamis, 13 Mei 2026';
-
-                $donations = [
-                    [
-                        'id' => 1, 
-                        'judul' => $sessionData['judul'] ?? 'Hari Anak Nasional - Panti Bunda Kasih', 
-                        'org' => $sessionData['kategori'] ?? 'Organisasi (Yayasan)', 
-                        'tgl' => $tglDinamis, 
-                        'img' => isset($sessionData['foto']) ? asset('storage/'.$sessionData['foto']) : 'https://via.placeholder.com/140x100?text=Donasi+1', 
-                        'desc' => $sessionData['deskripsi'] ?? 'Tersedia 20 paket nasi kotak ayam bakar sisa acara syukuran siang ini...', 
-                        'alamat' => $sessionData['alamat'] ?? 'Jl. Bougenville Timur No. 22'
-                    ],
-                    ['id' => 2, 'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Jumat, 31 Mei 2025', 'img' => 'https://via.placeholder.com/140x100?text=Donasi+2', 'desc' => 'Program makanan bergizi untuk sesama.', 'alamat' => 'Jl. Mawar No. 10'],
-                    ['id' => 3, 'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Sabtu, 01 Juni 2025', 'img' => 'https://via.placeholder.com/140x100?text=Donasi+3', 'desc' => 'Paket sembako dan makanan siap saji.', 'alamat' => 'Jl. Melati No. 5'],
-                    ['id' => 4, 'judul' => 'Jumat Berkah - Masjid Agung', 'org' => 'Kegiatan Keagamaan', 'tgl' => 'Jumat, 06 Juni 2025', 'img' => 'https://via.placeholder.com/140x100?text=Donasi+4', 'desc' => 'Nasi kotak untuk jamaah jumat.', 'alamat' => 'Jl. Al-Ikhlas No. 1'],
-                    ['id' => 5, 'judul' => 'Hari Anak Nasional - Yayasan Sejahtera', 'org' => 'Organisasi (Yayasan)', 'tgl' => 'Senin, 23 Juli 2025', 'img' => 'https://via.placeholder.com/140x100?text=Donasi+5', 'desc' => 'Pesta makanan untuk anak-anak yayasan.', 'alamat' => 'Jl. Merdeka No. 100'],
-                ];
-            @endphp
-
-            @foreach($donations as $item)
-            <div class="donation-card-wrapper">
-                <a href="{{ route('admin.donasi.detail', [
-                    'judul' => $item['judul'], 
-                    'org' => $item['org'], 
-                    'tgl' => $item['tgl'], 
-                    'desc' => $item['desc'], 
-                    'alamat' => $item['alamat'],
-                    'img_raw' => $item['img']
-                ]) }}" class="donation-card">
-                    <img src="{{ $item['img'] }}" class="donation-thumb">
-                    <div class="donation-info">
-                        <h3>{{ $item['judul'] }}</h3>
-                        <span class="category">{{ $item['org'] }}</span>
-                        <div class="meta">{{ $item['tgl'] }}</div>
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <div class="date-container">
+                        <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" required>
+                        <input type="text" id="date-display" placeholder="Pilih Tanggal" readonly>
+                        <i class="fa-regular fa-calendar-days calendar-icon"></i>
                     </div>
                 </a>
                 
@@ -156,20 +130,54 @@
             </div>
             @endforeach
 
-            <div class="pagination-area">
-                <span>1-5 dari 200</span>
-                <a href="#" class="page-link active">1</a>
-                <a href="#" class="page-link">2</a>
-                <span>...</span>
-                <a href="#" class="page-link">10</a>
-                <a href="#" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
-            </div>
-        </div>
+                <div class="form-group">
+                    <label>Unggah Foto</label>
+                    <div class="image-container">
+                        <div class="preview-box">
+                            <img id="img-preview" src="https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Pratinjau+Foto" alt="Preview">
+                        </div>
+                        <input type="file" id="file-input" name="foto" accept="image/*">
+                        <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
+                            <i class="fa-regular fa-image"></i> Pilih Foto
+                        </button>
+                    </div>
+                </div>
 
-        <div class="fab-add">
-            <i class="fa-solid fa-plus"></i>
+                <div class="form-group">
+                    <label>Deskripsi Kegiatan</label>
+                    <textarea name="deskripsi" rows="4" required placeholder="Jelaskan detail makanan yang didonasikan..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Alamat Pengambilan</label>
+                    <input type="text" name="alamat" required placeholder="Masukkan alamat lengkap">
+                </div>
+
+                <div class="footer-actions">
+                    <a href="{{ route('admin.dashboard') }}" class="btn-base btn-kembali">Batal</a>
+                    <button type="submit" class="btn-simpan btn-base">Simpan Postingan</button>
+                </div>
+            </form>
         </div>
     </div>
 
+    <script>
+        const fileInput = document.getElementById('file-input');
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) { document.getElementById('img-preview').src = e.target.result; }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updateDateDisplay(val) {
+            if(!val) return;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const d = new Date(val);
+            document.getElementById('date-display').value = d.toLocaleDateString('id-ID', options);
+        }
+    </script>
 </body>
 </html>

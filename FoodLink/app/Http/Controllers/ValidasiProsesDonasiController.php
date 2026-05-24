@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Donation;
 use Illuminate\Http\Request;
-use Carbon\Carbon; // Ditambahkan untuk fungsi manipulasi tanggal
+use Carbon\Carbon;
 
 class ValidasiProsesDonasiController extends Controller
 {
@@ -20,7 +20,7 @@ class ValidasiProsesDonasiController extends Controller
             'sudah_diproses' => Donation::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
 
-        // Mengambil data dengan pagination (5 data per halaman) agar desain figma berfungsi
+        // Mengambil data dengan pagination (5 data per halaman)
         $donations = Donation::where('status', 'menunggu')
             ->latest()
             ->paginate(5);
@@ -43,7 +43,8 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'disetujui'
         ]);
 
-        return redirect()->route('validasi.disetujui')
+        // PERBAIKAN: Menambahkan 'admin.' pada nama route
+        return redirect()->route('admin.validasi.disetujui')
             ->with('success', 'Donasi berhasil disetujui');
     }
 
@@ -62,7 +63,8 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'ditolak'
         ]);
 
-        return redirect()->route('validasi.ditolak')
+        // PERBAIKAN: Menambahkan 'admin.' pada nama route
+        return redirect()->route('admin.validasi.ditolak')
             ->with('success', 'Donasi berhasil ditolak');
     }
 
@@ -81,16 +83,17 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'menunggu'
         ]);
 
-        return redirect()->route('validasi.index')
+        // PERBAIKAN: Menambahkan 'admin.' pada nama route
+        return redirect()->route('admin.validasi.index')
             ->with('info', 'Donasi dikembalikan ke antrian');
     }
 
     // ===============================
     // DISETUJUI
     // ===============================
-    public function disetujui()
+    // PERBAIKAN: Mengubah nama fungsi agar sesuai dengan web.php
+    public function halamanDisetujui()
     {
-        // Menggunakan paginate juga agar seragam dengan halaman index
         $donations = Donation::where('status', 'disetujui')
             ->latest()
             ->paginate(5);
@@ -101,9 +104,9 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     // DITOLAK
     // ===============================
-    public function ditolak()
+    // PERBAIKAN: Mengubah nama fungsi agar sesuai dengan web.php
+    public function halamanDitolak()
     {
-        // Menggunakan paginate juga agar seragam dengan halaman index
         $donations = Donation::where('status', 'ditolak')
             ->latest()
             ->paginate(5);

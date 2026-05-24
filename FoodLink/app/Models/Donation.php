@@ -5,65 +5,58 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Donation extends Model
-{
+class Donation extends Model {
     use HasFactory;
 
+    // Nama tabel sesuai phpMyAdmin kamu
+    protected $table = 'donations'; 
+
+    // Kolom yang ada di gambar phpMyAdmin kamu
     protected $fillable = [
-        // 🔹 DATA LAMA
         'judul',
         'kategori',
         'tanggal',
         'foto',
         'deskripsi',
         'alamat',
-        'quantity',
-        'food_type',
-        'estimated_time',
-        'user_id',
-
-        // 🔥 TAMBAHAN UNTUK VALIDASI
+        'nama_makanan',
+        'donatur',
+        'porsi',
         'status',
-        'validated_by'
+        'quantity',
+        'validated_by',
+        'user_id'
     ];
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 HELPER VALIDASI (BIAR CLEAN)
+    | HELPER SCOPES
     |--------------------------------------------------------------------------
     */
 
-    // Scope: data menunggu
-    public function scopeMenunggu($query)
-    {
-        return $query->where('status', 'menunggu');
+    public function scopeMenunggu($query) { 
+        return $query->where('status', 'menunggu'); 
     }
 
-    // Scope: disetujui
-    public function scopeDisetujui($query)
-    {
-        return $query->where('status', 'disetujui');
+    public function scopeDisetujui($query) { 
+        return $query->where('status', 'disetujui'); 
     }
 
-    // Scope: ditolak
-    public function scopeDitolak($query)
-    {
-        return $query->where('status', 'ditolak');
+    public function scopeDitolak($query) { 
+        return $query->where('status', 'ditolak'); 
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 RELASI (OPTIONAL)
+    | RELATIONS
     |--------------------------------------------------------------------------
     */
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+    public function user() { 
+        return $this->belongsTo(User::class); 
     }
 
-    public function validator()
-    {
-        return $this->belongsTo(User::class, 'validated_by');
+    public function validator() { 
+        return $this->belongsTo(User::class, 'validated_by'); 
     }
 }

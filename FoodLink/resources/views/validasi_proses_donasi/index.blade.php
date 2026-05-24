@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto">
     <h1 class="text-2xl font-bold mb-8">Validasi Proses Donasi</h1>
 
-    <!-- STATS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
             <div class="text-3xl font-bold text-gray-800">3</div>
@@ -22,19 +21,17 @@
         </div>
     </div>
 
-    <!-- TABS -->
     <div class="flex space-x-2 mb-6">
-        <a href="{{ route('validasi.index') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Menunggu Validasi</a>
-        <a href="{{ route('validasi.disetujui') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Disetujui</a>
-        <a href="{{ route('validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
+        {{-- PERBAIKAN: Menambahkan 'admin.' di depan nama route --}}
+        <a href="{{ route('admin.validasi.index') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Menunggu Validasi</a>
+        <a href="{{ route('admin.validasi.disetujui') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Disetujui</a>
+        <a href="{{ route('admin.validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
     </div>
 
-    <!-- LIST DONASI -->
     <div class="space-y-4">
         @forelse($donations as $item)
         <div class="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col md:flex-row gap-6 relative shadow-sm">
             
-            <!-- PERBAIKAN: Thumbnail Gambar dengan Logika Ekstensi Spesifik -->
             <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex-shrink-0 flex items-center justify-center border border-[#FBEBCE] overflow-hidden">
                 <img src="
                     @if($item->foto)
@@ -71,8 +68,15 @@
                 </div>
 
                 <div class="flex gap-2 mt-4">
-                    <form action="{{ route('validasi.setujui', $item->id) }}" method="POST"> @csrf <button class="bg-[#81E6D9] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#4FD1C5] transition shadow-sm">Setujui</button></form>
-                    <form action="{{ route('validasi.tolak', $item->id) }}" method="POST"> @csrf <button class="bg-[#FEB2B2] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#FC8181] transition shadow-sm">Tolak</button></form>
+                    {{-- PERBAIKAN: Menambahkan 'admin.' di depan nama route --}}
+                    <form action="{{ route('admin.validasi.setujui', $item->id) }}" method="POST"> 
+                        @csrf 
+                        <button class="bg-[#81E6D9] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#4FD1C5] transition shadow-sm">Setujui</button>
+                    </form>
+                    <form action="{{ route('admin.validasi.tolak', $item->id) }}" method="POST"> 
+                        @csrf 
+                        <button class="bg-[#FEB2B2] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#FC8181] transition shadow-sm">Tolak</button>
+                    </form>
                 </div>
             </div>
         </div>
