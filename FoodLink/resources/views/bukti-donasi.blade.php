@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Bukti Penyelesaian Donasi')
 
@@ -7,15 +7,11 @@
     /* --- MEMAKSA KONTEN MEPEET KE KIRI & MELUAS PENUH SEPERTI MOCKUP --- */
     .page-content-container {
         width: 100%;
-        max-width: 100%; 
-        /* Menggunakan negative margin untuk menarik paksa konten ke arah kiri mendekati sidebar */
-        margin-left: -70px; 
-        padding: 10px 40px 40px 0px; 
+        max-width: 100%;
+        margin-left: -70px;
+        padding: 10px 40px 40px 0px;
         box-sizing: border-box;
     }
-
-    /* Jika di layar monitor kamu masih kurang ke kiri atau terlalu mepet, 
-       kamu tinggal naik-turunkan nilai 'margin-left: -50px' di atas ya! */
 
     h2 {
         font-size: 26px;
@@ -30,12 +26,11 @@
         font-size: 14px;
     }
 
-    /* --- SEARCH AREA: MELUAS SEJAJAR --- */
     .search-wrapper {
-        display: flex; 
-        gap: 0; 
+        display: flex;
+        gap: 0;
         align-items: center;
-        width: 100%; 
+        width: 100%;
         margin-bottom: 30px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         border-radius: 8px;
@@ -44,9 +39,9 @@
     .search {
         flex: 1;
         padding: 12px 18px;
-        border-radius: 8px 0 0 8px; 
+        border-radius: 8px 0 0 8px;
         border: 1px solid #e2e8f0;
-        border-right: none; 
+        border-right: none;
         font-family: 'Poppins', sans-serif;
         font-size: 14px;
         outline: none;
@@ -58,12 +53,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 47px; 
+        height: 47px;
         width: 48px;
-        background: #5b3a1e; 
-        color: white; 
-        border: 1px solid #5b3a1e; 
-        border-radius: 0 8px 8px 0; 
+        background: #5b3a1e;
+        color: white;
+        border: 1px solid #5b3a1e;
+        border-radius: 0 8px 8px 0;
         cursor: pointer;
         font-size: 15px;
         transition: background 0.2s;
@@ -73,14 +68,13 @@
         background: #422a16;
     }
 
-    /* --- CARD LIST: PENUH KE SAMPING --- */
     .card {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 20px 0;
         border-bottom: 1px solid #ededed;
-        width: 100%; 
+        width: 100%;
     }
 
     .left {
@@ -135,7 +129,7 @@
 
     .btn-secondary {
         background: #ffffff;
-        color: #46854d; 
+        color: #46854d;
         padding: 10px 20px;
         border-radius: 8px;
         text-decoration: none;
@@ -151,7 +145,6 @@
         border-color: #46854d;
     }
 
-    /* Pagination */
     .pagination {
         display: flex;
         justify-content: space-between;

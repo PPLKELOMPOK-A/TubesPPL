@@ -62,3 +62,4 @@ class BuktiDonasiController extends Controller
         return view('show', ['data' => $donation]);
     }
 }
+

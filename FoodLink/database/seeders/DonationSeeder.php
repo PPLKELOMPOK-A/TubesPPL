@@ -27,3 +27,4 @@ class DonationSeeder extends Seeder
         ]);
     }
 }
+

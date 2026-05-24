@@ -1,133 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Validasi Proses Donasi</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+﻿@extends('layouts.app')
 
-<div class="container">
+@section('title', 'Validasi Proses Donasi')
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h3>Admin</h3>
-        <ul>
-            <li class="active">Validasi Donasi</li>
-            <li><a href="{{ route('validasi.disetujui') }}">Disetujui</a></li>
-            <li><a href="{{ route('validasi.ditolak') }}">Ditolak</a></li>
-        </ul>
+@section('content')
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold mb-8">Validasi Proses Donasi</h1>
 
-        <div class="logout">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button>Logout</button>
-            </form>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
+            <div class="text-3xl font-bold text-gray-800">3</div>
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Masuk Hari Ini</div>
+        </div>
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
+            <div class="text-3xl font-bold text-gray-800">1</div>
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Perlu Validasi</div>
+        </div>
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
+            <div class="text-3xl font-bold text-gray-800">2</div>
+            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Sudah di Proses</div>
         </div>
     </div>
 
-    <!-- Content -->
-    <div class="content">
-        <h2>Validasi Proses Donasi</h2>
-        <p class="sub">Kelola dan verifikasi donasi yang masuk</p>
+    <div class="flex space-x-2 mb-6">
+        <a href="{{ route('admin.validasi.index') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Menunggu Validasi</a>
+        <a href="{{ route('admin.validasi.disetujui') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Disetujui</a>
+        <a href="{{ route('admin.validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
+    </div>
 
-        <!-- NOTIFIKASI -->
-        @if(session('success'))
-            <div style="color:green">{{ session('success') }}</div>
-        @endif
-
-        @if(session('error'))
-            <div style="color:red">{{ session('error') }}</div>
-        @endif
-
-        <!-- STATISTIK -->
-        <div class="stats">
-            <div class="stat-card">
-                <h2>{{ \App\Models\Donation::where('status','menunggu')->count() }}</h2>
-                <p>Menunggu</p>
-            </div>
-
-            <div class="stat-card success">
-                <h2>{{ \App\Models\Donation::where('status','disetujui')->count() }}</h2>
-                <p>Disetujui</p>
-            </div>
-
-            <div class="stat-card danger">
-                <h2>{{ \App\Models\Donation::where('status','ditolak')->count() }}</h2>
-                <p>Ditolak</p>
-            </div>
-        </div>
-
-        <!-- LIST DATA (REAL DATABASE) -->
+    <div class="space-y-4">
         @forelse($donations as $item)
-        <div class="card-donasi">
+        <div class="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col md:flex-row gap-6 relative shadow-sm">
+            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex-shrink-0 flex items-center justify-center border border-[#FBEBCE] overflow-hidden">
+                <img src="
+                    @if($item->foto)
+                        {{ asset('storage/'.$item->foto) }}
+                    @elseif(str_contains(strtolower($item->judul ?? ''), 'mie') || str_contains(strtolower($item->judul ?? ''), 'bakso'))
+                        {{ asset('img/mie ayam bakso.jpeg') }}
+                    @elseif(str_contains(strtolower($item->judul ?? ''), 'nasi'))
+                        {{ asset('img/nasi kotak.avif') }}
+                    @elseif(str_contains(strtolower($item->judul ?? ''), 'roti') || str_contains(strtolower($item->judul ?? ''), 'pastry'))
+                        {{ asset('img/roti pastry.jpg') }}
+                    @else
+                        https://cdn-icons-png.flaticon.com/512/3081/3081840.png
+                    @endif
+                " class="w-full h-full object-cover">
+            </div>
 
-            <!-- Gambar -->
-            <div class="thumb"></div>
+            <div class="flex-1 pt-1">
+                <div class="flex justify-between items-start">
+                    <h2 class="text-base font-bold text-gray-800">{{ $item->judul }}</h2>
+                    <span class="text-[#D9A74A] text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest bg-[#FFF4E0]">Menunggu</span>
+                </div>
+                
+                <div class="text-[10px] text-gray-400 mt-1 flex gap-4">
+                    <span>Donatur: <span class="text-gray-500">{{ $item->kategori ?? 'Warung Pak Budi' }}</span></span>
+                    <span>Dikirim: {{ optional($item->created_at)->format('d M, H:i') }}</span>
+                </div>
 
-            <!-- Info -->
-            <div class="info">
-                <h4>{{ $item->judul }}</h4>
-                <p>{{ $item->kategori }}</p>
-                <small>{{ $item->created_at->format('d M Y H:i') }}</small>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="bg-[#FFF4E0] text-[#D9A74A] text-[9px] font-bold px-3 py-1 rounded-md">{{ $item->quantity }} Porsi</span>
+                    <span class="bg-[#A0AEC0] text-white text-[9px] font-bold px-3 py-1 rounded-md">Layak konsumsi</span>
+                    @if($item->expired_at)
+                    <span class="bg-[#A0AEC0] text-white text-[9px] font-bold px-3 py-1 rounded-md">Expired: {{ \Carbon\Carbon::parse($item->expired_at)->format('d M H:i') }}</span>
+                    @endif
+                </div>
 
-                <div class="badge-group">
-                    <span class="badge">{{ $item->quantity ?? 0 }} Porsi</span>
-                    <span class="badge gray">Layak konsumsi</span>
+                <div class="flex gap-2 mt-4">
+                    <form action="{{ route('admin.validasi.setujui', $item->id) }}" method="POST">
+                        @csrf
+                        <button class="bg-[#81E6D9] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#4FD1C5] transition shadow-sm">Setujui</button>
+                    </form>
+                    <form action="{{ route('admin.validasi.tolak', $item->id) }}" method="POST">
+                        @csrf
+                        <button class="bg-[#FEB2B2] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#FC8181] transition shadow-sm">Tolak</button>
+                    </form>
                 </div>
             </div>
-
-            <!-- Status DINAMIS -->
-            <div class="status">
-                {{ strtoupper($item->status) }}
-            </div>
-
-            <!-- Action -->
-            <div class="action">
-
-                <!-- SETUJUI -->
-                <form action="{{ route('validasi.setujui', $item->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn green"
-                        onclick="return confirm('Setujui donasi ini?')">
-                        Setujui
-                    </button>
-                </form>
-
-                <!-- TOLAK -->
-                <form action="{{ route('validasi.tolak', $item->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn red"
-                        onclick="return confirm('Tolak donasi ini?')">
-                        Tolak
-                    </button>
-                </form>
-
-                <!-- RETURN -->
-                <form action="{{ route('validasi.return', $item->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn gray"
-                        onclick="return confirm('Kembalikan ke antrian?')">
-                        Return
-                    </button>
-                </form>
-
-            </div>
-
         </div>
-
         @empty
-        <div class="empty">
-            <h4>Tidak ada donasi yang perlu divalidasi</h4>
-        </div>
+            <div class="text-center py-10 text-gray-300 italic">Tidak ada data donasi.</div>
         @endforelse
-
-        <div class="pagination">
-            Total: {{ $donations->count() }} data
-        </div>
-
     </div>
 </div>
-
-</body>
-</html>
+@endsection

@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Donation extends Model {
     use HasFactory;
 
-    // 1. Kasih tahu Laravel untuk pakai tabel ini
     protected $table = 'donations';
 
-    // 2. Sesuaikan nama kolom persis seperti yang ada di phpMyAdmin
+    // Kolom yang ada di gambar phpMyAdmin kamu
     protected $fillable = [
         'judul_donasi',
         'kategori_penerima',
@@ -20,28 +19,37 @@ class Donation extends Model {
         'deskripsi',
         'alamat_penyaluran',
         'rating',
-        'komentar'
+        'komentar',
+        'judul',
+        'kategori',
+        'tanggal',
+        'foto',
+        'alamat',
+        'nama_makanan',
+        'donatur',
+        'porsi',
+        'status',
+        'quantity',
+        'validated_by',
+        'user_id'
     ];
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 HELPER VALIDASI (BIAR CLEAN)
+    | HELPER VALIDASI / SCOPES
     |--------------------------------------------------------------------------
     */
 
-    // Scope: data menunggu
     public function scopeMenunggu($query)
     {
         return $query->where('status', 'menunggu');
     }
 
-    // Scope: disetujui
     public function scopeDisetujui($query)
     {
         return $query->where('status', 'disetujui');
     }
 
-    // Scope: ditolak
     public function scopeDitolak($query)
     {
         return $query->where('status', 'ditolak');
@@ -49,7 +57,7 @@ class Donation extends Model {
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 RELASI (OPTIONAL)
+    | RELATIONS
     |--------------------------------------------------------------------------
     */
 
@@ -63,3 +71,4 @@ class Donation extends Model {
         return $this->belongsTo(User::class, 'validated_by');
     }
 }
+

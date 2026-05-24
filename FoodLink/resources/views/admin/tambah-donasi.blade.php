@@ -15,44 +15,51 @@
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
         .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
         .nav-group { flex-grow: 1; padding: 0 15px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; margin-bottom: 6px; border-radius: 10px; }
-        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; transition: 0.2s;
+            margin-bottom: 6px; border-radius: 10px;
+        }
+        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; font-weight: 600; }
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         .nav-item.active i { color: #FFFFFF; }
-        .logout-section { padding: 0 15px; margin-top: auto; }
-        .logout-btn { border: none; background: none; width: 100%; text-align: left; cursor: pointer; color: #d9534f; display: flex; align-items: center; gap: 15px; padding: 12px 20px; font-size: 14px; font-weight: 500; }
+        .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
 
-        /* --- MAIN CONTENT --- */
-        .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; border-bottom: 1px solid #f0f0f0; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; margin-left: 15px; }
+        .logout-section { padding: 25px 30px; margin-top: auto; }
+        .logout-btn { border: none; background: none; cursor: pointer; color: #4A4A4A; display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 500; }
 
-        /* --- CONTAINER --- */
-        .container { padding: 40px 60px; max-width: 1000px; width: 100%; margin-left: 0; margin-right: auto; }
+        /* --- MAIN PANEL --- */
+        .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 20px; }
+        .top-bar i { color: #ccc; font-size: 20px; }
+        .admin-profile { display: flex; align-items: center; gap: 10px; }
+        .admin-profile span { color: #6B4F2A; font-weight: 600; font-size: 14px; }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; }
 
-        .form-group { margin-bottom: 25px; max-width: 700px; }
-        .form-group label { display: block; font-size: 14px; font-weight: 600; color: #444; margin-bottom: 8px; }
-        
-        input[type="text"], input[type="date"], select, textarea {
-            width: 100%; padding: 12px 15px; border: 1px solid #D0D0D0; border-radius: 8px; font-size: 14px; color: #555; outline: none; background: white;
-        }
+        /* --- CONTENT --- */
+        .container { padding: 30px 60px; max-width: 1200px; width: 100%; margin-left: 0; }
+        .announcement { background: white; border: 1px solid #eee; border-radius: 12px; padding: 40px; text-align: center; color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .action-bar { display: flex; gap: 15px; margin-bottom: 30px; }
+        .search-wrapper { flex: 1; position: relative; }
+        .search-wrapper input { width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; color: #666; }
+        .search-wrapper i { position: absolute; left: 15px; top: 14px; color: #aaa; }
+        .btn-filter { padding: 0 20px; border: 1px solid #ddd; border-radius: 8px; background: white; color: #444; font-size: 13px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
 
-        .date-container { position: relative; }
-        #date-display { cursor: pointer; background: white; }
-        #real-date { position: absolute; opacity: 0; width: 100%; height: 100%; left: 0; top: 0; cursor: pointer; z-index: 2; }
-        .calendar-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; pointer-events: none; z-index: 1; }
-
-        .image-container { display: flex; align-items: flex-start; gap: 20px; margin-top: 10px; max-width: 700px; }
-        .preview-box { width: 400px; height: 250px; border-radius: 12px; border: 1px solid #eee; overflow: hidden; background: #f5f5f5; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-edit-foto { background: white; border: 1px solid #D0D0D0; padding: 10px 15px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-
-        .footer-actions { display: flex; justify-content: flex-start; gap: 15px; margin-top: 40px; padding-bottom: 50px; max-width: 700px; }
-        .btn-base { padding: 12px 40px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; transition: 0.3s; min-width: 130px; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-kembali { background: white; color: #444; border: 1px solid #D0D0D0; }
-        .btn-simpan { background-color: #6B4F2A; color: white; border: none; }
-        .btn-simpan:hover { background-color: #563e21; }
-        #file-input { display: none; }
+        /* --- LIST DONASI --- */
+        .donation-card-wrapper { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding: 15px 0; }
+        .donation-card { display: flex; align-items: center; gap: 25px; text-decoration: none; color: inherit; flex: 1; }
+        .donation-thumb { width: 140px; height: 100px; border-radius: 10px; object-fit: cover; background: #f5f5f5; }
+        .donation-info { flex: 1; }
+        .donation-info h3 { font-size: 17px; color: #111; margin-bottom: 5px; font-weight: 700; }
+        .donation-info .category { font-size: 13px; color: #444; margin-bottom: 8px; display: block; }
+        .donation-info .meta { font-size: 13px; color: #999; }
+        .admin-tools { display: flex; gap: 20px; padding-right: 20px; }
+        .btn-tool { background: none; border: none; cursor: pointer; font-size: 22px; color: #444; transition: 0.2s; text-decoration: none; }
+        .btn-tool:hover { color: #6B4F2A; }
+        .fab-add { position: fixed; bottom: 40px; right: 40px; width: 60px; height: 60px; background-color: #F8E7C1; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; }
+        .fab-add i { font-size: 24px; color: #111; }
+        .pagination-area { display: flex; justify-content: flex-end; align-items: center; margin-top: 40px; gap: 15px; font-size: 13px; color: #666; padding-bottom: 100px; }
+        .page-link { padding: 5px 12px; border: 1px solid #eee; border-radius: 4px; text-decoration: none; color: #444; }
+        .page-link.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
     </style>
 </head>
 <body>
@@ -61,9 +68,9 @@
         <div class="nav-group">
             <div class="brand">Foodlink</div>
             <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="{{ route('validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
+            <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
         </div>
         <div class="logout-section">
@@ -76,7 +83,10 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            <div class="admin-profile">
+                <span>Admin</span>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            </div>
         </div>
 
         <div class="container">
@@ -98,6 +108,8 @@
                         <option value="Individu">Individu</option>
                     </select>
                 </div>
+                <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
+            </div>
 
                 <div class="form-group">
                     <label>Tanggal</label>
@@ -106,7 +118,17 @@
                         <input type="text" id="date-display" placeholder="Pilih Tanggal" readonly>
                         <i class="fa-regular fa-calendar-days calendar-icon"></i>
                     </div>
+                </a>
+                
+                <div class="admin-tools">
+                    <form action="#" method="POST" onsubmit="return confirm('Hapus?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-tool"><i class="fa-solid fa-trash-can"></i></button>
+                    </form>
+                    <a href="{{ route('admin.donasi.edit') }}" class="btn-tool"><i class="fa-solid fa-pen-to-square"></i></a>
                 </div>
+            </div>
+            @endforeach
 
                 <div class="form-group">
                     <label>Unggah Foto</label>
