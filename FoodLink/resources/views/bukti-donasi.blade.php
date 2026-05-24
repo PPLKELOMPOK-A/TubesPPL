@@ -211,7 +211,7 @@
     <div class="card">
 
         <div class="left">
-            <img src="{{ $item->foto ? asset('images/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb">
+            <img src="{{ $item->foto ? asset('img/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb">
 
             <div class="info">
                 <h4>{{ $item->judul }}</h4>

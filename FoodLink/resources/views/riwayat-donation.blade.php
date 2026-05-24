@@ -110,7 +110,7 @@
 
     @forelse($donations as $item)
     <div class="donation-card" id="card-{{ $item->id }}">
-        <img src="{{ asset('storage/' . $item->foto) }}" class="thumb-img" onerror="this.src='https://via.placeholder.com/120x90'">
+        <img src="{{ asset('img/'.$item->foto) }}" class="thumb-img" onerror="this.src='https://via.placeholder.com/120x90'">
         
         <div class="info-section">
             <h4>{{ $item->judul }}</h4>

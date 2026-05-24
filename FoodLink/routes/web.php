@@ -15,6 +15,7 @@ use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
 use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\PenugasanController;
+use App\Http\Controllers\TipsController;
 use App\Models\Donation;
 
 /*
@@ -75,6 +76,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
     Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
     Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+
+    // Tips
+    Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
+    Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
 
     // --- AREA KHUSUS ADMIN ---
     Route::prefix('admin')->name('admin.')->group(function () {

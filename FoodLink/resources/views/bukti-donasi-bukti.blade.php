@@ -25,7 +25,7 @@
         <div class="gallery">
             @if($donasi->galeri && count($donasi->galeri) > 0)
                 @foreach($donasi->galeri as $foto)
-                    <img src="{{ asset('images/'.$foto) }}" alt="Bukti Donasi">
+                    <img src="{{ asset('img/'.$foto) }}" alt="Bukti Donasi">
                 @endforeach
             @else
                 <p style="color: gray; font-style: italic;">Tidak ada foto bukti tersedia.</p>
