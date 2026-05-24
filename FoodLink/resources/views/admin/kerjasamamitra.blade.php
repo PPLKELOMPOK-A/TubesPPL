@@ -104,17 +104,6 @@
         <p class="text-center text-gray-400 py-20 font-bold">Data tidak ditemukan.</p>
         @endforelse
     </div>
-
-    <div class="flex justify-end items-center mt-12 gap-4">
-        <span class="text-xs font-bold text-gray-500">1-{{ count($mitras) }} dari 200</span>
-        <div class="flex bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <button class="p-2 border-r hover:bg-gray-50 text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg></button>
-            <button class="px-4 py-2 border-r bg-[#333] text-white text-xs font-bold">1</button>
-            <button class="px-4 py-2 border-r text-xs font-bold text-gray-600">2</button>
-            <button class="px-4 py-2 border-r text-xs font-bold text-gray-600">9</button>
-            <button class="p-2 hover:bg-gray-50 text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"></path></svg></button>
-        </div>
-    </div>
 </div>
 
 <div id="modalTambahMitra" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
