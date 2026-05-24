@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- Sesuaikan dengan nama file layout utama Anda --}}
+@extends('layouts.admin') {{-- Sesuaikan dengan nama file layout utama Anda --}}
 
 @section('title', 'Foodlink Admin - Dashboard')
 

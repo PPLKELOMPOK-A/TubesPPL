@@ -1,65 +1,45 @@
-<!DOCTYPE html>
-<html lang="id">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'FoodLink Admin')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <title>@yield('title', 'Foodlink')</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #fdfdfd; }
+        .sidebar { width: 260px; background-color: #FBEBCE; padding: 20px; border-right: 1px solid #e9e2d4; }
+        .brand { font-weight: 700; font-size: 22px; color: #6B4F2A; margin-bottom: 18px; }
+        .nav { display: flex; flex-direction: column; gap: 8px; }
+        .nav a { text-decoration: none; color: #4A4A4A; padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        .nav a:hover { background: #f6ead3; color: #3b2f2f; }
+        .main { display: flex; min-height: 100vh; }
+        .content-wrap { flex: 1; padding: 28px 40px; max-width: 1100px; margin: 0 auto; }
+        .profile-small { margin-left: auto; }
+    </style>
+    @yield('styles')
 </head>
-<body class="bg-gray-50 text-gray-800">
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-[#FBEBCE] flex flex-col justify-between border-r border-gray-200">
-            <div class="p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 px-4">Admin</h3>
-                <nav class="space-y-2 text-sm font-medium">
-                    
-                    <a href="{{ route('admin.validasi.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-md transition {{ request()->routeIs('admin.validasi.*') ? 'bg-[#5A3D2B] text-white' : 'text-gray-700 hover:bg-[#f3dcb5]' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span>Validasi Donasi</span>
-                    </a>
-                    
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-md transition text-gray-700 hover:bg-[#f3dcb5]">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                        <span>Chat</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.retur.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-md transition {{ request()->routeIs('admin.retur.*') ? 'bg-[#5A3D2B] text-white' : 'text-gray-700 hover:bg-[#f3dcb5]' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span>Retur Donasi</span>
-                    </a>
-                    
-                    <a href="{{ route('admin.penugasan.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-md transition {{ request()->routeIs('admin.penugasan.*') ? 'bg-[#5A3D2B] text-white' : 'text-gray-700 hover:bg-[#f3dcb5]' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span>Penugasan Relawan</span>
-                    </a>
-
-                    <a href="{{ route('mitra.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-md transition {{ request()->routeIs('mitra.*') ? 'bg-[#5A3D2B] text-white' : 'text-gray-700 hover:bg-[#f3dcb5]' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        <span>Kerja Sama Mitra</span>
-                    </a>
-
-                </nav>
-            </div>
-            <div class="p-6 text-sm">
-                <form action="{{ route('logout') }}" method="POST">
+<body>
+    <div class="main">
+        <aside class="sidebar">
+            <div class="brand">Foodlink</div>
+            <nav class="nav">
+                <a href="{{ route('dashboard') }}">Beranda</a>
+                <a href="{{ route('riwayat-donasi.index') }}">Riwayat Donasi</a>
+                <a href="{{ route('bukti.donasi') }}">Bukti Donasi</a>
+                <a href="#">Riwayat Koordinasi</a>
+                <a href="#">Retur Donasi</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin-top: 12px;">
                     @csrf
-                    <button type="submit" class="flex items-center space-x-3 text-gray-700 hover:text-black font-medium w-full px-4 py-2 hover:bg-[#f3dcb5] rounded-md transition">
-                        <span>Logout</span>
-                    </button>
+                    <button type="submit" style="background:none;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;text-align:left;color:#4A4A4A;">Keluar Akun</button>
                 </form>
-            </div>
+            </nav>
         </aside>
 
-        <main class="flex-1 p-8 bg-white">
-            <div class="flex justify-end items-center mb-8 pb-4 border-b">
-                <div class="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=Admin" alt="Admin" class="w-full h-full object-cover">
-                </div>
-            </div>
+        <div class="content-wrap">
             @yield('content')
-        </main>
+        </div>
     </div>
 </body>
 </html>

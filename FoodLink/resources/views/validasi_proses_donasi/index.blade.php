@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.admin')
 
 @section('title', 'Validasi Proses Donasi')
 
@@ -22,7 +22,6 @@
     </div>
 
     <div class="flex space-x-2 mb-6">
-        {{-- PERBAIKAN: Menambahkan 'admin.' di depan nama route --}}
         <a href="{{ route('admin.validasi.index') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Menunggu Validasi</a>
         <a href="{{ route('admin.validasi.disetujui') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Disetujui</a>
         <a href="{{ route('admin.validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
@@ -31,7 +30,6 @@
     <div class="space-y-4">
         @forelse($donations as $item)
         <div class="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col md:flex-row gap-6 relative shadow-sm">
-            
             <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex-shrink-0 flex items-center justify-center border border-[#FBEBCE] overflow-hidden">
                 <img src="
                     @if($item->foto)
@@ -68,13 +66,12 @@
                 </div>
 
                 <div class="flex gap-2 mt-4">
-                    {{-- PERBAIKAN: Menambahkan 'admin.' di depan nama route --}}
-                    <form action="{{ route('admin.validasi.setujui', $item->id) }}" method="POST"> 
-                        @csrf 
+                    <form action="{{ route('admin.validasi.setujui', $item->id) }}" method="POST">
+                        @csrf
                         <button class="bg-[#81E6D9] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#4FD1C5] transition shadow-sm">Setujui</button>
                     </form>
-                    <form action="{{ route('admin.validasi.tolak', $item->id) }}" method="POST"> 
-                        @csrf 
+                    <form action="{{ route('admin.validasi.tolak', $item->id) }}" method="POST">
+                        @csrf
                         <button class="bg-[#FEB2B2] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#FC8181] transition shadow-sm">Tolak</button>
                     </form>
                 </div>

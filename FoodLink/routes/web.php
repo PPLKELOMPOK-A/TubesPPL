@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Donation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuktiDonasiController;
+use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ValidasiProsesDonasiController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
+use App\Http\Controllers\TipsController;
 
 Route::get('/', function () { return view('welcome'); });
 
@@ -32,6 +34,35 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
+    // Detail Donasi untuk User
+    Route::get('/donasi/detail/{id}', function ($id) {
+        if (Auth::user()->role === 'admin') { 
+            return redirect()->route('admin.dashboard'); 
+        }
+        $data = Donation::findOrFail($id);
+        return view('detail-donasi-user', compact('data')); 
+    })->name('user.donasi.detail');
+
+    // Fitur Pengajuan Donasi (Oleh User)
+    Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
+    Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
+    
+    // Tracking & Bukti Donasi
+    Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking');
+    Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
+    Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
+    Route::get('/bukti-donasi/{id}/detail', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
+    Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])->name('bukti-donasi.bukti');
+
+    Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+    Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
+    Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+
+    // Tips
+    Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
+    Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
+
+    // --- AREA KHUSUS ADMIN ---
     Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', function (Request $request) {
@@ -77,7 +108,12 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/donasi/hapus/{id}', function ($id) {
             $donasi = Donation::findOrFail($id);
-            if ($donasi->foto) { Storage::disk('public')->delete($donasi->foto); }
+            if ($donasi->foto_kegiatan) {
+                Storage::disk('public')->delete($donasi->foto_kegiatan);
+            }
+            if ($donasi->foto) {
+                Storage::disk('public')->delete($donasi->foto);
+            }
             $donasi->delete();
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil dihapus!');
         })->name('donasi.delete');
