@@ -8,31 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Donation extends Model {
     use HasFactory;
 
-    protected $table = 'donations';
+    protected $table = 'kegiatan_donasis';
 
     // Kolom yang ada di gambar phpMyAdmin kamu
     protected $fillable = [
-        'judul_donasi',
-        'kategori_penerima',
-        'tanggal_kegiatan',
-        'foto_kegiatan',
-        'deskripsi',
-        'alamat_penyaluran',
-        'rating',
-        'komentar',
-        'judul',
-        'kategori',
-        'tanggal',
-        'foto',
-        'alamat',
-        'nama_makanan',
-        'donatur',
-        'porsi',
-        'status',
-        'quantity',
-        'validated_by',
-        'user_id'
-    ];
+    'judul_donasi',
+    'kategori_penerima',
+    'tanggal_kegiatan',
+    'foto_kegiatan',
+    'deskripsi',
+    'alamat_penyaluran',
+    'status'
+];
 
     /*
     |--------------------------------------------------------------------------
