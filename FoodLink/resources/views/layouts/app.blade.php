@@ -30,6 +30,9 @@
                 <a href="{{ route('bukti.donasi') }}">Bukti Donasi</a>
                 <a href="#">Riwayat Koordinasi</a>
                 <a href="#">Retur Donasi</a>
+                
+                <a href="{{ route('dropbox.index') }}">Drop Box</a>
+                
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin-top: 12px;">
                     @csrf
                     <button type="submit" style="background:none;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;text-align:left;color:#4A4A4A;">Keluar Akun</button>
