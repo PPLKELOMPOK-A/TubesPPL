@@ -37,24 +37,21 @@ class DonationController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
-        $validated = $request->validate([
-            'judul'          => 'required|string|max:255',
-            'kategori'       => 'required|string|max:255',
-            'tanggal'        => 'required|date',
-            'foto'           => 'nullable|image',
-            'deskripsi'      => 'required|string',
-            'alamat'         => 'required|string',
-            'status'         => 'nullable|string',
-            'quantity'       => 'nullable|string',
-            'food_type'      => 'nullable|string',
-            'estimated_time' => 'nullable|integer',
-        ]);
+       $validated = $request->validate([
+    'judul_donasi'        => 'required|string|max:255',
+    'kategori_penerima'   => 'required|string|max:255',
+    'tanggal_kegiatan'    => 'required|date',
+    'foto_kegiatan'       => 'nullable|image',
+    'deskripsi'           => 'required|string',
+    'alamat_penyaluran'   => 'required|string',
+    'status'              => 'nullable|string',
+]);
 
-        // Upload foto jika ada
-        if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')->store('donation_photos', 'public');
-        }
+       if ($request->hasFile('foto_kegiatan')) {
+    $validated['foto_kegiatan'] = $request
+        ->file('foto_kegiatan')
+        ->store('donation_photos', 'public');
+}
 
         // Simpan ke database
         $donation = Donation::create($validated);

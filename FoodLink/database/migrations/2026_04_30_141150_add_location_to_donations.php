@@ -19,7 +19,7 @@ return new class extends Migration
 
 public function down()
 {
-    Schema::table('donations', function (Blueprint $table) {
+    Schema::table('kegiatan_donasis', function (Blueprint $table) {
         $table->dropColumn(['latitude', 'longitude']);
     });
 }

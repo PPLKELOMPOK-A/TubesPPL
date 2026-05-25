@@ -167,7 +167,7 @@
             </div>
 
         </div>
-
+</a>
         @empty
 
         <div style="
