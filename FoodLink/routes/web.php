@@ -30,32 +30,31 @@ use App\Models\Chat;
 // ======================
 Route::get('/', fn () => view('welcome'));
 
-
 // ======================
 // GUEST
 // ======================
 Route::middleware('guest')->group(function () {
-
     Route::get('/login', [Controller::class, 'showLogin'])->name('login');
     Route::post('/login', [Controller::class, 'login']);
-
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-
 // ======================
-// AUTH USER
+// AUTH USER & ADMIN
 // ======================
 Route::middleware('auth')->group(function () {
 
-    // DASHBOARD USER
-    Route::get('/dashboard', function () {
+    // --- LOGOUT GLOBAL ---
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    // ==========================================
+    // AREA USER BIASA
+    // ==========================================
+    Route::get('/dashboard', function () {
         if (Auth::user()->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-
         return view('dashboard', [
             'donations' => Donation::latest()->get()
         ]);
@@ -71,58 +70,151 @@ Route::middleware('auth')->group(function () {
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
     
     Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking');
-
     Route::get('/tracking/{id}', function ($id) {
         return view('trackingdetail', [
             'donation' => Donation::findOrFail($id)
         ]);
     })->name('tracking.detail');
 
-
-    // BUKTI
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
 
-
-    Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
-    Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
-
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function (Request $request) {
-            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $semuaDonasi = Donation::orderBy('created_at', 'desc')->get();
-            return view('admin.dashboardAdmin', compact('semuaDonasi'));
-        })->name('dashboard');
-
+    // --- KOMUNITAS ---
+    Route::get('/komunitas', function (Request $request) {
+        $posts = Komunitas::query();
+        if ($request->search) {
+            $posts->where(function ($q) use ($request) {
+                $q->where('judul', 'like', '%' . $request->search . '%')
+                  ->orWhere('isi', 'like', '%' . $request->search . '%');
+            });
+        }
         if ($request->kategori) {
             $posts->where('kategori', $request->kategori);
         }
+        $posts = $posts->latest()->get();
+        return view('komunitas', compact('posts'));
+    })->name('komunitas.index');
 
-        Route::prefix('validasi-proses-donasi')->group(function () {
-            Route::get('/', [ValidasiProsesDonasiController::class, 'index'])->name('validasi.index');
-            Route::get('/disetujui', [ValidasiProsesDonasiController::class, 'halamanDisetujui'])->name('validasi.disetujui');
-            Route::get('/ditolak', [ValidasiProsesDonasiController::class, 'halamanDitolak'])->name('validasi.ditolak');
-            Route::post('/{id}/setujui', [ValidasiProsesDonasiController::class, 'setujui'])->name('validasi.setujui');
-            Route::post('/{id}/tolak', [ValidasiProsesDonasiController::class, 'tolak'])->name('validasi.tolak');
-        });
-
-        Route::get('/donasi/tambah', function () { return view('admin.tambah-donasi'); })->name('donasi.create');
-        Route::post('/donasi/tambah', function (Request $request) {
-            $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : null;
-            Donation::create([
-                'judul' => $request->judul, 'kategori' => $request->kategori, 'tanggal' => $request->tanggal,
-                'foto' => $fotoPath, 'deskripsi' => $request->deskripsi, 'alamat' => $request->alamat, 'user_id' => Auth::id()
-            ]);
-            return redirect()->route('admin.dashboard')->with('success', 'Berhasil ditambahkan!');
-        })->name('donasi.store');
+    Route::get('/komunitas/create', function () {
+        return view('tambah-komunitas');
+    })->name('komunitas.create');
 
     Route::get('/komunitas/{id}', function ($id) {
-        return view('komunitas-detail', [
-            'post' => Komunitas::findOrFail($id)
-        ]);
+        $post = Komunitas::findOrFail($id);
+        return view('komunitas-detail', compact('post'));
     })->name('komunitas.detail');
 
     Route::post('/komunitas/store', function (Request $request) {
+        $request->validate([
+            'judul' => 'required',
+            'isi' => 'required',
+            'kategori' => 'nullable',
+        ]);
+        Komunitas::create([
+            'nama_user' => auth()->user()->name,
+            'judul'     => $request->judul,
+            'isi'       => $request->isi,
+            'kategori'  => $request->kategori,
+        ]);
+        return redirect()->route('komunitas.index');
+    })->name('komunitas.store');
+
+    // // --- KOMUNITAS (Sudah Dikeluarkan dari Area Admin) ---
+    // Route::get('/komunitas', function (Request $request) {
+    //     $posts = Komunitas::query();
+    //     if ($request->search) {
+    //         $posts->where(function ($q) use ($request) {
+    //             $q->where('judul', 'like', '%' . $request->search . '%')
+    //               ->orWhere('isi', 'like', '%' . $request->search . '%');
+    //         });
+    //     }
+    //     if ($request->kategori) {
+    //         $posts->where('kategori', $request->kategori);
+    //     }
+    //     $posts = $posts->latest()->get();
+    //     return view('komunitas', compact('posts'));
+    // })->name('komunitas.index');
+
+    // Route::get('/komunitas/create', function () {
+    //     return view('tambah-komunitas');
+    // })->name('komunitas.create');
+
+    // Route::get('/komunitas/{id}', function ($id) {
+    //     $post = Komunitas::findOrFail($id);
+    //     return view('komunitas-detail', compact('post'));
+    // })->name('komunitas.detail');
+
+    // Route::post('/komunitas/store', function (Request $request) {
+    //     $request->validate([
+    //         'judul' => 'required',
+    //         'isi' => 'required',
+    //         'kategori' => 'nullable',
+    //     ]);
+    //     Komunitas::create([
+    //         'nama_user' => auth()->user()->name,
+    //         'judul'     => $request->judul,
+    //         'isi'       => $request->isi,
+    //         'kategori'  => $request->kategori,
+    //     ]);
+    //     return redirect()->route('komunitas.index');
+    // })->name('komunitas.store');
+
+    // --- CHAT USER ---
+    Route::get('/chat', function () {
+        $admin = \App\Models\User::where('role', 'admin')->first();
+        if (!$admin) abort(500, 'Admin tidak ada');
+        $chats = \App\Models\Chat::where(function ($q) use ($admin) {
+            $q->where('sender_id', auth()->id())->where('receiver_id', $admin->id);
+        })
+        ->orWhere(function ($q) use ($admin) {
+            $q->where('sender_id', $admin->id)->where('receiver_id', auth()->id());
+        })
+        ->orderBy('created_at', 'asc')->get();
+        return view('chat.user', compact('chats', 'admin'));
+    })->name('chat.user');
+
+    Route::post('/chat/send', function (Request $request) {
+        $admin = \App\Models\User::where('role', 'admin')->first();
+        Chat::create([
+            'sender_id' => auth()->id(),
+            'receiver_id' => $admin->id,
+            'message' => $request->message,
+        ]);
+        return back();
+    })->name('chat.send');
+
+
+    // ==========================================
+    // AREA KHUSUS ADMIN
+    // ==========================================
+    
+    // GRUP ADMIN 1 (Route menggunakan nama awalan 'admin.')
+    Route::prefix('admin')->name('admin.')->group(function () {
+        
+        Route::get('/dashboard', function (Request $request) {
+            if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
+            $query = Donation::query();
+            if ($request->search) { $query->where('judul_donasi', 'like', "%{$request->search}%"); }
+            if ($request->kategori) { $query->whereIn('kategori_penerima', (array) $request->kategori); }
+            return view('admin.dashboardAdmin', ['semuaDonasi' => $query->latest()->get()]);
+        })->name('dashboard');
+
+        Route::get('/validasi', [AdminValidasiController::class, 'index'])->name('validasi.index');
+        Route::get('/penugasan', fn () => view('admin.penugasan'))->name('penugasan.index');
+        
+        Route::get('/donasi/tambah', fn () => view('admin.tambah-donasi'))->name('donasi.create');
+        Route::post('/donasi/tambah', function (Request $request) {
+            $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : null;
+            Donation::create([
+                'judul_donasi' => $request->judul,
+                'kategori_penerima' => $request->kategori,
+                'tanggal_kegiatan' => $request->tanggal,
+                'foto_kegiatan' => $fotoPath,
+                'deskripsi' => $request->deskripsi,
+                'alamat_penyaluran' => $request->alamat
+            ]);
+            return redirect()->route('admin.dashboard');
+        })->name('donasi.store');
 
         Route::post('/donasi/hapus/{id}', function ($id) {
             $donasi = Donation::findOrFail($id);
@@ -134,12 +226,13 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
-        Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
     });
 
-    // ===== KERJA SAMA MITRA =====
+    // GRUP ADMIN 2 (Route Mitra & Dropbox tanpa awalan nama 'admin.')
     Route::prefix('admin')->group(function () {
+        
+        // --- KERJA SAMA MITRA ---
         Route::get('/kerjasama-mitra', function (Request $request) {
             if (!session()->has('mitra_data')) {
                 session()->put('mitra_data', [
@@ -188,7 +281,7 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('mitra.index', ['status' => $statusBaru]);
         })->name('mitra.updateStatus');
 
-        // ===== DROP BOX INTERAKTIF MAPS ANIMATION =====
+        // --- DROP BOX ---
         Route::get('/drop-box', function (Request $request) {
             date_default_timezone_set('Asia/Jakarta');
             $now = time();
@@ -207,9 +300,7 @@ Route::middleware('auth')->group(function () {
             foreach ($dropboxes as $key => $db) {
                 if (isset($db['active_task'])) {
                     $t = $db['active_task'];
-                    
                     if ($now >= $t['waktu_selesai']) {
-                        // Selesai Di Antar
                         $dropboxes[$key]['kapasitas'] = rand(0, 5);
                         $dropboxes[$key]['status'] = 'tersedia';
                         $dropboxes[$key]['update'] = date('H:i', $t['waktu_selesai']) . " | {$t['petugas']} - Selesai Di Antar";
@@ -217,11 +308,9 @@ Route::middleware('auth')->group(function () {
                         unset($dropboxes[$key]['active_task']);
                         $dataChanged = true;
                     } elseif ($now >= $t['waktu_jemput']) {
-                        // Sedang Mengantar Barang (Dari Drop Box ke Tujuan)
                         $dropboxes[$key]['update'] = date('H:i', $now) . " | {$t['petugas']} - Sedang Mengantar Barang (Est Selesai: " . date('H:i', $t['waktu_selesai']) . ")";
                         $dataChanged = true;
                     } elseif ($now >= $t['waktu_mulai']) {
-                        // Sedang Menjemput Barang (Dari Pangkalan ke Drop Box)
                         $dropboxes[$key]['update'] = date('H:i', $now) . " | {$t['petugas']} - Sedang Menjemput Barang (Est Tiba: " . date('H:i', $t['waktu_jemput']) . ")";
                         $dataChanged = true;
                     } else {
@@ -229,7 +318,6 @@ Route::middleware('auth')->group(function () {
                     }
                 }
             }
-
             if ($dataChanged) { session()->put('dropbox_data', $dropboxes); }
 
             $allDropboxes = collect($dropboxes)->map(function($item) { return (object) $item; });
@@ -253,7 +341,6 @@ Route::middleware('auth')->group(function () {
             $dropboxes = session('dropbox_data', []);
             $newId = count($dropboxes) > 0 ? max(array_column($dropboxes, 'id')) + 1 : 1;
             $lat = -6.2000 + (mt_rand(-400, 400) / 10000); $lng = 106.8100 + (mt_rand(-400, 400) / 10000);
-
             $newDropbox = [
                 'id' => $newId, 'nama' => $request->input('nama'), 'status' => 'tersedia', 
                 'lokasi' => $request->input('lokasi'), 'mitra' => $request->input('mitra'), 
@@ -268,143 +355,33 @@ Route::middleware('auth')->group(function () {
             date_default_timezone_set('Asia/Jakarta');
             $dropboxes = session('dropbox_data', []);
             $namaPetugas = $request->input('petugas');
-            $jamMulaiStr = $request->input('waktu'); // Input Jam
-
+            $jamMulaiStr = $request->input('waktu');
             $waktuMulaiTS = strtotime(date('Y-m-d ') . $jamMulaiStr);
 
             foreach ($dropboxes as $key => $db) {
                 if ($db['id'] == $id) {
                     if(!isset($dropboxes[$key]['history'])) { $dropboxes[$key]['history'] = []; }
-
-                    // Generate koordinat Pangkalan Relawan (Awal) dan Tujuan Antar (Akhir)
                     $latAwal = $db['lat'] + (mt_rand(-300, 300) / 10000);
                     $lngAwal = $db['lng'] + (mt_rand(-300, 300) / 10000);
                     $latTujuan = $db['lat'] + (mt_rand(-400, 400) / 10000);
                     $lngTujuan = $db['lng'] + (mt_rand(-400, 400) / 10000);
 
-                    // Set Tugas Aktif (Cepat untuk Presentasi: Jemput +1 Menit, Antar +2 Menit)
                     $dropboxes[$key]['active_task'] = [
                         'petugas' => $namaPetugas,
-                        'waktu_mulai' => $waktuMulaiTS,               // Berangkat dari Pangkalan
-                        'waktu_jemput' => $waktuMulaiTS + (1 * 60),   // Tiba di Drop Box
-                        'waktu_selesai' => $waktuMulaiTS + (2 * 60),  // Tiba di Tujuan (Selesai)
+                        'waktu_mulai' => $waktuMulaiTS,               
+                        'waktu_jemput' => $waktuMulaiTS + (1 * 60),   
+                        'waktu_selesai' => $waktuMulaiTS + (2 * 60),  
                         'lat_awal' => $latAwal,
                         'lng_awal' => $lngAwal,
                         'lat_tujuan' => $latTujuan,
                         'lng_tujuan' => $lngTujuan
                     ];
-                    
                     $dropboxes[$key]['update'] = "Dijadwalkan: $namaPetugas pada $jamMulaiStr";
                     break;
                 }
             }
             session()->put('dropbox_data', $dropboxes);
-            return redirect()->route('dropbox.index');
+            return redirect()->route('dropbox.jemput');
         })->name('dropbox.jemput');
     });
-
-        if (!$admin) abort(500, 'Admin tidak ada');
-
-        $chats = Chat::where(function ($q) use ($admin) {
-            $q->where('sender_id', auth()->id())
-              ->where('receiver_id', $admin->id);
-        })
-        ->orWhere(function ($q) use ($admin) {
-            $q->where('sender_id', $admin->id)
-              ->where('receiver_id', auth()->id());
-        })
-        ->latest()
-        ->get();
-
-        return view('chat.user', compact('chats', 'admin'));
-    })->name('chat.user');
-
-
-    Route::post('/chat/send', function (Request $request) {
-
-        $admin = \App\Models\User::where('role', 'admin')->first();
-
-        Chat::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $admin->id,
-            'message' => $request->message,
-        ]);
-
-        return back();
-    })->name('chat.send');
-
-
-    // LOGOUT
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-});
-
-
-// ======================
-// ADMIN
-// ======================
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-
-    // DASHBOARD
-    Route::get('/dashboard', function (Request $request) {
-
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('dashboard');
-        }
-
-        $query = Donation::query();
-
-        if ($request->search) {
-            $query->where('judul_donasi', 'like', "%{$request->search}%");
-        }
-
-        if ($request->kategori) {
-            $query->whereIn('kategori_penerima', (array) $request->kategori);
-        }
-
-        return view('admin.dashboardAdmin', [
-            'semuaDonasi' => $query->latest()->get()
-        ]);
-
-    })->name('dashboard');
-
-
-    // VALIDASI
-    Route::get('/validasi', [AdminValidasiController::class, 'index'])
-        ->name('validasi.index');
-
-
-    // PENUGASAN (FIX ERROR KAMU)
-    Route::get('/penugasan', fn () => view('admin.penugasan'))
-        ->name('penugasan.index');
-
-
-    // DONASI CREATE (FIX ERROR UTAMA KAMU)
-    Route::get('/donasi/tambah', fn () => view('admin.tambah-donasi'))
-        ->name('donasi.create');
-
-
-    Route::post('/donasi/tambah', function (Request $request) {
-
-        Donation::create([
-            'judul_donasi' => $request->judul,
-            'kategori_penerima' => $request->kategori,
-            'tanggal_kegiatan' => $request->tanggal,
-            'foto_kegiatan' => $request->file('foto')
-                ? $request->file('foto')->store('donasi', 'public')
-                : null,
-            'deskripsi' => $request->deskripsi,
-            'alamat_penyaluran' => $request->alamat
-        ]);
-
-        return redirect()->route('admin.dashboard');
-
-    })->name('donasi.store');
-
-
-    // RETUR
-    Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
-
-
-    // REPORT
-    Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 });

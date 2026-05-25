@@ -158,10 +158,10 @@
                 <i class="fa fa-location-dot"></i> Tracking
             </a>
 
-            <a href="{{ route('komunitas.index') }}" class="nav-item {{ request()->is('komunitas*') ? 'active' : '' }}">
-                <i class="fa fa-users"></i> Komunitas
-            </a>
-
+           <a href="{{ route('komunitas.index') }}" 
+   class="nav-item {{ Request::is('komunitas') ? 'active' : '' }}">
+    <i class="fa-solid fa-users"></i> Komunitas
+</a>
             @if(Route::has('bukti.donasi'))
                 <a href="{{ route('bukti.donasi') }}" class="nav-item">
                     <i class="fa fa-file"></i> Bukti Donasi
