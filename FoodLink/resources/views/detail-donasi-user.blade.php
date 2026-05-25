@@ -5,7 +5,7 @@
 @section('content')
 <style>
     /* --- CONTAINER DETAIL --- */
-    .container-detail { padding: 0 10px; max-width: 1000px; width: 100%; margin-left: 0; margin-right: auto; }
+    .container-detail { padding: 40px 60px; max-width: 1000px; width: 100%; margin-left: 0; margin-right: auto; }
 
     .back-nav { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #eee; color: #444; text-decoration: none; margin-bottom: 20px; transition: 0.2s; }
     .back-nav:hover { background: #e0e0e0; color: #000; }
@@ -28,7 +28,6 @@
     .btn-action-detail:hover { background-color: #563e21; }
 </style>
 
-<!-- Menggunakan class wrapper dari Master Layout -->
 <div class="main-content-canvas">
     <div class="container-detail">
         
@@ -37,14 +36,12 @@
         </a>
 
         <div class="header-info">
-            <!-- Disesuaikan dengan nama kolom Database -->
             <h1>{{ $data->judul_donasi }}</h1>
             <span class="category">{{ $data->kategori_penerima }}</span>
             <p class="date">{{ \Carbon\Carbon::parse($data->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</p>
         </div>
 
         <div class="image-container">
-            <!-- Disesuaikan dengan nama kolom Database -->
             @if(!empty($data->foto_kegiatan))
                 <img src="{{ asset('storage/' . $data->foto_kegiatan) }}" alt="Foto Donasi">
             @else
@@ -59,7 +56,6 @@
 
         <div class="content-section">
             <h3 class="section-title">Alamat</h3>
-            <!-- Disesuaikan dengan nama kolom Database -->
             <p class="section-text">{{ $data->alamat_penyaluran }}</p>
         </div>
 

@@ -1,8 +1,9 @@
-<?php
+﻿<?php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+<<<<<<< HEAD
 use App\Models\Donation;
 <<<<<<< HEAD
 use App\Models\User;
@@ -62,21 +63,17 @@ class DonationSeeder extends Seeder
 =======
 use App\Models\User; // <-- Tambahan: Import model User
 use Carbon\Carbon;
+=======
+use Illuminate\Support\Facades\DB;
+>>>>>>> 053b9a674eb83b28c88b26ae2a80351b5925932f
 
 class DonationSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Hapus data lama dengan delete() agar lebih aman dari error constraint
-        Donation::query()->delete();
-
-        // 1. PASTIKAN ADA USER: Cari user pertama, atau buat baru kalau tabel users kosong
-        $user = User::firstOrCreate(
-            ['email' => 'donaturdummy@gmail.com'],
+        DB::table('donations')->insert([
             [
+<<<<<<< HEAD
                 'name' => 'Donatur Dummy',
                 'password' => bcrypt('12345678'),
                 'role' => 'user'
@@ -127,6 +124,22 @@ class DonationSeeder extends Seeder
             'created_at' => Carbon::now()->subHours(2)->subMinutes(17),
             'updated_at' => Carbon::now()->subHours(2)->subMinutes(17),
 >>>>>>> 1702c37bbe994028f2c3cee2b01135d95a34769d
+=======
+                'judul' => 'Program Makan Sehat - Yayasan Peduli',
+                'kategori' => 'Organisasi (Yayasan)',
+                'tanggal' => '2026-05-30',
+                'foto' => 'makan_sehat.jpg',
+                'deskripsi' => 'Penyaluran donasi dilakukan kepada anak-anak panti asuhan dalam rangka Hari Anak Nasional',
+                'status' => 'Selesai',
+                'user_id' => 1,
+                'rating' => null,
+                'komentar' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            // tambah data contoh lain jika perlu
+>>>>>>> 053b9a674eb83b28c88b26ae2a80351b5925932f
         ]);
     }
 }
+

@@ -1,15 +1,11 @@
-/* =========================
-   RESET
-========================= */
+﻿/* RESET */
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: #f5f5f5;
 }
 
-/* =========================
-   LAYOUT
-========================= */
+/* LAYOUT */
 .container {
     display: flex;
     min-height: 100vh;
@@ -20,6 +16,7 @@ body {
     width: 230px;
     background: #e8d3a5;
     padding: 20px;
+    min-height: 100vh;
 }
 
 .sidebar h3 {
@@ -38,13 +35,13 @@ body {
     cursor: pointer;
 }
 
+.sidebar ul li:hover {
+    background: #d9c29a;
+}
+
 .sidebar ul li.active {
     background: #3b2f2f;
     color: white;
-}
-
-.sidebar ul li:hover {
-    background: #d9c29a;
 }
 
 /* CONTENT */
@@ -53,9 +50,6 @@ body {
     padding: 40px;
 }
 
-/* =========================
-   TITLE
-========================= */
 .content h2 {
     font-size: 22px;
     margin-bottom: 5px;
@@ -67,9 +61,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* =========================
-   STATS
-========================= */
+/* STATS */
 .stats {
     display: flex;
     gap: 20px;
@@ -97,9 +89,7 @@ body {
 .stat-card:nth-child(2) { background: #cde5d2; }
 .stat-card:nth-child(3) { background: #f3c6c6; }
 
-/* =========================
-   TABS
-========================= */
+/* TABS */
 .tabs {
     display: flex;
     gap: 10px;
@@ -120,9 +110,7 @@ body {
     color: white;
 }
 
-/* =========================
-   CARD DONASI
-========================= */
+/* CARD DONASI */
 .card-donasi {
     display: flex;
     align-items: center;
@@ -141,7 +129,6 @@ body {
     box-shadow: 0 10px 20px rgba(0,0,0,0.12);
 }
 
-/* IMAGE */
 .thumb {
     width: 85px;
     height: 85px;
@@ -149,7 +136,6 @@ body {
     border-radius: 12px;
 }
 
-/* INFO */
 .info {
     flex: 1;
 }
@@ -171,7 +157,6 @@ body {
     color: #999;
 }
 
-/* BADGE */
 .badge-group {
     margin-top: 6px;
     display: flex;
@@ -189,7 +174,6 @@ body {
     background: #ddd;
 }
 
-/* STATUS */
 .status {
     position: absolute;
     top: 15px;
@@ -202,7 +186,6 @@ body {
     font-weight: bold;
 }
 
-/* BUTTON */
 .action {
     display: flex;
     gap: 10px;
@@ -221,9 +204,6 @@ body {
 .btn.red { background: #ef5350; }
 .btn.gray { background: #757575; }
 
-/* =========================
-   ALERT
-========================= */
 .alert {
     padding: 10px;
     margin-bottom: 15px;
@@ -235,17 +215,11 @@ body {
 .alert.error { background: #f8d7da; }
 .alert.info { background: #d1ecf1; }
 
-/* =========================
-   EMPTY
-========================= */
 .empty {
     text-align: center;
     margin-top: 30px;
 }
 
-/* =========================
-   PAGINATION
-========================= */
 .pagination {
     margin-top: 20px;
     font-size: 13px;

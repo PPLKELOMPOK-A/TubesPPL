@@ -69,26 +69,9 @@ class DonationController extends Controller
      * Mengembalikan semua donasi dalam format JSON
      * Untuk polling / real-time tanpa Pusher
      */
-    public function getDonationsJson()
-    {
-        $donations = Donation::orderByDesc('created_at')->get();
-        return response()->json($donations);
-    }
-    public function up(): void
+  public function getDonationsJson()
 {
-    Schema::table('donations', function (Blueprint $table) {
-        $table->foreignId('courier_id')
-              ->nullable()
-              ->constrained('couriers')
-              ->onDelete('set null');
-    });
-}
-
-public function down(): void
-{
-    Schema::table('donations', function (Blueprint $table) {
-        $table->dropForeign(['courier_id']);
-        $table->dropColumn('courier_id');
-    });
+    $donations = Donation::orderByDesc('created_at')->get();
+    return response()->json($donations);
 }
 }
