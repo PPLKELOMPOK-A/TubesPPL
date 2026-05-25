@@ -47,7 +47,7 @@
             margin-bottom: 6px;
         }
 
-        .nav-item i { width: 20px; color: #6B4F2A; }
+        .nav-item i { width: 20px; color: #6B4F2A; text-align: center; }
 
         .nav-item:hover { background: rgba(107,79,42,0.1); }
 
@@ -72,6 +72,10 @@
             text-align: left;
             cursor: pointer;
             border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .logout-btn:hover {
@@ -103,6 +107,7 @@
             margin-left: 10px;
         }
     </style>
+    @yield('styles')
 </head>
 
 <body>
@@ -142,6 +147,13 @@
                 <i class="fa fa-home"></i> Dashboard
             </a>
 
+            {{-- Fitur Drop Box milik temanmu digabungkan di sini --}}
+            @if(Route::has('dropbox.index'))
+                <a href="{{ route('dropbox.index') }}" class="nav-item {{ request()->routeIs('dropbox.*') ? 'active' : '' }}">
+                    <i class="fa fa-box-archive"></i> Drop Box
+                </a>
+            @endif
+
             <a href="{{ route('donation.tracking') }}" class="nav-item {{ request()->is('tracking*') ? 'active' : '' }}">
                 <i class="fa fa-location-dot"></i> Tracking
             </a>
@@ -150,14 +162,12 @@
                 <i class="fa fa-users"></i> Komunitas
             </a>
 
-            {{-- AMAN: cek route ada atau tidak --}}
             @if(Route::has('bukti.donasi'))
                 <a href="{{ route('bukti.donasi') }}" class="nav-item">
                     <i class="fa fa-file"></i> Bukti Donasi
                 </a>
             @endif
 
-            {{-- review belum ada di web.php → amanin --}}
             @if(Route::has('review.index'))
                 <a href="{{ route('review.index') }}" class="nav-item">
                     <i class="fa fa-star"></i> Rating & Review
