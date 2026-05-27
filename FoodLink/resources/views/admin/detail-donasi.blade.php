@@ -15,7 +15,7 @@
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
         .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
         
-        .nav-group { flex-grow: 1; padding: 0 15px; /* Memberi jarak agar tidak penuh ke pinggir */ }
+        .nav-group { flex-grow: 1; padding: 0 15px; }
         
         .nav-item { 
             display: flex; 
@@ -27,7 +27,7 @@
             font-weight: 500; 
             gap: 15px; 
             margin-bottom: 6px; 
-            border-radius: 10px; /* Sudut kotak sewajarnya */
+            border-radius: 10px; 
             transition: 0.2s;
         }
         
@@ -69,8 +69,10 @@
         .btn { padding: 12px 35px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; min-width: 120px; }
         
         .btn-kembali { background: white; border: 1px solid #D0D0D0; color: #444; }
+        /* CSS Hapus yang duplikat sudah dihapus dan disisakan yang merah */
         .btn-hapus { background: #fdfdfd; border: 1px solid #d9534f; color: #d9534f; }
-        .btn-hapus { background: white; border: 1px solid #D0D0D0; color: #444; }
+        .btn-hapus:hover { background: #d9534f; color: #fff; }
+        
         .btn-edit { background: #6B4F2A; color: white; border: none; }
         .btn-edit:hover { background-color: #563e21; }
 
@@ -84,10 +86,10 @@
         <div class="nav-group">
             <div class="brand">Foodlink</div>
             <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="{{ route('validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="{{ route('admin.validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
             <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
+            <a href="{{ route('admin.penugasan.index') }}" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
         </div>
         <div class="logout-section">
              <form action="{{ route('logout') }}" method="POST">
@@ -104,7 +106,6 @@
         </div>
 
         <div class="container">
-            <!-- Pesan Sukses jika baru saja di-edit -->
             @if(session('success'))
                 <div class="alert-success">
                     <i class="fa-solid fa-circle-check"></i>
@@ -112,22 +113,19 @@
                 </div>
             @endif
 
-            <!-- BACK BUTTON UX: Diletakkan di atas, hanya icon -->
             <a href="{{ route('admin.dashboard') }}" class="back-nav" title="Kembali ke Beranda">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
 
             <div class="header-info">
-                <!-- DIUBAH: Menggunakan ->judul -->
-                <h1>{{ $data->judul }}</h1>
-                <span class="category">{{ $data->kategori }}</span>
-                <p class="date">{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}</p>
+                <h1>{{ $data->judul_donasi }}</h1>
+                <span class="category">{{ $data->kategori_penerima }}</span>
+                <p class="date">{{ \Carbon\Carbon::parse($data->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</p>
             </div>
 
             <div class="image-container">
-                <!-- DIUBAH: Menggunakan ->foto -->
-                @if(!empty($data->foto))
-                    <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto Donasi">
+                @if(!empty($data->foto_kegiatan))
+                    <img src="{{ asset('storage/' . $data->foto_kegiatan) }}" alt="Foto Donasi">
                 @else
                     <img src="https://via.placeholder.com/450x300/f5f5f5/cccccc?text=Belum+Ada+Foto" alt="Donasi">
                 @endif
@@ -135,30 +133,21 @@
 
             <div class="content-section">
                 <h3 class="section-title">Deskripsi Kegiatan</h3>
-                <!-- DIUBAH: Menggunakan ->deskripsi -->
                 <p class="section-text">{{ $data->deskripsi }}</p>
             </div>
 
             <div class="content-section">
-                <h3 class="section-title">Alamat</h3>
-                <!-- DIUBAH: Menggunakan ->alamat -->
-                <p class="section-text">{{ $data->alamat }}</p>
+                <h3 class="section-title">Alamat Penyaluran</h3>
+                <p class="section-text">{{ $data->alamat_penyaluran }}</p>
             </div>
 
             <div class="footer-actions">
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-kembali">Kembali</a>
                 
-                <button class="btn btn-hapus">Hapus</button>
-                
-                <a href="{{ route('admin.donasi.edit') }}" class="btn btn-edit">Edit</a>
-                
-                <!-- PERUBAHAN: Tombol Hapus dibungkus Form agar berfungsi ke route hapus -->
                 <form action="{{ route('admin.donasi.delete', ['id' => $data->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
                     @csrf
                     <button type="submit" class="btn btn-hapus">Hapus</button>
                 </form>
 
-                <!-- DIUBAH: Menggunakan ->id -->
                 <a href="{{ route('admin.donasi.edit', ['id' => $data->id]) }}" class="btn btn-edit">Edit</a>
             </div>
         </div>
