@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
@@ -13,6 +13,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
+use App\Http\Controllers\NotifikasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,21 @@ Route::middleware(['guest'])->group(function () {
 // --- AUTH AREA (Harus Login) ---
 Route::middleware(['auth'])->group(function () {
     
+    // --- AREA PUSAT NOTIFIKASI (Akses Admin & Donatur) ---
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/mark-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.markAllAsRead');
+    // Tambahkan ini di dalam group Route::middleware(['auth'])->group(function () { ... })
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/mark-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.markAllAsRead');
+    Route::post('/notifikasi/{id}/read', [NotifikasiController::class, 'markSingleAsRead'])->name('notifikasi.markSingleAsRead');
+    // Di dalam Route::middleware(['auth'])->group(function () { ... })
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/mark-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.markAllAsRead');
+    // Mengubah status baca lalu dialihkan ke halaman detail
+    Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'markSingleAsRead'])->name('notifikasi.markSingleAsRead');
+    // Halaman khusus untuk menampilkan detail notifikasi
+    Route::get('/notifikasi/{id}/detail', [NotifikasiController::class, 'show'])->name('notifikasi.show');
+
     // --- AREA USER BIASA ---
     Route::get('/dashboard', function (Request $request) {
         // Redirect jika admin nyasar ke dashboard user

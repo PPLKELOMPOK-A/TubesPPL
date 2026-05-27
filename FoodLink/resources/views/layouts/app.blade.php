@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +45,21 @@
         /* Helper untuk Notifikasi */
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
         .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+        /* --- EFEK HOVER LONCENG NOTIFIKASI --- */
+        .notif-bell {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notif-bell i {
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+        .notif-bell:hover i {
+            transform: scale(1.15);
+            color: #6B4F2A; /* Warna coklat khas brand */
+        }
     </style>
 </head>
 <body>
@@ -110,7 +125,12 @@
 
     <div class="main-panel">
         <div class="top-bar">
-            <i class="fa-regular fa-bell"></i>
+            
+            {{-- ICON LONCENG NOTIFIKASI YANG SUDAH DIBUNGKUS LINK --}}
+            <a href="{{ route('notifikasi.index') }}" class="notif-bell" title="Pusat Notifikasi">
+                <i class="fa-regular fa-bell"></i>
+            </a>
+
             <div class="profile-section">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
