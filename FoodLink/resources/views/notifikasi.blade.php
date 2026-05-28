@@ -205,11 +205,7 @@
                 onclick="window.location.href='{{ $isUnread ? route('notifikasi.markSingleAsRead', $notification->id) : route('notifikasi.show', $notification->id) }}';" 
                 style="cursor: pointer;">
                 
-                @if($isUnread)
-                    <form id="mark-form-{{ $notification->id }}" action="{{ route('notifikasi.markSingleAsRead', $notification->id) }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                @endif
+                {{-- KODE <FORM> SEBELUMNYA DI SINI SUDAH DIHAPUS --}}
 
                 <div class="notif-icon-box">
                     @if($isUnread)
