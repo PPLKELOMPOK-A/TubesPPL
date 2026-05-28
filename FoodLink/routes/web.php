@@ -1,19 +1,26 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Models\Donation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
-use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes - Foodlink Project
+|--------------------------------------------------------------------------
+*/
+
 
 Route::get('/', function () { return view('welcome'); });
 
@@ -88,6 +95,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
     });
+
+        // ===== VALIDASI DONASI =====
+        Route::prefix('validasi-proses-donasi')->group(function () {
+            Route::get('/', [ValidasiProsesDonasiController::class, 'index'])->name('validasi.index');
+            Route::get('/disetujui', [ValidasiProsesDonasiController::class, 'halamanDisetujui'])->name('validasi.disetujui');
+            Route::get('/ditolak', [ValidasiProsesDonasiController::class, 'halamanDitolak'])->name('validasi.ditolak');
+            Route::post('/{id}/setujui', [ValidasiProsesDonasiController::class, 'setujui'])->name('validasi.setujui');
+            Route::post('/{id}/tolak', [ValidasiProsesDonasiController::class, 'tolak'])->name('validasi.tolak');
+            
+            // Tambahan dari tim (return donasi) dibiarkan agar fitur kelompok tidak error
+            Route::post('/{id}/return', [ValidasiProsesDonasiController::class, 'returnDonasi'])->name('validasi.return');
+        });
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

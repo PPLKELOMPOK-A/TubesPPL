@@ -23,6 +23,47 @@ class DonasiMakanan extends Model
         'waktu_layak',
         'deskripsi',
         'foto_makanan',
-        'status'
+        'status',
+        'validated_by',
+        'user_id'
     ];
+
+    // --- TAMBAHKAN RELASI INI ---
+    // Menghubungkan DonasiMakanan dengan KegiatanDonasi berdasarkan kesamaan kategori_penerima
+    public function kegiatanDonasi()
+    {
+        return $this->belongsTo(KegiatanDonasi::class, 'kategori_penerima', 'kategori_penerima');
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | HELPER SCOPES
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopeMenunggu($query) { 
+        return $query->where('status', 'menunggu'); 
+    }
+
+    public function scopeDisetujui($query) { 
+        return $query->where('status', 'disetujui'); 
+    }
+
+    public function scopeDitolak($query) { 
+        return $query->where('status', 'ditolak'); 
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
+    public function user() { 
+        return $this->belongsTo(User::class); 
+    }
+
+    public function validator() { 
+        return $this->belongsTo(User::class, 'validated_by'); 
+    }
 }
