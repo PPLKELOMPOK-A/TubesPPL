@@ -6,7 +6,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* FIX: Memaksa layout keluar dari kontainer pembungkus agar sidebar menempel ke pojok */
     .container, .container-fluid {
         max-width: none !important;
         padding-left: 0 !important;
@@ -19,7 +18,6 @@
         padding-bottom: 0 !important;
     }
 
-    /* Konten Utama */
     .main-content {
         flex: 1;
         padding: 60px 80px;
@@ -27,7 +25,6 @@
         min-height: 100vh;
     }
 
-    /* Header & Typography */
     .page-title {
         font-size: 28px;
         font-weight: 800;
@@ -41,7 +38,6 @@
         margin-bottom: 30px;
     }
 
-    /* Area Foto */
     .main-image-wrapper {
         margin-bottom: 25px;
     }
@@ -51,21 +47,6 @@
         max-width: 900px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        max-width: 900px;
-        margin-bottom: 30px;
-    }
-
-    .gallery-grid img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-        border-radius: 12px;
     }
 
     .description-text {
@@ -79,10 +60,9 @@
         border-left: 4px solid #e6d1a3;
     }
 
-    /* Footer Buttons Rapat Kanan */
     .action-row {
         display: flex;
-        justify-content: flex-end; 
+        justify-content: flex-end;
         gap: 15px;
         max-width: 900px;
     }
@@ -117,46 +97,42 @@
 </style>
 
 <main class="main-content">
-        <header>
-            <h1 class="page-title">{{ $data['judul'] }}</h1>
-            <p class="page-subtitle">Lihat dan verifikasi hasil distribusi donasi makanan</p>
-        </header>
+    <header>
+        <h1 class="page-title">{{ $data->judul }}</h1>
+        <p class="page-subtitle">Lihat dan verifikasi hasil distribusi donasi makanan</p>
+    </header>
 
-        <div class="main-image-wrapper">
-            <img src="{{ asset($data['foto_utama']) }}" alt="Foto Utama">
-        </div>
+    <div class="main-image-wrapper">
+        @if($data->foto)
+            <img src="{{ asset('img/' . $data->foto) }}" alt="Foto Utama">
+        @else
+            <p style="color:#999;">Tidak ada foto tersedia</p>
+        @endif
+    </div>
 
-        <div class="gallery-grid">
-            @if(!empty($data['galeri']))
-                @foreach ($data['galeri'] as $foto)
-                    <img src="{{ asset($foto) }}" alt="Foto Galeri">
-                @endforeach
-            @endif
-        </div>
+    <div class="description-text">
+        <strong>Laporan / Deskripsi:</strong><br>
+        {{ $data->deskripsi }}
+    </div>
 
-        <div class="description-text">
-            <strong>Laporan / Deskripsi:</strong><br>
-            {{ $data->deskripsi }}
-        </div>
+    <footer class="action-row">
+        <a href="#" id="btn-download-bukti" class="btn-action btn-download">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Bukti
+        </a>
 
-        <footer class="action-row">
-            <a href="#" id="btn-download-bukti" class="btn-action btn-download">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Download Bukti
-            </a>
-
-            <a href="{{ route('bukti.donasi') }}" class="btn-action btn-back">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                Kembali
-            </a>
-        </footer>
-    </main>
+        <a href="{{ route('bukti.donasi') }}" class="btn-action btn-back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Kembali
+        </a>
+    </footer>
+</main>
 
 <script>
     document.getElementById('btn-download-bukti').addEventListener('click', function(e) {
