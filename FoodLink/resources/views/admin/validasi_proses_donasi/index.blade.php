@@ -78,15 +78,15 @@
 
     <div class="stats-container">
         <div class="stat-card">
-            <div class="stat-number">{{ $stats['hari_ini'] ?? 12 }}</div>
+            <div class="stat-number">{{ $stats['hari_ini'] ?? 0 }}</div>
             <div class="stat-label">MASUK HARI INI</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ $stats['menunggu'] ?? 5 }}</div>
+            <div class="stat-number">{{ $stats['menunggu'] ?? 0 }}</div>
             <div class="stat-label">PERLU VALIDASI</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ $stats['diproses'] ?? 7 }}</div>
+            <div class="stat-number">{{ $stats['diproses'] ?? 0 }}</div>
             <div class="stat-label">SUDAH DI PROSES</div>
         </div>
     </div>
@@ -120,30 +120,32 @@
                     
                     <div>
                         <div class="donasi-header-row">
-                            <h3 class="donasi-name">{{ $donasi->judul ?? 'Nama Makanan' }}</h3>
+                            <h3 class="donasi-name">{{ $donasi->kategori_makanan ?? 'Kategori Makanan' }}</h3>
                             
-                            @if($donasi->status == 'menunggu')
+                            @if($donasi->status == 'menunggu' || $donasi->status == 'pending')
                                 <div class="status-label status-menunggu">MENUNGGU</div>
                             @elseif($donasi->status == 'disetujui')
                                 <div class="status-label status-disetujui">DISETUJUI</div>
-                            @else
+                            @elseif($donasi->status == 'ditolak')
                                 <div class="status-label status-ditolak">DITOLAK</div>
+                            @else
+                                <div class="status-label status-menunggu">{{ strtoupper($donasi->status) }}</div>
                             @endif
                         </div>
 
                         <div class="donasi-meta">
-                           Donatur: {{ $donasi->kategori ?? 'Nama Donatur' }} &nbsp;&nbsp;&nbsp; Dikirim: {{ $donasi->created_at ? $donasi->created_at->format('d M, H:i') : '26 Mar, 10:15' }}
+                            Donatur: {{ $donasi->nama_donatur ?? 'Anonim' }} &nbsp;&nbsp;&nbsp; Dikirim: {{ $donasi->created_at ? $donasi->created_at->format('d M, H:i') : '-' }}
                         </div>
 
                         <div class="badges-row">
-                            <span class="badge-item badge-porsi">{{ $donasi->quantity ?? 50 }} Porsi</span>
-                            <span class="badge-item badge-layak">Layak konsumsi</span>
-                            <span class="badge-item badge-expired">Expired: {{ $donasi->expired_at ? date('d M H:i', strtotime($donasi->expired_at)) : '26 Mar 18:00' }}</span>
+                            <span class="badge-item badge-porsi">Porsi (Lihat Deskripsi)</span>
+                            <span class="badge-item badge-layak">Lokasi: {{ $donasi->lokasi_dropbox ?? '-' }}</span>
+                            <span class="badge-item badge-expired">Waktu Layak: {{ $donasi->waktu_layak ?? '-' }}</span>
                         </div>
                     </div>
 
                     <div>
-                        @if($donasi->status == 'menunggu')
+                        @if($donasi->status == 'menunggu' || $donasi->status == 'pending')
                             <div class="action-buttons">
                                 <form action="{{ route('admin.validasi.setujui', $donasi->id) }}" method="POST">
                                     @csrf
@@ -172,7 +174,7 @@
                             <div class="reject-reason-box">
                                 <div class="reject-title">Keterangan Penolakan:</div>
                                 <div class="reject-desc">
-                                    {{ $donasi->alasan_penolakan ?? 'Donasi tidak memenuhi standar kelayakan konsumsi atau sudah melewati batas waktu kadaluarsa saat divalidasi oleh admin.' }}
+                                    Donasi ditolak atau tidak memenuhi syarat kelayakan.
                                 </div>
                             </div>
                         @endif
@@ -182,13 +184,13 @@
             </div>
         @empty
             <div style="text-align: center; padding: 40px; color: #888; background: #fff; border-radius: 12px; border: 1px solid #eee;">
-                Tidak ada data donasi.
+                Tidak ada data donasi pada status ini.
             </div>
         @endforelse
 
     </div>
 
-    @if(isset($donations) && method_exists($donations, 'links'))
+    @if(isset($donations) && method_exists($donations, 'links') && $donations->hasPages())
     <div class="pagination-container">
         <span>Menampilkan {{ $donations->firstItem() ?? 0 }} - {{ $donations->lastItem() ?? 0 }} dari {{ $donations->total() ?? 0 }}</span>
         <div style="transform: scale(0.85); transform-origin: right;">
