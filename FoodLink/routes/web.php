@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Models\Donation;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
@@ -20,7 +20,6 @@ use App\Http\Controllers\KegiatanDonasiController;
 | Web Routes - Foodlink Project
 |--------------------------------------------------------------------------
 */
-
 
 Route::get('/', function () { return view('welcome'); });
 
@@ -39,6 +38,9 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
+    // ==========================================
+    // GRUP ROUTE ADMIN (Dengan Prefix 'admin.')
+    // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', function (Request $request) {
@@ -50,13 +52,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('kegiatan.create');
         Route::post('/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('kegiatan.store');
 
-        // FITUR VALIDASI PROSES DONASI (Fokus Utama PR Kamu)
+        // ===== FITUR VALIDASI PROSES DONASI =====
+        // (Sudah digabung dengan rute return tambahan dari teman kelompokmu)
         Route::prefix('validasi-proses-donasi')->group(function () {
             Route::get('/', [ValidasiProsesDonasiController::class, 'index'])->name('validasi.index');
             Route::get('/disetujui', [ValidasiProsesDonasiController::class, 'halamanDisetujui'])->name('validasi.disetujui');
             Route::get('/ditolak', [ValidasiProsesDonasiController::class, 'halamanDitolak'])->name('validasi.ditolak');
             Route::post('/{id}/setujui', [ValidasiProsesDonasiController::class, 'setujui'])->name('validasi.setujui');
             Route::post('/{id}/tolak', [ValidasiProsesDonasiController::class, 'tolak'])->name('validasi.tolak');
+            Route::post('/{id}/return', [ValidasiProsesDonasiController::class, 'returnDonasi'])->name('validasi.return');
         });
 
         Route::get('/donasi/tambah', function () { return view('admin.tambah-donasi'); })->name('donasi.create');
@@ -96,17 +100,68 @@ Route::middleware('auth')->group(function () {
 
     });
 
-        // ===== VALIDASI DONASI =====
-        Route::prefix('validasi-proses-donasi')->group(function () {
-            Route::get('/', [ValidasiProsesDonasiController::class, 'index'])->name('validasi.index');
-            Route::get('/disetujui', [ValidasiProsesDonasiController::class, 'halamanDisetujui'])->name('validasi.disetujui');
-            Route::get('/ditolak', [ValidasiProsesDonasiController::class, 'halamanDitolak'])->name('validasi.ditolak');
-            Route::post('/{id}/setujui', [ValidasiProsesDonasiController::class, 'setujui'])->name('validasi.setujui');
-            Route::post('/{id}/tolak', [ValidasiProsesDonasiController::class, 'tolak'])->name('validasi.tolak');
+    // ==========================================
+    // GRUP KERJASAMA MITRA (Tanpa Prefix 'admin.')
+    // ==========================================
+    // Sengaja dipisah dari grup name('admin.') temanmu agar nama rutenya tetap mitra.index
+    Route::prefix('admin')->group(function () {
+        Route::get('/kerjasama-mitra', function (Request $request) {
+            if (!session()->has('mitra_data')) {
+                session()->put('mitra_data', [
+                    ['id' => 1, 'nama_mitra' => 'Restoran Sederhana', 'status' => 'aktif', 'kategori' => 'Restoran', 'lokasi' => 'Jakarta Selatan', 'keterangan_waktu' => 'Bergabung Jan 2025', 'total_donasi' => '142', 'porsi_tersalur' => '1.2k', 'logo' => null, 'deskripsi' => 'Restoran Sederhana merupakan mitra kuliner berjenis Restoran yang berlokasi di Jakarta Selatan. Mitra ini berkomitmen penuh untuk mendukung program FoodLink dalam mendistribusikan makanan layak konsumsi guna mengurangi food waste dan membantu masyarakat sekitar.'],
+                    ['id' => 2, 'nama_mitra' => 'Yayasan Peduli Pangan', 'status' => 'pengajuan', 'kategori' => 'NGO', 'lokasi' => 'Jakarta Timur', 'keterangan_waktu' => 'Diajukan 20 Mar 2026', 'total_donasi' => 0, 'porsi_tersalur' => 0, 'logo' => null, 'deskripsi' => 'Yayasan Peduli Pangan merupakan lembaga swadaya masyarakat berjenis NGO yang berfokus di Jakarta Timur. Bermitra dengan FoodLink, yayasan ini aktif bergerak dalam pengelolaan sisa makanan secara higienis untuk disalurkan kepada pihak yang membutuhkan.'],
+                    ['id' => 3, 'nama_mitra' => 'Kantin Kampus UI', 'status' => 'tidak_aktif', 'kategori' => 'Kantin', 'lokasi' => 'Depok', 'keterangan_waktu' => 'Terakhir aktif Nov 2025', 'total_donasi' => '23', 'porsi_tersalur' => '180', 'logo' => null, 'deskripsi' => 'Kantin Kampus UI merupakan area kuliner berjenis Kantin yang terletak di Depok. Melalui kolaborasi bersama FoodLink, para pelaku usaha di kantin ini ikut berkontribusi nyata dalam mendonasikan surplus makanan layak makan bagi lingkungan sekitar.'],
+                ]);
+            }
+            $allMitras = collect(session('mitra_data'))->map(function($item) { return (object) $item; });
+            $status = $request->query('status');
+            $kategori = $request->query('kategori');
+            $search = $request->query('search');
+            $mitras = $allMitras;
             
-            // Tambahan dari tim (return donasi) dibiarkan agar fitur kelompok tidak error
-            Route::post('/{id}/return', [ValidasiProsesDonasiController::class, 'returnDonasi'])->name('validasi.return');
-        });
+            if ($status) $mitras = $mitras->where('status', $status);
+            if ($kategori) $mitras = $mitras->where('kategori', $kategori);
+            if ($search) {
+                $mitras = $mitras->filter(function($item) use ($search) { return stripos($item->nama_mitra, $search) !== false || stripos($item->lokasi, $search) !== false || stripos($item->kategori, $search) !== false; });
+            }
+            
+            return view('admin.kerjasamamitra', [
+                'mitras' => $mitras,
+                'totalMitra' => $allMitras->count(), 
+                'mitraAktif' => $allMitras->where('status', 'aktif')->count(),
+                'mitraPengajuan' => $allMitras->where('status', 'pengajuan')->count()
+            ]);
+        })->name('mitra.index');
+
+        Route::post('/kerjasama-mitra/store', function (Request $request) {
+            $mitras = session('mitra_data', []);
+            $newId = count($mitras) > 0 ? max(array_column($mitras, 'id')) + 1 : 1;
+            $nama = $request->input('nama_mitra');
+            $kategori = $request->input('kategori');
+            $lokasi = $request->input('lokasi');
+            $deskripsiDinamis = "{$nama} merupakan mitra kerja sama berjenis {$kategori} yang beroperasi di wilayah {$lokasi}. Mitra ini berkomitmen penuh untuk bersinergi bersama platform FoodLink dalam mengelola surplus makanan layak guna menyebarkan dampak sosial positif bagi masyarakat sekitar.";
+            
+            $newMitra = ['id' => $newId, 'nama_mitra' => $nama, 'status' => 'pengajuan', 'kategori' => $kategori, 'lokasi' => $lokasi, 'keterangan_waktu' => 'Diajukan ' . date('d M Y'), 'total_donasi' => 0, 'porsi_tersalur' => 0, 'logo' => null, 'deskripsi' => $deskripsiDinamis];
+            $mitras[] = $newMitra;
+            session()->put('mitra_data', $mitras);
+            return redirect()->route('mitra.index', ['status' => 'pengajuan']);
+        })->name('mitra.store');
+
+        Route::patch('/kerjasama-mitra/{id}/status', function (Request $request, $id) {
+            $statusBaru = $request->input('status');
+            $mitras = session('mitra_data', []);
+            if ($statusBaru === 'ditolak') {
+                $mitras = array_filter($mitras, function($m) use ($id) { return $m['id'] != $id; });
+                session()->put('mitra_data', array_values($mitras));
+                return redirect()->route('mitra.index', ['status' => 'pengajuan']);
+            }
+            foreach ($mitras as $key => $mitra) {
+                if ($mitra['id'] == $id) { $mitras[$key]['status'] = $statusBaru; break; }
+            }
+            session()->put('mitra_data', $mitras);
+            return redirect()->route('mitra.index', ['status' => $statusBaru]);
+        })->name('mitra.updateStatus');
+    });
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

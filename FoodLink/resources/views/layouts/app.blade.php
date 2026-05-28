@@ -60,9 +60,12 @@
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
-                <a href="{{ url('/admin/validasi-proses-donasi') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
-                <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
+                
+                {{-- Validasi Donasi (Link sudah diperbaiki) --}}
+                <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
+                
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
@@ -70,9 +73,13 @@
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
                 
-                {{-- MENU DASHBOARD LAPORAN (BARU DITAMBAHKAN) --}}
                 <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
+                </a>
+
+                {{-- MENU KERJASAMA MITRA (BARU DITAMBAHKAN) --}}
+                <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
 
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
@@ -82,7 +89,7 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
 
