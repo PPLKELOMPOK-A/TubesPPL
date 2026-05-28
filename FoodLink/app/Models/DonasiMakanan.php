@@ -25,4 +25,11 @@ class DonasiMakanan extends Model
         'foto_makanan',
         'status'
     ];
+
+    // --- TAMBAHKAN RELASI INI ---
+    // Menghubungkan DonasiMakanan dengan KegiatanDonasi berdasarkan kesamaan kategori_penerima
+    public function kegiatanDonasi()
+    {
+        return $this->belongsTo(KegiatanDonasi::class, 'kategori_penerima', 'kategori_penerima');
+    }
 }

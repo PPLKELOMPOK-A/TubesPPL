@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -82,7 +82,7 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth; 
@@ -13,6 +13,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
+use App\Http\Controllers\RiwayatDonationController; // <-- Ditambahkan untuk Riwayat Donasi
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +67,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking');
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
+
+    // --- FITUR RIWAYAT, EDIT, & BATAL DONASI MAKANAN (Diambil dari PA-18 & dihubungkan ke PA-11) ---
+    Route::get('/riwayat-donasi', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+    Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
+    Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
+    Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
+    Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.bukti');
 
 
     // --- AREA KHUSUS ADMIN ---
@@ -187,6 +195,25 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
     }); // End Prefix Admin Group
+    // =================================================================
+    // ROUTE SEMENTARA UNTUK TESTING (HAPUS JIKA TEMAN SUDAH SELESAI)
+    // =================================================================
+    Route::get('/donasi/{id}/dummy-setujui', function ($id) {
+        $donasi = \App\Models\DonasiMakanan::findOrFail($id);
+        $donasi->status = 'Disetujui'; // Ubah status secara paksa
+        $donasi->save();
+        
+        return redirect()->back()->with('success', 'DUMMY: Status diubah menjadi Disetujui!');
+    });
+
+    Route::get('/donasi/{id}/dummy-pending', function ($id) {
+        $donasi = \App\Models\DonasiMakanan::findOrFail($id);
+        $donasi->status = 'pending'; // Kembalikan status secara paksa
+        $donasi->save();
+        
+        return redirect()->back()->with('success', 'DUMMY: Status dikembalikan ke Pending!');
+    });
+    // =================================================================
 
     // GLOBAL LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
