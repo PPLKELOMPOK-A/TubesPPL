@@ -32,11 +32,25 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
+    // --- RUTE DASHBOARD USER (Pencarian & Filter Aktif) ---
     Route::get('/dashboard', function (Request $request) {
         if (Auth::user()->role === 'admin') { 
             return redirect()->route('admin.dashboard'); 
         }
-        $donations = Donation::where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(10);
+        
+        $query = Donation::query();
+
+        // Fitur Pencarian
+        if ($request->has('search') && $request->search != '') {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        // Fitur Filter
+        if ($request->has('kategori') && is_array($request->kategori)) {
+            $query->whereIn('kategori', $request->kategori);
+        }
+
+        $donations = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
@@ -47,7 +61,20 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $semuaDonasi = Donation::orderBy('created_at', 'desc')->get();
+            
+            $query = Donation::query();
+
+            // Fitur Pencarian Admin
+            if ($request->has('search') && $request->search != '') {
+                $query->where('judul', 'like', '%' . $request->search . '%');
+            }
+
+            // Fitur Filter Admin
+            if ($request->has('kategori') && is_array($request->kategori)) {
+                $query->whereIn('kategori', $request->kategori);
+            }
+
+            $semuaDonasi = $query->orderBy('created_at', 'desc')->get();
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
@@ -153,7 +180,6 @@ Route::middleware('auth')->group(function () {
     // Rute untuk melihat detail donasi oleh user
     Route::get('/donasi/detail/{id}', function ($id) {
         $data = App\Models\Donation::findOrFail($id);
-        // Pastikan 'detail-donasi' di bawah ini sesuai dengan nama file blade kamu ya!
         return view('detail-donasi', compact('data')); 
     })->name('user.donasi.detail');
 
@@ -180,17 +206,21 @@ Route::middleware('auth')->group(function () {
 
     // ==========================================
     // --- ROUTE PROFIL USER KESELURUHAN ---
-    // (Bisa diakses oleh Admin maupun User biasa)
+    // (Hanya untuk User Biasa. Admin akan dilempar kembali ke Dashboard)
     // ==========================================
     Route::get('/profil', function () {
+        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
         return view('profil');
     })->name('profil');
 
     Route::get('/profil/edit', function () {
+        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
         return view('edit-profil'); 
     })->name('profil.edit');
 
     Route::post('/profil/update', function (Request $request) {
+        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
+
         $user = Auth::user();
 
         if ($request->hasFile('foto_profil')) {

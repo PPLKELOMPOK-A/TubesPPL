@@ -121,8 +121,9 @@
         @forelse($semuaDonasi as $item)
         <div class="donasi-item">
             <a href="{{ route('admin.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                @if(!empty($item->foto_kegiatan))
-                    <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
+                {{-- PERBAIKAN: Menggunakan nama kolom yang benar: ->foto --}}
+                @if(!empty($item->foto))
+                    <img src="{{ asset('storage/' . $item->foto) }}" class="donasi-img" alt="Foto Donasi">
                 @else
                     <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb; background-color:#f5f5f5;">
                         <i class="fa-solid fa-image fa-2x"></i>
@@ -130,9 +131,10 @@
                 @endif
                 
                 <div class="donasi-info">
-                    <span class="category">{{ $item->kategori_penerima }}</span>
-                    <h3>{{ $item->judul_donasi }}</h3>
-                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
+                    {{-- PERBAIKAN: Menggunakan nama kolom yang benar: ->kategori, ->judul, ->tanggal --}}
+                    <span class="category">{{ $item->kategori }}</span>
+                    <h3>{{ $item->judul }}</h3>
+                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</div>
                 </div>
             </a>
             
@@ -187,4 +189,5 @@
         }
     }
 </script>
+
 @endsection
