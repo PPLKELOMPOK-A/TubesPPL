@@ -92,6 +92,9 @@
                 <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
+                 <a href="{{ route('tracking.index') }}"  class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-location-dot"></i> Tracking
+                </a>
 
             @endif
 

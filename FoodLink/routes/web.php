@@ -38,6 +38,19 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
+    // Riwayat Donation
+    Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+    Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
+    Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+
+     Route::get('/tracking', [DonationController::class, 'index'])->name('tracking.index');
+
+    Route::get('/tracking/{id}', function ($id) {
+       return view('tracking.trackingdetail', [
+    'donation' => Donation::findOrFail($id)
+]);
+    })->name('tracking.detail');
+
     // ==========================================
     // GRUP ROUTE ADMIN (Dengan Prefix 'admin.')
     // ==========================================
