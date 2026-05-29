@@ -106,7 +106,6 @@
                 <button class="filter-btn">Filter <i class="fa-solid fa-chevron-down"></i></button>
             </div>
 
-            <!-- List Item 1 (Utama - Dinamis terhubung ke Session dengan ID 1) -->
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => 1]) }}" class="donasi-content">
                     @if(!empty($semuaDonasi[1]['foto']))
@@ -127,7 +126,6 @@
                 </div>
             </div>
 
-            <!-- List Item 2 (Membawa ID 2) -->
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => 2]) }}" class="donasi-content">
                     <img src="https://via.placeholder.com/110x80/f5f5f5/cccccc?text=Foto" class="donasi-img" alt="Foto Donasi">
@@ -143,7 +141,6 @@
                 </div>
             </div>
 
-            <!-- List Item 3 (Membawa ID 3) -->
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => 3]) }}" class="donasi-content">
                     <img src="https://via.placeholder.com/110x80/f5f5f5/cccccc?text=Foto" class="donasi-img" alt="Foto Donasi">
@@ -159,7 +156,6 @@
                 </div>
             </div>
 
-            <!-- List Item 4 (Membawa ID 4) -->
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => 4]) }}" class="donasi-content">
                     <img src="https://via.placeholder.com/110x80/f5f5f5/cccccc?text=Foto" class="donasi-img" alt="Foto Donasi">
@@ -175,7 +171,6 @@
                 </div>
             </div>
 
-            <!-- List Item 5 (Membawa ID 5) -->
             <div class="donasi-item">
                 <a href="{{ route('admin.donasi.detail', ['id' => 5]) }}" class="donasi-content">
                     <img src="https://via.placeholder.com/110x80/f5f5f5/cccccc?text=Foto" class="donasi-img" alt="Foto Donasi">
@@ -190,7 +185,7 @@
                     <a href="{{ route('admin.donasi.edit', ['id' => 5]) }}" style="color: inherit;"><i class="fa-regular fa-pen-to-square"></i></a>
                 </div>
             </div>
-
+            
             <div class="pagination-row">
                 <span>1-5 dari 200</span>
                 <div class="page-nav">

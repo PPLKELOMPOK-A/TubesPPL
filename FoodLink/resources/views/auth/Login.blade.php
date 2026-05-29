@@ -53,6 +53,7 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
+            box-sizing: border-box; /* Tambahan agar padding tidak merusak lebar */
         }
 
         .remember {
@@ -70,7 +71,7 @@
         }
 
         .remember input[type="checkbox"] {
-            width: auto; /* penting biar ga full width */
+            width: auto;
         }
 
         button {
@@ -127,7 +128,8 @@
                         <label>
                             <input type="checkbox" name="remember"> Remember me
                         </label>
-                        <a href="#">Forgot Password</a>
+                        {{-- Rute yang diperbarui ke password.request --}}
+                        <a href="{{ route('password.request') }}">Forgot Password</a>
                     </div>
 
                     <button type="submit">Login</button>
