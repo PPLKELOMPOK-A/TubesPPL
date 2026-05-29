@@ -13,8 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Menambahkan kolom foto_profil bertipe string (VARCHAR)
-            // nullable() artinya boleh kosong jika user belum upload foto
+
             $table->string('foto_profil')->nullable()->after('email'); 
         });
     }
