@@ -66,9 +66,12 @@
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-                <a href="#" class="nav-item">
-                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
+                <a href="{{ route('retur.index') }}"
+                class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    Retur Donasi
                 </a>
+
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
@@ -81,7 +84,7 @@
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
-
+                
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
             @else
                 
@@ -89,7 +92,7 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
+                <a href="#" class="nav-item">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
 
