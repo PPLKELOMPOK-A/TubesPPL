@@ -132,6 +132,7 @@
 
                     <button type="submit">Login</button>
                 </form>
+                
 
                 <div class="register">
                     New here? <a href="{{ route('register') }}">Create an account</a>

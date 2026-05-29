@@ -11,23 +11,41 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (SESUAI REVISI) --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
-        .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
-        .nav-group { flex-grow: 1; padding: 0 15px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; margin-bottom: 6px; border-radius: 10px; }
-        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; }
+        .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
+        
+        .nav-group { flex-grow: 1; padding: 0 15px; /* Memberi jarak agar tidak penuh ke pinggir */ }
+        
+        .nav-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            color: #4A4A4A; 
+            font-size: 14px; 
+            font-weight: 500; 
+            gap: 15px; 
+            margin-bottom: 6px; 
+            border-radius: 10px; /* Sudut kotak sewajarnya */
+            transition: 0.2s;
+        }
+        
+        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; font-weight: 600; }
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         .nav-item.active i { color: #FFFFFF; }
-        .logout-section { padding: 0 15px; margin-top: auto; }
-        .logout-btn { border: none; background: none; width: 100%; text-align: left; cursor: pointer; color: #d9534f; display: flex; align-items: center; gap: 15px; padding: 12px 20px; font-size: 14px; font-weight: 500; }
+        
+        .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
+
+        .logout-section { padding: 25px 30px; margin-top: auto; }
+        .logout-btn { border: none; background: none; cursor: pointer; color: #4A4A4A; display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 500; }
 
         /* --- MAIN CONTENT --- */
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; border-bottom: 1px solid #f0f0f0; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; margin-left: 15px; }
 
-        /* --- CONTAINER (REVISI: MERAPAT KE KIRI) --- */
+        /* --- CONTAINER --- */
         .container { 
             padding: 40px 60px; 
             max-width: 1000px; 
@@ -55,7 +73,7 @@
         .preview-box img { width: 100%; height: 100%; object-fit: cover; }
         .btn-edit-foto { background: white; border: 1px solid #D0D0D0; padding: 10px 15px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
 
-        /* Actions (REVISI: MERAPAT KE KIRI) */
+        /* Actions */
         .footer-actions { 
             display: flex; 
             justify-content: flex-start; 
@@ -77,10 +95,10 @@
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="fa-solid fa-house"></i> Beranda</a>
+            <a href="{{ route('validasi.index') }}" class="nav-item active"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
+            <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
         </div>
         <div class="logout-section">
