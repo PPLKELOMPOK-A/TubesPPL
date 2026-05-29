@@ -33,11 +33,11 @@ class RiwayatDonationController extends Controller
     }
     public function showBukti($id)
     {
-    // Ambil data donasi berdasarkan ID (Sesuaikan nama modelnya, misal: Donasi)
-    $donasi = \App\Models\DonasiMakanan::findOrFail($id);
+        // Ambil data donasi berdasarkan ID
+        $donasi = \App\Models\DonasiMakanan::findOrFail($id);
 
-    // Kembalikan ke view detail bukti yang sudah kita buat sebelumnya
-    // Sesuaikan 'nama_folder.detail-bukti' dengan lokasi file blade Anda
-    return view('riwayat-donasi.detail-bukti', compact('donasi'));
+        // UBAH BAGIAN INI: 
+        // Panggil view 'riwayat-lihat-bukti' (sesuai nama file blade yang Anda miliki)
+        return view('riwayat-lihat-bukti', compact('donasi'));
     }
 }

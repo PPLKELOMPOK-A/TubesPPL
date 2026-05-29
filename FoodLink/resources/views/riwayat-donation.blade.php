@@ -197,7 +197,7 @@
                     <span class="badge-processed">
                         <i class="fa-solid fa-check-circle"></i> Selesai
                     </span>
-                    <a href="{{ route('riwayat-donasi.show-bukti', $item->id) }}" class="btn-view-proof">
+                    <a href="{{ route('riwayat-donasi.bukti', $item->id) }}" class="btn-view-proof">
                         <i class="fa-solid fa-file-invoice"></i> Lihat Bukti
                     </a>
                 @endif
