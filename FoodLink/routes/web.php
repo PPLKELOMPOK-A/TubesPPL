@@ -11,6 +11,7 @@ use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\PenugasanController;
+use App\Http\Controllers\TipsController;
 use App\Models\Donation;
 
 
@@ -52,40 +53,20 @@ Route::middleware('auth')->group(function () {
     return view('trackingdetail'); // sesuaikan nama file tanpa .blade.php
 })->name('tracking.detail');
 
-   // Bukti Donasi
-   // Bukti Donasi (List)
-Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])
-    ->name('bukti-donasi.index');
+   // Riwayat Donasi dan Bukti Donasi
+    Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
+    Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
+    Route::get('/bukti-donasi/{id}/detail', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
+    Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])->name('bukti-donasi.bukti');
 
-// Detail Donasi
-Route::get('/bukti-donasi/{id}', [BuktiDonasiController::class, 'show'])
-    ->name('bukti-donasi.show');
+    Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+    Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
+    Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
 
-Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])
-    ->name('bukti-donasi.bukti');
+    // Tips
+    Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
+    Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
 
-Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti-donasi.index');
-Route::get('/bukti-donasi/{id}', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
-
-Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
-Route::post('/donation/rate/{id}', [RiwayatDonationController::class, 'storeRating'])->name('donation.rate');
-
-Route::post('/riwayat-donation/rate', [RiwayatDonationController::class, 'storeRating'])->name('riwayat-donasi.rate');
-Route::get('/tracking', [RiwayatDonationController::class, 'index'])->name('donation.tracking');
-
-Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])
-    ->name('riwayat-donasi.show-bukti');
-
-Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
-
-// Rute untuk menampilkan halaman riwayat
-Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
-
-// Rute untuk menangani pengiriman rating (Ini yang bikin 404 kalau tidak ada)
-Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
-
-// Rute untuk bukti donasi (Agar tidak error 500 seperti sebelumnya)
-Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
     // ================== ADMIN ==================
     Route::prefix('admin')->group(function () {
 

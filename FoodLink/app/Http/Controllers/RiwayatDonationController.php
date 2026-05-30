@@ -3,67 +3,87 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Donation; // Pastikan model Donation sudah ada
+use App\Models\Donation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RiwayatDonationController extends Controller
 {
-    public function index()
-    {
-         // Mengambil data donasi milik user yang sedang login
-        $donations = Donation::where('user_id', Auth::id())->latest()->get();
-        return view('riwayat-donation', compact('donations'));
+    public function index(Request $request)
+
+{
+    $status = $request->query('status');
+    $query = Donation::where('user_id', Auth::id())->orderBy('created_at', 'desc');
+
+    // Logik penapisan mengikut tab yang diklik
+    if ($status === 'selesai') {
+        $query->where('status', 'selesai');
+    } elseif ($status === 'diproses') {
+        $query->whereNull('status');
+    } elseif ($status === 'ditolak') {
+        $query->where('status', 'ditolak');
+    } elseif ($status === 'diretur') {
+        // AMBIL PERHATIAN DI SINI:
+        // Jika tab 'diretur' diklik, tapis donasi yang ID-nya wujud dalam tabel retur_donasis
+        $query->whereIn('id', function($q) {
+            $q->select('id_donasi')->from('retur_donasis');
+        });
     }
 
-    public function storeRating(Request $request)
-{
-    // 1. Validasi data yang masuk
-    $request->validate([
-        'donation_id' => 'required',
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string'
-    ]);
+    $donations = $query->get();
 
-    // 2. Cari data donasinya dan update kolom rating & comment
-    // Pastikan di tabel 'donations' kamu sudah ada kolom 'rating' dan 'comment'
-    $donation = \App\Models\Donation::findOrFail($request->donation_id);
+    // --- Kod pengiraan count anda yang sebelum ini ---
+    $totalSemua = Donation::where('user_id', Auth::id())->count();
+    $totalSelesai = Donation::where('user_id', Auth::id())->where('status', 'selesai')->count();
+    $totalDiproses = Donation::where('user_id', Auth::id())->whereNull('status')->count();
+    $totalDitolak = Donation::where('user_id', Auth::id())->where('status', 'ditolak')->count();
     
-    if($donation) {
+    $totalDiretur = DB::table('retur_donasis')
+        ->whereIn('id_donasi', Donation::where('user_id', Auth::id())->pluck('id'))
+        ->count();
+
+    return view('Riwayat Donasi.riwayat-donasi', compact(
+        'donations', 'totalSemua', 'totalSelesai', 'totalDiproses', 'totalDitolak', 'totalDiretur'
+    ));
+}    
+
+    public function storeRating(Request $request, $id)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string'
+        ]);
+
+        $donation = Donation::findOrFail($id);
+        
         $donation->update([
             'rating' => $request->rating,
-            'comment' => $request->comment
+            'komentar' => $request->komentar
         ]);
+
+        return redirect()->back()->with('success', 'Penilaian berhasil dikirim!');
     }
 
-    // 3. Kembali ke halaman sebelumnya dengan pesan sukses
-    return redirect()->back()->with('success', 'Penilaian berhasil dikirim!');
-}
+    public function updateRating(Request $request, $id)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string|max:255',
+        ]);
 
-public function updateRating(Request $request, $id)
-{
-    // 1. Validasi input
-    $request->validate([
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'nullable|string|max:255',
-    ]);
+        $donasi = Donation::findOrFail($id);
 
-    // 2. Cari data donasinya
-    $donasi = Donation::findOrFail($id);
+        $donasi->update([
+            'rating' => $request->rating,
+            'komentar' => $request->komentar,
+        ]);
 
-    // 3. Update datanya
-    $donasi->update([
-        'rating' => $request->rating,
-        'comment' => $request->comment,
-    ]);
+        return redirect()->back()->with('success', 'Penilaian berhasil disimpan!');
+    }
 
-    // 4. Redirect kembali agar tidak loading terus
-    return redirect()->back()->with('success', 'Penilaian berhasil disimpan!');
+    public function showBukti($id)
+    {
+        $donasi = Donation::findOrFail($id);
+        return view('bukti-penyelesaian-donasi.bukti-donasi-bukti', compact('donasi'));
+    }
 }
-public function showBukti($id)
-{
-    $item = \App\Models\Donation::findOrFail($id);
-    // Logika untuk menampilkan bukti, misalnya:
-    return view('bukti-donasi', compact('item'));
-}
-}
-       
