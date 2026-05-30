@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 use App\Models\Donation;
-// use App\Models\Chat;
-// use App\Models\Komunitas;
+use App\Models\Chat;
+use App\Models\Komunitas;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
@@ -16,8 +18,8 @@ use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
-// use App\Http\Controllers\RiwayatDonationController;
-// use App\Http\Controllers\TipsController;
+use App\Http\Controllers\RiwayatDonationController;
+use App\Http\Controllers\TipsController;
 
 /*
 |--------------------------------------------------------------------------
