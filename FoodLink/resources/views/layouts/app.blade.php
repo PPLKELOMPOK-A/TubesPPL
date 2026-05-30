@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -66,9 +66,12 @@
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-                <a href="#" class="nav-item">
-                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
-                </a>
+               <a href="{{ route('retur.index') }}"
+   class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+    <i class="fa-solid fa-arrow-rotate-left"></i>
+    Retur Donasi
+</a>
+
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
