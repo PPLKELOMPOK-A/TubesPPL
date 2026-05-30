@@ -163,5 +163,12 @@ Route::middleware('auth')->group(function () {
         })->name('mitra.updateStatus');
     });
 
+    // ================= RETUR DONASI =================
+Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])
+    ->name('retur.index');
+
+Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])
+    ->name('retur.store');
+    
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

@@ -1,162 +1,318 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Retur Donasi</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            background: #f5f5f5;
-        }
+@section('content')
+<style>
+   .main-body h1,
+.main-body h2 {
+    margin-top: 0;
+}
 
-        .container {
-            display: flex;
-        }
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px 35px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
 
-        .sidebar {
-            width: 220px;
-            background: #e6cfa3;
-            height: 100vh;
-            padding: 20px;
-        }
+    .form-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #5a3e1b;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+    }
 
-        .sidebar a {
-            display: block;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            color: black;
-        }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 30px;
+    }
 
-        .sidebar a.active {
-            background: #5a3e1b;
-            color: white;
-            border-radius: 5px;
-        }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
 
-        .content {
-            flex: 1;
-            padding: 40px;
-        }
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+    label {
+        font-size: 12px;
+        color: #666;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
 
-        input, select, textarea {
-            width: 300px;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 7px;
+        border: 1px solid #ccc;
+        font-size: 13px;
+    }
 
-        textarea {
-            width: 500px;
-        }
+    .upload-box {
+    width: 100%;
+    min-height: 450px;
+    border-radius: 12px;
+    background: #f0ede8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px dashed #c9b99a;
+    cursor: pointer;
+    padding: 10px;
+}
 
-        .upload-box {
-            width: 500px;
-            height: 150px;
+  .upload-box img {
+    width: 100%;
+    height: auto;
+    max-height: 700px;
+    object-fit: contain;
+    border-radius: 10px;
+    display: none;
+    z-index: 10;
+}
+
+    .submit-btn {
+        padding: 10px 28px;
+        background: #5a3e1b;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="content-area">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <!-- <h2>Retur Donasi</h2> -->
+
+            <div class="topbar-right">
+
+
+            </div>
+
+        </div>
+
+        <div class="main-body">
+
+    {{-- SUCCESS ALERT --}}
+    @if(session('success'))
+
+        <div style="
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 14px 18px;
             border-radius: 10px;
-            background: #ddd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 10px;
-        }
+            margin-bottom: 20px;
+            border: 1px solid #badbcc;
+            font-size: 14px;
+            font-weight: 500;
+        ">
+            {{ session('success') }}
+        </div>
 
-        button {
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: #5a3e1b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
+    @endif
 
-<body>
 
-<div class="container">
+    {{-- ERROR ALERT --}}
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <a class="active">Beranda</a>
-        <a>Validasi Donasi</a>
-        <a>Chat</a>
-        <a>Retur Donasi</a>
-        <a>Penugasan Relawan</a>
-        <a>Logout</a>
-    </div>
+            <div class="form-card">
 
-    <!-- Content -->
-    <div class="content">
-        <h2>Retur Donasi</h2>
-
-        @if(session('success'))
-            <p style="color:green">{{ session('success') }}</p>
-        @endif
-        
-<form action="{{ route('admin.retur.store') }}" method="POST">
-            @csrf
-
-            <div class="form-group">
-                <label>ID Donasi</label><br>
-                <input type="text" name="id_donasi" placeholder="Masukkan ID Donasi">
-            </div>
-
-            <div class="form-group">
-                <label>Nama Makanan</label><br>
-                <input type="text" name="nama_makanan" placeholder="Masukkan Nama Makanan">
-            </div>
-
-            <div class="form-group">
-                <label>Jumlah yang diretur</label><br>
-                <input type="number" name="jumlah" placeholder="Masukkan jumlah">
-            </div>
-
-            <div class="form-group">
-                <label>Kategori Makanan</label><br>
-                <select name="kategori">
-                    <option value="">Pilih kategori</option>
-                    <option>Makanan Berat</option>
-                    <option>Makanan Ringan</option>
-                    <option>Minuman</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Alasan retur</label><br>
-                <input type="text" name="alasan" placeholder="Contoh: Tidak sesuai">
-            </div>
-
-            <div class="form-group">
-                <label>Tanggal Pengajuan</label><br>
-                <input type="date" name="tanggal_pengajuan">
-            </div>
-
-            <div class="form-group">
-                <label>Deskripsi Retur</label><br>
-                <textarea name="deskripsi" placeholder="Masukkan alasan detail"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Upload Bukti</label><br>
-                <input type="file" name="bukti">
-                <div class="upload-box">
-                    ⬆️ Upload Bukti
+                <div class="form-title">
+                    Form Pengajuan Retur Donasi
                 </div>
-            </div>
 
-            <button type="submit">Retur</button>
+                <form action="{{ route('retur.store') }}" method="POST" enctype="multipart/form-data">
 
-        </form>
-    </div>
+                    @csrf
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>ID Donasi</label>
+
+                            <input
+                                type="text"
+                                name="id_donasi"
+                                placeholder="Masukkan ID Donasi"
+                                value="{{ old('id_donasi') }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nama Makanan</label>
+
+                            <input
+                                type="text"
+                                name="nama_makanan"
+                                placeholder="Masukkan Nama Makanan"
+                                value="{{ old('nama_makanan') }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Jumlah yang Diretur</label>
+
+                            <input
+                                type="number"
+                                name="jumlah"
+                                placeholder="Masukkan jumlah"
+                                value="{{ old('jumlah') }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kategori Makanan</label>
+
+                            <select name="kategori">
+                                <option value="">Pilih kategori</option>
+
+                                <option {{ old('kategori') == 'Makanan Berat' ? 'selected' : '' }}>
+                                    Makanan Berat
+                                </option>
+
+                                <option {{ old('kategori') == 'Makanan Ringan' ? 'selected' : '' }}>
+                                    Makanan Ringan
+                                </option>
+
+                                <option {{ old('kategori') == 'Minuman' ? 'selected' : '' }}>
+                                    Minuman
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Alasan Retur</label>
+
+                            <input
+                                type="text"
+                                name="alasan"
+                                placeholder="Contoh: Tidak Sesuai"
+                                value="{{ old('alasan') }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tanggal Pengajuan</label>
+
+                            <input
+                                type="date"
+                                name="tanggal_pengajuan"
+                                value="{{ old('tanggal_pengajuan') }}"
+                            >
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Deskripsi Retur</label>
+
+                            <textarea
+                                name="deskripsi"
+                                placeholder="Masukkan alasan dikembalikan"
+                            >{{ old('deskripsi') }}</textarea>
+                        </div>
+
+                        <div class="form-group full">
+
+                            <label>Upload Bukti</label>
+
+                            <input
+    type="file"
+    name="bukti"
+    id="buktiInput"
+    accept="image/*"
+    onchange="previewImage(event)"
+    style="display: none;"
+>
+
+                            <div
+    class="upload-box"
+    onclick="document.getElementById('buktiInput').click()"
+>
+
+    <i data-lucide="upload-cloud" id="uploadIcon"></i>
+
+    <img
+        id="preview"
+        src=""
+        alt="Preview"
+    >
 
 </div>
 
-</body>
-</html>
+                        </div>
+
+                    </div>
+
+                  <div style="
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+">
+
+
+                       <button type="submit" class="submit-btn" style="
+    padding: 12px 28px;
+    border-radius: 8px;
+">
+    Retur
+</button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script>
+    lucide.createIcons();
+
+    function previewImage(event) {
+
+        const input = event.target;
+
+        const preview = document.getElementById('preview');
+
+        const icon = document.getElementById('uploadIcon');
+
+        if (input.files && input.files[0]) {
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                preview.src = e.target.result;
+
+                preview.style.display = 'block';
+
+                icon.style.display = 'none';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+@endsection
