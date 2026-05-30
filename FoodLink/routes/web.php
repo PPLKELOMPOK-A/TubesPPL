@@ -177,11 +177,13 @@ Route::middleware('auth')->group(function () {
     // --- ROUTE UNTUK USER BIASA ---
     // ==========================================
     
+   
     // Rute untuk melihat detail donasi oleh user
-    Route::get('/donasi/detail/{id}', function ($id) {
-        $data = App\Models\Donation::findOrFail($id);
-        return view('detail-donasi', compact('data')); 
-    })->name('user.donasi.detail');
+  
+Route::get('/donasi/detail/{id}', function ($id) {
+    $data = App\Models\Donation::findOrFail($id);
+    return view('detail-donasi-user', compact('data')); 
+})->name('user.donasi.detail');
 
     // Rute untuk form daftar donasi
     Route::get('/donasi/daftar/{id}', function ($id) {

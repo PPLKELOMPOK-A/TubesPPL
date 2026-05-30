@@ -107,12 +107,8 @@
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
                         </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Individu" 
-                                   onchange="document.getElementById('filterForm').submit();"
-                                   {{ in_array('Individu', request('kategori', [])) ? 'checked' : '' }}> 
-                            Individu
-                        </label>
+                        
+                        
                     </div>
                 </div>
             </div>
