@@ -55,55 +55,6 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('dashboard');
 
-    // // ===== FITUR USER (Tracking, Riwayat, Tips, Komunitas, Bukti) =====
-    // Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
-    // Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
-    // Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
-
-    Route::get('/tracking', [DonationController::class, 'index'])->name('tracking.index');
-    Route::get('/tracking/{id}', function ($id) {
-        return view('tracking.trackingdetail', [
-            'donation' => Donation::findOrFail($id)
-        ]);
-    })->name('tracking.detail');
-
-    Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
-    Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
-
-    // Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
-    // Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
-
-    // Route::get('/komunitas/{id}', function ($id) {
-    //     return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
-    // })->name('komunitas.detail');
-
-    // // ===== FITUR CHAT =====
-    // Route::get('/chat', function () {
-    //     $admin = \App\Models\User::where('role', 'admin')->first();
-    //     if (!$admin) abort(500, 'Admin tidak ada');
-
-    //     $chats = Chat::where(function ($q) use ($admin) {
-    //         $q->where('sender_id', auth()->id())->where('receiver_id', $admin->id);
-    //     })
-    //     ->orWhere(function ($q) use ($admin) {
-    //         $q->where('sender_id', $admin->id)->where('receiver_id', auth()->id());
-    //     })
-    //     ->latest()->get();
-
-    //     return view('chat.user', compact('chats', 'admin'));
-    // })->name('chat.user');
-
-    // Route::post('/chat/send', function (Request $request) {
-    //     $admin = \App\Models\User::where('role', 'admin')->first();
-    //     Chat::create([
-    //         'sender_id' => auth()->id(),
-    //         'receiver_id' => $admin->id,
-    //         'message' => $request->message,
-    //     ]);
-    //     return back();
-    // })->name('chat.send');
-
-
     // ==========================================
     // GRUP ROUTE ADMIN (Dengan Prefix 'admin.')
     // ==========================================
