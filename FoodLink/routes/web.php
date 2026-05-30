@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 use App\Models\Donation;
 use App\Models\Chat;
 use App\Models\Komunitas;
@@ -256,6 +257,13 @@ Route::middleware('auth')->group(function () {
         })->name('dropbox.jemput');
     });
 
+    // / ================= RETUR DONASI =================
+Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])
+    ->name('retur.index');
+
+Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])
+    ->name('retur.store');
+    
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
