@@ -1,79 +1,263 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex min-h-screen bg-gray-100">
-    <!-- Sidebar -->
-    <aside class="w-64 p-6 flex flex-col" style="background-color: #FFE6B5;">
-        <h2 class="font-bold mb-6 text-lg">Donatur</h2>
-        <nav class="flex flex-col gap-3 text-gray-800">
-            <a href="#" class="p-2 rounded font-semibold flex items-center gap-2 bg-[#5C4421] text-white">Beranda</a>
-            <a href="#" class="p-2 rounded flex items-center gap-2 hover:bg-opacity-80">Validasi Donasi</a>
-            <a href="#" class="p-2 rounded flex items-center gap-2 hover:bg-opacity-80">Chat</a>
-            <a href="#" class="p-2 rounded flex items-center gap-2 hover:bg-opacity-80">Retur Donasi</a>
-            <a href="#" class="p-2 rounded flex items-center gap-2 hover:bg-opacity-80">Penugasan Relawan</a>
-        </nav>
-        <div class="mt-auto">
-            <a href="#" class="flex items-center gap-2 text-gray-700 font-semibold">Logout</a>
+
+<style>
+    /* Tambahan style untuk efek hover pada tombol */
+    .btn-kembali {
+        background: #FBEBCE; /* Warna krem sesuai tema */
+        color: #6B4F2A; /* Warna teks coklat tua */
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Jarak antara icon dan teks */
+        transition: all 0.3s ease; /* Animasi halus */
+        border: 2px solid #FBEBCE;
+    }
+    
+    .btn-kembali:hover {
+        background: #6B4F2A; /* Berubah coklat saat di-hover */
+        color: #FBEBCE; /* Teks berubah krem */
+        border: 2px solid #6B4F2A;
+    }
+</style>
+
+<div class="main-content-canvas" style="max-width: 1100px; margin: 0 auto; padding: 10px 20px 40px 20px;">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        margin-bottom: 40px;
+    ">
+        <div>
+            <h1 style="
+                font-size:32px;
+                font-weight:700;
+                color:#333;
+                margin: 0;
+            ">
+                Detail Tracking
+            </h1>
+
+            <p style="
+                color:#888;
+                margin-top:8px;
+                margin-bottom: 0;
+            ">
+                Pantau perjalanan donasi secara real-time
+            </p>
         </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-8 space-y-6">
-        <!-- Header -->
-        <header class="mb-4">
-            <h1 class="text-2xl font-bold">Detail Tracking Pengiriman</h1>
-            <p class="text-gray-600">ID : FL-001</p>
-        </header>
+        <a href="{{ route('donation.tracking') }}" class="btn-kembali">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Kembali
+        </a>
+    </div>
 
-        <div class="grid grid-cols-3 gap-6">
-            <!-- Map + Lokasi -->
-            <div class="col-span-2 space-y-4">
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h2 class="font-semibold mb-2">Lokasi Pengiriman</h2>
-                    <iframe src="https://maps.google.com/?q=-6.1751,106.827&output=embed"
-                            width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    <div style="
+        display:grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 32px;
+    ">
 
-                    <ul class="mt-3 text-sm text-gray-700 space-y-1">
-                        <li class="flex items-center gap-2"><span class="text-green-500">●</span> Lokasi Pengambilan: Jl. Sudirman No.52, Jakarta Selatan</li>
-                        <li class="flex items-center gap-2"><span class="text-blue-500">●</span> Lokasi Saat Ini: Jl. Thamrin No.10, Jakarta Pusat</li>
-                        <li class="flex items-center gap-2"><span class="text-purple-500">●</span> Tujuan Akhir: Jl. Gatot Subroto No.45, Jakarta Pusat</li>
-                    </ul>
+        <div style="
+            display:flex;
+            flex-direction:column;
+            gap: 32px;
+        ">
+
+            <div style="
+                background:white;
+                border-radius:24px;
+                padding: 32px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            ">
+                <h2 style="
+                    font-size:20px;
+                    font-weight:700;
+                    margin-bottom:20px;
+                    color: #222;
+                ">
+                    Lokasi Pengiriman
+                </h2>
+
+                <iframe
+    src="https://maps.google.com/maps?q={{ urlencode($donation->alamat_penyaluran) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+    width="100%"
+    height="320"
+    style="border:0; border-radius:18px;"
+    loading="lazy">
+</iframe>
+
+                <div style="
+                    margin-top:20px;
+                    color:#555;
+                    line-height:1.6;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                ">
+                    <span style="font-size: 18px;">📍</span> 
+                    <span>{{ $donation->alamat_penyaluran }}</span>
                 </div>
+            </div>
 
-                <!-- Timeline -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="font-semibold">Timeline Pengiriman</h2>
-                        <button class="text-sm text-blue-500 hover:underline">Refresh</button>
+            <div style="
+                background:white;
+                border-radius:24px;
+                padding: 32px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            ">
+
+                <h2 style="
+                    font-size:20px;
+                    font-weight:700;
+                    margin-bottom:24px;
+                    color: #222;
+                ">
+                    Timeline Pengiriman
+                </h2>
+
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    gap:20px;
+                ">
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 20px;">✅</span>
+                        <div>
+                            <strong style="color: #333;">Donasi dibuat</strong>
+                            <br>
+                            <small style="color:#888; font-size: 13px; margin-top: 4px; display: inline-block;">
+                                {{ $donation->created_at }}
+                            </small>
+                        </div>
                     </div>
-                    <ul class="text-sm text-gray-700 space-y-3">
-                        <li>✅ Donasi Dikonfirmasi - 30 Mei 2025, 09:00 WIB</li>
-                        <li>👤 Relawan Ditugaskan - 30 Mei 2025, 10:00 WIB</li>
-                        <li>🚚 Dalam Perjalanan - 30 Mei 2025, 10:30 WIB</li>
-                    </ul>
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 20px;">🚚</span>
+                        <div>
+                            <span style="color: #555;">Status:</span>
+                            <strong style="color: #333; margin-left: 4px;">
+                                {{ ucfirst(str_replace('_',' ', $donation->status)) }}
+                            </strong>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Detail Donasi + Kurir -->
-            <div class="space-y-4">
-                <!-- Detail Donasi -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h2 class="font-semibold mb-2">Detail Donasi</h2>
-                    <p><strong>Nama Makanan</strong> : Nasi Kotak & Lauk Pauk</p>
-                    <p><strong>Jumlah</strong> : 200 porsi</p>
-                    <p><strong>Kategori</strong> : Makanan Siap Saji</p>
-                    <p><strong>Tanggal Donasi</strong> : 30 Mei 2025, 08:00 WIB</p>
-                    <p><strong>Estimasi Pengiriman</strong> : 30 Mei 2025, 12:00 WIB</p>
-                    <p><strong>Catatan</strong> : Makanan harus sampai sebelum jam 1 siang untuk makan anak-anak</p>
-                </div>
-
-                <!-- Informasi Kurir -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h2 class="font-semibold mb-2">Informasi Kurir</h2>
-                    <p>Nama Kurir: Budi Santoso</p>
-                    <p>No. Telepon: +62 856-7890-1234</p>
-                </div>
-            </div>
         </div>
-    </main>
+
+        <div style="
+            display:flex;
+            flex-direction:column;
+            gap: 32px;
+        ">
+
+            <div style="
+                background:white;
+                border-radius:24px;
+                padding: 32px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            ">
+
+                <h2 style="
+                    font-size:20px;
+                    font-weight:700;
+                    margin-bottom:24px;
+                    color: #222;
+                ">
+                    Detail Donasi
+                </h2>
+
+                <div style="
+                    display:flex;
+                    flex-direction:column;
+                    gap:20px;
+                    color:#555;
+                    line-height:1.6;
+                ">
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px;">🍱</span>
+                        <div>
+                            <strong style="color: #333; display: block; margin-bottom: 4px;">Judul Donasi</strong>
+                            {{ $donation->judul_donasi }}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px;">🏷️</span>
+                        <div>
+                            <strong style="color: #333; display: block; margin-bottom: 4px;">Kategori</strong>
+                            {{ $donation->kategori_penerima }}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px;">📅</span>
+                        <div>
+                            <strong style="color: #333; display: block; margin-bottom: 4px;">Tanggal</strong>
+                            {{ $donation->tanggal_kegiatan }}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px;">📝</span>
+                        <div>
+                            <strong style="color: #333; display: block; margin-bottom: 4px;">Deskripsi</strong>
+                            {{ $donation->deskripsi }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="
+                background:white;
+                border-radius:24px;
+                padding: 32px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            ">
+
+                <h2 style="
+                    font-size:20px;
+                    font-weight:700;
+                    margin-bottom:20px;
+                    color: #222;
+                ">
+                    Status Pengiriman
+                </h2>
+
+                <div style="
+                    background: {{ $donation->status == 'terkirim' ? '#DDF8E4' : '#FFF4D6' }};
+                    color: {{ $donation->status == 'terkirim' ? '#2E7D32' : '#E69500' }};
+                    padding: 16px;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    font-size: 16px;
+                    text-align: center;
+                    letter-spacing: 0.5px;
+                ">
+                    {{ ucfirst(str_replace('_',' ', $donation->status)) }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+@endsection

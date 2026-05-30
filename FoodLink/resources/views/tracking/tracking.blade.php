@@ -105,7 +105,7 @@
             ];
         @endphp
 
-     @forelse ($donations as $d)
+       @forelse ($donations as $d)
 
 <a href="{{ route('tracking.detail', $d->id) }}" style="
     text-decoration:none;
@@ -119,6 +119,7 @@
     transition:.2s;
     cursor:pointer;
 ">
+
             <!-- STATUS -->
             <span style="
                 {{ $statusStyles[$d->status] ?? '' }}
@@ -167,8 +168,10 @@
             </div>
 
         </div>
+
 </a>
-        @empty
+
+@empty
 
         <div style="
             grid-column:1/-1;
