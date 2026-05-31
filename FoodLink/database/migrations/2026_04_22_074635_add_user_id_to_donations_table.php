@@ -10,17 +10,22 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-{
-    Schema::table('donations', function (Blueprint $table) {
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    });
-}
+    {
+        // Memeriksa apakah kolom user_id belum ada di tabel donations
+        if (!Schema::hasColumn('donations', 'user_id')) {
+            Schema::table('donations', function (Blueprint $table) {
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            });
+        }
+    }
 
-public function down()
-{
-    Schema::table('donations', function (Blueprint $table) {
-        $table->dropForeign(['user_id']);
-        $table->dropColumn('user_id');
-    });
-}
+    public function down()
+    {
+        if (Schema::hasColumn('donations', 'user_id')) {
+            Schema::table('donations', function (Blueprint $table) {
+                $table->dropForeign(['user_id']);
+                $table->dropColumn('user_id');
+            });
+        }
+    }
 };

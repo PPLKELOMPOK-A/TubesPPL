@@ -28,7 +28,6 @@ class AuthController extends Controller {
 
             $request->session()->regenerate();
 
-            // === PERBAIKAN DI SINI ===
             // Jika role adalah admin, arahkan ke dashboard admin
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.dashboard');
@@ -48,18 +47,17 @@ class AuthController extends Controller {
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'user',
         ]);
 
-        Auth::login($user);
-
-        // Ini akan memicu pengecekan di web.php 
-        // User akan masuk ke dashboard user biasa sesuai logic role 'user' di atas.
-        return redirect('/dashboard');
+        // === PERUBAHAN DI SINI ===
+        // Hapus `Auth::login($user);` agar user tidak langsung login otomatis.
+        // Ubah redirect agar mengarah ke route login dengan pesan sukses.
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 
     public function logout(Request $request) {

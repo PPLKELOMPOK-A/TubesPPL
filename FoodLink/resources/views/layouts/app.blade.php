@@ -30,7 +30,10 @@
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #FFF9EE; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 25px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
-        .profile-section { display: flex; align-items: center; gap: 12px; }
+        
+        /* Modifikasi profil agar bisa diklik secara visual */
+        .profile-section { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: opacity 0.2s; }
+        .profile-section:hover { opacity: 0.8; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
         .main-content-canvas { padding: 40px 50px; }
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
@@ -49,6 +52,11 @@
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
+<<<<<<< HEAD
+=======
+                
+                {{-- Validasi Donasi --}}
+>>>>>>> 20615fb48936d9173b0c712dd0ba81057277e848
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
@@ -122,12 +130,19 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            <div class="profile-section">
+            
+            <a href="{{ route('profile.edit') }}" class="profile-section">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
-            </div>
+                
+                {{-- PERBAIKAN LOGIKA: Deteksi foto profil real-time dari database --}}
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                @endif
+            </a>
         </div>
 
         @yield('content')
