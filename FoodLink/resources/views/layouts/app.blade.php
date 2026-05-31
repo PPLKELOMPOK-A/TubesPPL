@@ -36,7 +36,10 @@
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #FFF9EE; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 25px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
-        .profile-section { display: flex; align-items: center; gap: 12px; }
+        
+        /* Modifikasi profil agar bisa diklik secara visual */
+        .profile-section { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: opacity 0.2s; }
+        .profile-section:hover { opacity: 0.8; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
         
         /* Reset padding canvas agar rapi di dalam main-panel */
@@ -66,8 +69,7 @@
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-                {{-- DISESUAIKAN: Jika di web.php murni bernama 'retur.index' tanpa prefix admin --}}
-                <a href="{{ route('retur.index') }}" class="nav-item {{ Request::is('retur-donasi*') || request()->routeIs('retur.*') ? 'active' : '' }}">
+               <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
 
@@ -79,7 +81,7 @@
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
 
-                {{-- MENU KERJASAMA MITRA (BARU DITAMBAHKAN) --}}
+                {{-- MENU KERJASAMA MITRA --}}
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
@@ -94,7 +96,7 @@
                 <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
-                 <a href="{{ route('tracking.index') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
+                <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
 
@@ -124,17 +126,13 @@
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
             
-            {{-- PERUBAHAN: Tag div diganti jadi a, agar bisa diklik menuju route('profil') --}}
-            <a href="{{ route('profil') }}" class="profile-section" style="text-decoration: none;">
+            {{-- SEKARANG SUDAH MENGGUNAKAN TAG <a> AGAR BISA DIPENCET --}}
+            {{-- Silakan ganti route('profile.edit') sesuai dengan nama route profil di project Laravel kamu --}}
+            <a href="{{ route('profile.edit') }}" class="profile-section">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                
-                @if(!empty(Auth::user()->foto_profil))
-                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
-                @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
-                @endif
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
             </a>
         </div>
 

@@ -107,8 +107,12 @@
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
                         </label>
-                        
-                        
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Individu" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Individu', request('kategori', [])) ? 'checked' : '' }}> 
+                            Individu
+                        </label>
                     </div>
                 </div>
             </div>
@@ -117,9 +121,8 @@
         @forelse($semuaDonasi as $item)
         <div class="donasi-item">
             <a href="{{ route('admin.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                {{-- PERBAIKAN: Menggunakan nama kolom yang benar: ->foto --}}
-                @if(!empty($item->foto))
-                    <img src="{{ asset('storage/' . $item->foto) }}" class="donasi-img" alt="Foto Donasi">
+                @if(!empty($item->foto_kegiatan))
+                    <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
                     <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb; background-color:#f5f5f5;">
                         <i class="fa-solid fa-image fa-2x"></i>
@@ -127,10 +130,9 @@
                 @endif
                 
                 <div class="donasi-info">
-                    {{-- PERBAIKAN: Menggunakan nama kolom yang benar: ->kategori, ->judul, ->tanggal --}}
-                    <span class="category">{{ $item->kategori }}</span>
-                    <h3>{{ $item->judul }}</h3>
-                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</div>
+                    <span class="category">{{ $item->kategori_penerima }}</span>
+                    <h3>{{ $item->judul_donasi }}</h3>
+                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
                 </div>
             </a>
             
@@ -185,5 +187,4 @@
         }
     }
 </script>
-
 @endsection

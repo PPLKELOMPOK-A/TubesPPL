@@ -4,7 +4,6 @@
 
 @section('content')
 <style>
-    /* --- GENERAL LAYOUT --- */
     .container { padding: 30px 50px; max-width: 1100px; width: 100%; margin-left: 0; }
     
     .announcement { background-color: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 12px; padding: 25px; text-align: center; color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 30px; }
@@ -44,30 +43,34 @@
     .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
 </style>
 
+<!-- Bungkus konten dengan class dari Master Layout -->
 <div class="main-content-canvas">
     <div class="container">
         
-                <div class="announcement">
-
+        <div class="announcement">
             Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari <strong>SENIN s.d. MINGGU Pukul 08.00 - 20.00 WIB</strong>. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
-
         </div>
 
+        {{-- KODE NOTIFIKASI SUKSES DENGAN LOGIKA HILANG 5 DETIK --}}
         @if(session('success'))
             <div id="success-alert" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #c3e6cb; font-weight: 500; transition: opacity 0.5s ease;">
                 <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> {{ session('success') }}
             </div>
+
             <script>
                 setTimeout(function() {
                     var alertBox = document.getElementById('success-alert');
                     if (alertBox) {
                         alertBox.style.opacity = '0';
-                        setTimeout(function() { alertBox.style.display = 'none'; }, 500);
+                        setTimeout(function() {
+                            alertBox.style.display = 'none';
+                        }, 500);
                     }
                 }, 5000);
             </script>
         @endif
 
+        <!-- FORM FILTER & SEARCH -->
         <form action="{{ route('dashboard') }}" method="GET" class="action-bar" id="filterForm">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -80,14 +83,24 @@
                 <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
                     <div class="filter-header">-Pilihan-</div>
                     <div class="filter-options">
-                        @foreach(['Organisasi (Yayasan)', 'Kegiatan Keagamaan', 'Individu'] as $kat)
                         <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="{{ $kat }}"
+                            <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)"
                                    onchange="document.getElementById('filterForm').submit();"
-                                   {{ in_array($kat, request('kategori', [])) ? 'checked' : '' }}> 
-                            {{ $kat }}
+                                   {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                            Organisasi (Yayasan)
                         </label>
-                        @endforeach
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan"
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                            Kegiatan Keagamaan
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Individu/Umum"
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                            Individu/Umum
+                        </label>
                     </div>
                 </div>
             </div>
@@ -96,39 +109,59 @@
         @forelse($donations as $item)
         <div class="donasi-item">
             <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                @if(!empty($item->foto))
-                    <img src="{{ asset('storage/' . $item->foto) }}" class="donasi-img" alt="Foto">
+                @if(!empty($item->foto_kegiatan))
+                    <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
-                    <div class="donasi-img" style="background:#f5f5f5; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-image"></i>
+                    <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb;">
+                        <i class="fa-solid fa-image fa-2x"></i>
                     </div> 
                 @endif
                 
                 <div class="donasi-info">
-                    <span class="category">{{ $item->kategori }}</span>
-                    <h3>{{ $item->judul }}</h3>
-                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, d F Y') }}</div>
+                    <span class="category">{{ $item->kategori_penerima }}</span>
+                    <h3>{{ $item->judul_donasi }}</h3>
+                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
                 </div>
             </a>
+            
             <div>
                 <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="btn-action">Daftar Donasi</a>
             </div>
         </div>
         @empty
-        <p style="text-align: center; padding: 20px;">Belum ada donasi yang tersedia.</p>
+        <div style="text-align: center; padding: 40px; color: #888; background: #fff; border-radius: 12px; border: 1px solid #EAEAEA;">
+            Belum ada donasi yang tersedia di Database.
+        </div>
         @endforelse
 
+        <!-- PAGINATION DUMMY -->
         <div class="pagination-footer">
-            {{ $donations->links() }}
+            <span>1-5 dari 200</span>
+            <a href="#" class="page-node active">1</a>
+            <a href="#" class="page-node">2</a>
+            <span>...</span>
+            <a href="#" class="page-node">9</a>
+            <a href="#" class="page-node">10</a>
+            <a href="#" class="page-node"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
     </div>
 </div>
 
+<!-- SCRIPT UNTUK MENGATUR MUNCUL/HILANGNYA KOTAK FILTER -->
 <script>
-    function toggleFilter() { document.getElementById("filterDropdown").classList.toggle("show"); }
+    function toggleFilter() {
+        document.getElementById("filterDropdown").classList.toggle("show");
+    }
+
     window.onclick = function(event) {
         if (!event.target.closest('.filter-wrapper')) {
-            document.getElementById("filterDropdown").classList.remove('show');
+            var dropdowns = document.getElementsByClassName("filter-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
         }
     }
 </script>

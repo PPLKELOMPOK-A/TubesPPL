@@ -39,7 +39,8 @@
 <div class="main-content-canvas">
     <div class="container-profil">
         <div class="profile-header-title">
-            <a href="{{ route('profil') }}" class="back-nav"><i class="fa-solid fa-arrow-left"></i></a>
+            {{-- PERBAIKAN: Diubah dari 'profil' ke 'profile.edit' --}}
+            <a href="{{ route('profile.edit') }}" class="back-nav"><i class="fa-solid fa-arrow-left"></i></a>
             <h1 class="page-title">Edit Profil</h1>
         </div>
 
@@ -90,7 +91,8 @@
 
             <div class="action-buttons">
                 <button type="submit" class="btn-simpan">Simpan Perubahan</button>
-                <a href="{{ route('profil') }}" class="btn-batal">Batal</a>
+                {{-- PERBAIKAN: Diubah dari 'profil' ke 'profile.edit' --}}
+                <a href="{{ route('profile.edit') }}" class="btn-batal">Batal</a>
             </div>
         </form>
     </div>
