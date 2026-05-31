@@ -154,6 +154,27 @@ Route::get('/komunitas/{id}', function ($id) {
 
 })->name('komunitas.detail');
 
+    Route::get('/chat', function () {
+        $admin = \App\Models\User::where('role', 'admin')->first();
+        if (!$admin) abort(500, 'Admin tidak ada');
+        $chats = Chat::where(function ($q) use ($admin) {
+            $q->where('sender_id', auth()->id())->where('receiver_id', $admin->id);
+        })->orWhere(function ($q) use ($admin) {
+            $q->where('sender_id', $admin->id)->where('receiver_id', auth()->id());
+        })->latest()->get();
+        return view('chat.user', compact('chats', 'admin'));
+    })->name('chat.user');
+
+    Route::post('/chat/send', function (Request $request) {
+        $admin = \App\Models\User::where('role', 'admin')->first();
+        Chat::create([
+            'sender_id' => auth()->id(),
+            'receiver_id' => $admin->id,
+            'message' => $request->message,
+        ]);
+        return back();
+    })->name('chat.send');
+
     // ==========================================
     // GRUP ROUTE ADMIN
     // ==========================================
@@ -217,6 +238,14 @@ Route::get('/komunitas/{id}', function ($id) {
             $donasi->delete();
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil dihapus!');
         })->name('donasi.delete');
+
+          // PENUGASAN RELAWAN
+        Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
+        Route::get('/penugasan/create', [PenugasanController::class, 'create'])->name('penugasan.create');
+        Route::post('/penugasan/store', [PenugasanController::class, 'store'])->name('penugasan.store');
+        Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
+        Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
+        Route::delete('/penugasan/{id}', [PenugasanController::class, 'destroy'])->name('penugasan.destroy');
 
         // Retur, Penugasan, Report
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
