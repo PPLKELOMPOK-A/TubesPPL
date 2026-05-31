@@ -42,7 +42,7 @@
     .action-icons a, .action-icons i { font-size: 20px; color: #333; cursor: pointer; text-decoration: none; transition: 0.2s; }
     .action-icons a:hover, .action-icons button:hover i { color: #6B4F2A; }
 
-    /* --- PAGINATION (Ditambahkan dari tampilan User) --- */
+    /* --- PAGINATION --- */
     .pagination-footer { display: flex; justify-content: flex-end; align-items: center; margin-top: 30px; gap: 10px; font-size: 12px; color: #888; }
     .page-node { padding: 5px 10px; border: 1px solid #E0E0E0; border-radius: 4px; text-decoration: none; color: #444; }
     .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
@@ -106,12 +106,6 @@
                                    onchange="document.getElementById('filterForm').submit();"
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Individu" 
-                                   onchange="document.getElementById('filterForm').submit();"
-                                   {{ in_array('Individu', request('kategori', [])) ? 'checked' : '' }}> 
-                            Individu
                         </label>
                     </div>
                 </div>

@@ -18,7 +18,7 @@ class DonationController extends Controller
         $terkirim = Donation::where('status', 'terkirim')->count();
         $dalamPerjalanan = Donation::where('status', 'dalam_perjalanan')->count();
 
-        return view('tracking', compact('donations', 'total', 'terkirim', 'dalamPerjalanan'));
+        return view('tracking.tracking', compact('donations', 'total', 'terkirim', 'dalamPerjalanan'));
     }
 
     public function show($id)

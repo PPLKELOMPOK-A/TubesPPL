@@ -83,16 +83,19 @@
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="{{ route('validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
-            <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda Admin</a>
+            <a href="{{ route('admin.validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard Laporan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-handshake"></i> Kerjasama Mitra</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Koordinasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
         </div>
         <div class="logout-section">
              <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</button>
             </form>
         </div>
     </div>
@@ -104,7 +107,6 @@
         </div>
 
         <div class="container">
-            <!-- Pesan Sukses jika baru saja di-edit -->
             @if(session('success'))
                 <div class="alert-success">
                     <i class="fa-solid fa-circle-check"></i>
@@ -112,20 +114,17 @@
                 </div>
             @endif
 
-            <!-- BACK BUTTON UX: Diletakkan di atas, hanya icon -->
             <a href="{{ route('admin.dashboard') }}" class="back-nav" title="Kembali ke Beranda">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
 
             <div class="header-info">
-                <!-- DIUBAH: Menggunakan ->judul -->
                 <h1>{{ $data->judul }}</h1>
                 <span class="category">{{ $data->kategori }}</span>
                 <p class="date">{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}</p>
             </div>
 
             <div class="image-container">
-                <!-- DIUBAH: Menggunakan ->foto -->
                 @if(!empty($data->foto))
                     <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto Donasi">
                 @else
@@ -135,30 +134,22 @@
 
             <div class="content-section">
                 <h3 class="section-title">Deskripsi Kegiatan</h3>
-                <!-- DIUBAH: Menggunakan ->deskripsi -->
                 <p class="section-text">{{ $data->deskripsi }}</p>
             </div>
 
             <div class="content-section">
                 <h3 class="section-title">Alamat</h3>
-                <!-- DIUBAH: Menggunakan ->alamat -->
                 <p class="section-text">{{ $data->alamat }}</p>
             </div>
 
             <div class="footer-actions">
                 <a href="{{ route('admin.dashboard') }}" class="btn btn-kembali">Kembali</a>
                 
-                <button class="btn btn-hapus">Hapus</button>
-                
-                <a href="{{ route('admin.donasi.edit') }}" class="btn btn-edit">Edit</a>
-                
-                <!-- PERUBAHAN: Tombol Hapus dibungkus Form agar berfungsi ke route hapus -->
                 <form action="{{ route('admin.donasi.delete', ['id' => $data->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
                     @csrf
                     <button type="submit" class="btn btn-hapus">Hapus</button>
                 </form>
 
-                <!-- DIUBAH: Menggunakan ->id -->
                 <a href="{{ route('admin.donasi.edit', ['id' => $data->id]) }}" class="btn btn-edit">Edit</a>
             </div>
         </div>
