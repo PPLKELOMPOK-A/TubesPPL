@@ -13,7 +13,7 @@ use App\Models\Komunitas;
 
 // Controllers
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController; // <-- PASTIKAN INI SUDAH DI-IMPORT
+use App\Http\Controllers\AdminController; 
 use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
@@ -24,6 +24,8 @@ use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
 use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\TipsController; 
+// Import Controller Komunitas Anda di sini jika ada, contoh:
+// use App\Http\Controllers\KomunitasController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -114,7 +116,6 @@ Route::middleware('auth')->group(function () {
     // ================== ADMIN ==================
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/donasi/detail/{id}', [AdminController::class, 'detailDonasi'])->name('admin.donasi.detail');
-        // PERBAIKAN DASHBOARD ADMIN: Diarahkan ke AdminController agar fitur search, filter, dan variabel $semuaDonasi sinkron
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // VALIDASI DONASI
@@ -131,26 +132,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
 
-       // PENUGASAN RELAWAN (Halaman Utama)
-    Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
-
-    // TAMBAH PENUGASAN (Arahkan ke Controller, jangan langsung closure view)
-    Route::get('/penugasan/create', [PenugasanController::class, 'create'])->name('penugasan.create');
-
-    // SIMPAN PENUGASAN
-    Route::post('/penugasan/store', [PenugasanController::class, 'store'])->name('penugasan.store');
-
-    // EDIT PENUGASAN 
-    Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
-
-    // UPDATE PENUGASAN
-    Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
-
-    // HAPUS PENUGASAN
-    Route::delete('/penugasan/{id}', [PenugasanController::class, 'destroy'])->name('penugasan.destroy');
-    
+        // PENUGASAN RELAWAN
+        Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
+        Route::get('/penugasan/create', [PenugasanController::class, 'create'])->name('penugasan.create');
+        Route::post('/penugasan/store', [PenugasanController::class, 'store'])->name('penugasan.store');
+        Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
+        Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
+        Route::delete('/penugasan/{id}', [PenugasanController::class, 'destroy'])->name('penugasan.destroy');
+        
         // REPORT
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+
+        // ==========================================
+        // TAMBAHAN FITUR KOMUNITAS ADMIN
+        // ==========================================
+        Route::get('/komunitas', function () {
+            // Gantilah view() ini dengan view asli halaman komunitas Anda
+            return view('admin.komunitas.index'); 
+        })->name('komunitas.index');
 
     });
 

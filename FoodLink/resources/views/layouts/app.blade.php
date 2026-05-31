@@ -128,10 +128,16 @@ main::-webkit-scrollbar-thumb {
                 </a>
 
                 <a href="/admin/chat"
-                   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/chat*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
-                    <i class="fa-solid fa-message text-base w-5 text-center {{ request()->is('admin/chat*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
-                    <span>Chat</span>
-                </a>
+   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/chat*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
+    <i class="fa-solid fa-message text-base w-5 text-center {{ request()->is('admin/chat*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
+    <span>Chat</span>
+</a>
+
+<a href="{{ route('admin.komunitas.index') }}" 
+   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/komunitas*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
+    <i class="fa-solid fa-users text-base w-5 text-center {{ request()->is('admin/komunitas*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
+    <span>Komunitas</span>
+</a>
 
             </nav>
         </div>
