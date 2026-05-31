@@ -5,9 +5,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+// Models
 use App\Models\Donation;
 use App\Models\Chat;
 use App\Models\Komunitas;
+
+// Controllers
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
@@ -18,7 +21,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
 use App\Http\Controllers\RiwayatDonationController;
-use App\Http\Controllers\TipsController;
+use App\Http\Controllers\TipsController; // <-- Tambahan dari GitHub
 
 /*
 |--------------------------------------------------------------------------
@@ -44,23 +47,27 @@ Route::middleware('guest')->group(function () {
 // ======================
 Route::middleware('auth')->group(function () {
 
-    // ===== DASHBOARD USER =====
-    Route::get('/dashboard', function () {
-        if (Auth::user()->role === 'admin') { 
-            return redirect()->route('admin.dashboard'); 
-        }
-        return view('dashboard', [
-            'donations' => Donation::where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(10)
-        ]);
+    // ===== DASHBOARD USER (Diambil dari versi perbaikan sebelumnya) =====
+    Route::get('/dashboard', function (Request $request) {
+        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
+        
+        $donations = \App\Models\KegiatanDonasi::orderBy('created_at', 'desc')->paginate(10);
+        return view('dashboard', compact('donations'));
     })->name('dashboard');
 
-    // ===== FITUR USER (Tracking, Riwayat, Tips, Komunitas, Bukti) =====
-    Route::get('/riwayat-donation', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
-    Route::get('/riwayat-donasi/{id}/bukti', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.show-bukti');
-    Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating');
+    // ===== FITUR PENGAJUAN DONASI & DETAIL =====
+    Route::get('/donasi/detail/{id}', function ($id) {
+        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
+        $data = \App\Models\KegiatanDonasi::findOrFail($id);
+        return view('detail-donasi-user', compact('data')); 
+    })->name('user.donasi.detail');
 
-    Route::get('/tracking', [DonationController::class, 'index'])->name('tracking.index');
-    Route::get('/tracking/{id}', function ($id) {
+    Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
+    Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
+    
+    // ===== FITUR TRACKING & BUKTI DONASI =====
+    Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); // Tetap pakai nama route lama agar tidak rusak
+    Route::get('/tracking/{id}', function ($id) { // Fitur baru dari GitHub
         return view('tracking.trackingdetail', [
             'donation' => Donation::findOrFail($id)
         ]);
@@ -69,14 +76,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
 
+    // ===== FITUR RIWAYAT & MANAJEMEN DONASI (Gabungan) =====
+    Route::get('/riwayat-donasi', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
+    Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
+    Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
+    Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
+    Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.bukti');
+    Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating'); // Fitur baru dari GitHub
+
+    // ===== FITUR BARU: TIPS & KOMUNITAS (Dari GitHub) =====
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
-
     Route::get('/komunitas/{id}', function ($id) {
         return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
     })->name('komunitas.detail');
 
-    // ===== FITUR CHAT =====
+    // ===== FITUR BARU: CHAT (Dari GitHub) =====
     Route::get('/chat', function () {
         $admin = \App\Models\User::where('role', 'admin')->first();
         if (!$admin) abort(500, 'Admin tidak ada');
@@ -108,10 +123,12 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
 
+        // --- DASHBOARD ADMIN (Model KegiatanDonasi + Search/Filter dari GitHub) ---
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
             
-            $query = Donation::query();
+            $query = \App\Models\KegiatanDonasi::query();
+            
             if ($request->search) {
                 $query->where('judul_donasi', 'like', "%{$request->search}%");
             }
@@ -122,11 +139,11 @@ Route::middleware('auth')->group(function () {
             return view('admin.dashboardAdmin', ['semuaDonasi' => $query->latest()->get()]);
         })->name('dashboard');
 
-        // Kegiatan & Donasi Baru
+        // Kegiatan Baru
         Route::get('/kegiatan/baru', [KegiatanDonasiController::class, 'create'])->name('kegiatan.create');
         Route::post('/kegiatan/simpan', [KegiatanDonasiController::class, 'store'])->name('kegiatan.store');
 
-        // Validasi Proses Donasi
+        // ===== FITUR VALIDASI PROSES DONASI =====
         Route::prefix('validasi-proses-donasi')->group(function () {
             Route::get('/', [ValidasiProsesDonasiController::class, 'index'])->name('validasi.index');
             Route::get('/disetujui', [ValidasiProsesDonasiController::class, 'halamanDisetujui'])->name('validasi.disetujui');
@@ -136,11 +153,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/{id}/return', [ValidasiProsesDonasiController::class, 'returnDonasi'])->name('validasi.return');
         });
 
-        // Manajemen Donasi (Tambah, Detail, Edit, Hapus)
-        Route::get('/donasi/tambah', function () { return view('admin.tambah-donasi'); })->name('donasi.create');
+        // ===== MANAJEMEN DONASI =====
+        Route::get('/donasi/tambah', function () { return view('admin.create'); })->name('donasi.create'); // Sesuai permintaan: admin.create
+        
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : null;
             Donation::create([
+                // Penamaan field disesuaikan dengan kode baru dari GitHub
                 'judul_donasi' => $request->judul, 'kategori_penerima' => $request->kategori, 'tanggal_kegiatan' => $request->tanggal,
                 'foto_kegiatan' => $fotoPath, 'deskripsi' => $request->deskripsi, 'alamat_penyaluran' => $request->alamat, 'user_id' => Auth::id()
             ]);
@@ -159,6 +178,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/donasi/hapus/{id}', function ($id) {
             $donasi = Donation::findOrFail($id);
+            // Menghapus file foto baik menggunakan nama field lama atau baru
             if ($donasi->foto_kegiatan) { Storage::disk('public')->delete($donasi->foto_kegiatan); }
             if ($donasi->foto) { Storage::disk('public')->delete($donasi->foto); }
             $donasi->delete();
@@ -170,6 +190,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+
     });
 
     // ==========================================
@@ -181,7 +202,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/kerjasama-mitra', function (Request $request) {
             if (!session()->has('mitra_data')) {
                 session()->put('mitra_data', [
-                    ['id' => 1, 'nama_mitra' => 'Restoran Sederhana', 'status' => 'aktif', 'kategori' => 'Restoran', 'lokasi' => 'Jakarta Selatan', 'keterangan_waktu' => 'Bergabung Jan 2025', 'total_donasi' => '142', 'porsi_tersalur' => '1.2k', 'logo' => null, 'deskripsi' => 'Restoran Sederhana merupakan mitra kuliner...'],
+                    ['id' => 1, 'nama_mitra' => 'Restoran Sederhana', 'status' => 'aktif', 'kategori' => 'Restoran', 'lokasi' => 'Jakarta Selatan', 'keterangan_waktu' => 'Bergabung Jan 2025', 'total_donasi' => '142', 'porsi_tersalur' => '1.2k', 'logo' => null, 'deskripsi' => 'Restoran Sederhana merupakan mitra kuliner berjenis Restoran yang berlokasi di Jakarta Selatan. Mitra ini berkomitmen penuh untuk mendukung program FoodLink dalam mendistribusikan makanan layak konsumsi guna mengurangi food waste dan membantu masyarakat sekitar.'],
                 ]);
             }
             $allMitras = collect(session('mitra_data'))->map(function($item) { return (object) $item; });
@@ -232,7 +253,6 @@ Route::middleware('auth')->group(function () {
                     ['id' => 1, 'nama' => 'Drop Box Sudirman', 'status' => 'tersedia', 'lokasi' => 'Jl. Jend. Sudirman No.1', 'mitra' => 'Gedung Artha', 'kapasitas' => 30, 'update' => 'Menunggu Penjemputan', 'lat' => -6.2250, 'lng' => 106.8056, 'history' => []],
                 ]);
             }
-            // Logika drop-box tetap utuh
             $dropboxes = session('dropbox_data');
             return view('admin.dropbox', [
                 'dropboxes' => collect($dropboxes)->map(function($item) { return (object) $item; }),
@@ -252,17 +272,13 @@ Route::middleware('auth')->group(function () {
         })->name('dropbox.store');
 
         Route::post('/drop-box/{id}/jemput', function (Request $request, $id) {
-            // Logika jemput drop-box
             return redirect()->route('dropbox.index');
         })->name('dropbox.jemput');
     });
 
-    // / ================= RETUR DONASI =================
-Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])
-    ->name('retur.index');
-
-Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])
-    ->name('retur.store');
+    // ================= RETUR DONASI GLOBAL =================
+    Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
+    Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
     
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

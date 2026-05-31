@@ -66,11 +66,9 @@
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-               <a href="{{ route('retur.index') }}"
-   class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-arrow-rotate-left"></i>
-    Retur Donasi
-</a>
+               <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
+                </a>
 
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
@@ -80,7 +78,7 @@
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
 
-                {{-- MENU KERJASAMA MITRA (BARU DITAMBAHKAN) --}}
+                {{-- MENU KERJASAMA MITRA --}}
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
@@ -92,10 +90,10 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
-                 <a href="{{ route('tracking.index') }}"  class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
+                <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
 
