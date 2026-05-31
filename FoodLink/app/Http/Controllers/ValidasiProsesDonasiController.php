@@ -130,5 +130,5 @@ class ValidasiProsesDonasiController extends Controller
 
         // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
         return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
-    }
+   }
 }
