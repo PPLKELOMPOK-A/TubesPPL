@@ -78,15 +78,6 @@
         align-items: center;
     }
 
-    .thumb {
-        width: 90px;
-        height: 65px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 20px;
-        background: #f5f5f5;
-    }
-
     .info h4 {
         margin: 0 0 4px 0;
         font-size: 16px;
@@ -137,7 +128,7 @@
         border-color: #46854d;
     }
 
-    .pagination {
+    .pagination-wrapper {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -146,31 +137,22 @@
         color: #666666;
     }
 
-    .pages {
-        display: flex;
-        gap: 5px;
-    }
-
-    .pages button {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .pages button.active {
-        background: #5b3a1e;
-        color: white;
-        border-color: #5b3a1e;
-    }
-
     .empty {
         text-align: center;
         padding: 40px;
         color: #888888;
         font-size: 14px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #d4edda;
+        color: #155724;
+        margin-top: 4px;
     }
 </style>
 @endsection
@@ -187,7 +169,7 @@
                    name="search"
                    value="{{ $search ?? request('search') }}"
                    class="search"
-                   placeholder="Search">
+                   placeholder="Cari bukti donasi...">
             <button type="submit" class="btn-search-icon">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -197,39 +179,34 @@
     @forelse($donasi as $item)
     <div class="card">
         <div class="left">
-            <img src="{{ $item->foto ? asset('img/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb" alt="Thumbnail">
             <div class="info">
-                <h4>{{ $item->judul }}</h4>
-                <p>{{ $item->kategori }}</p>
-                <p>{{ $item->tanggal }}</p>
+                <h4>Donasi ke {{ $item->kategori_penerima }}</h4>
+                <p>{{ $item->kategori_makanan }}</p>
+                <p>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</p>
+                <span class="status-badge">✅ {{ ucfirst($item->status) }}</span>
             </div>
         </div>
         <div class="actions">
             <a href="{{ route('bukti-donasi.bukti', $item->id) }}" class="btn-primary">
-                Lihat Bukti
-            </a>
-            <a href="{{ route('bukti-donasi.show', $item->id) }}" class="btn-secondary">
                 Detail
             </a>
         </div>
     </div>
     @empty
-    <div class="empty">Data tidak ditemukan.</div>
+    <div class="empty">Belum ada donasi yang selesai.</div>
     @endforelse
 
-    <div class="pagination">
+    <div class="pagination-wrapper">
         <span>
             @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                {{ $donasi->firstItem() }}-{{ $donasi->lastItem() }} dari {{ $donasi->total() }}
+                {{ $donasi->firstItem() ?? 0 }}-{{ $donasi->lastItem() ?? 0 }} dari {{ $donasi->total() }}
             @else
                 {{ $donasi->count() }} data
             @endif
         </span>
-        <div class="pages">
+        <div>
             @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                {{ $donasi->links('vendor.pagination.simple-tailwind') }}
-            @else
-                <button class="active">1</button>
+                {{ $donasi->links() }}
             @endif
         </div>
     </div>
