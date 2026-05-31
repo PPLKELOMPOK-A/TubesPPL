@@ -90,9 +90,69 @@ Route::middleware('auth')->group(function () {
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
 
-    Route::get('/komunitas/{id}', function ($id) {
-        return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
-    })->name('komunitas.detail');
+    // ======================
+// KOMUNITAS
+// ======================
+
+Route::get('/komunitas', function (Request $request) {
+
+    $query = Komunitas::query();
+
+    // search
+    if ($request->search) {
+        $query->where(function($q) use ($request){
+            $q->where('judul', 'like', '%' . $request->search . '%')
+              ->orWhere('isi', 'like', '%' . $request->search . '%')
+              ->orWhere('nama_user', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    // filter kategori
+    if ($request->kategori) {
+        $query->where('kategori', $request->kategori);
+    }
+
+    $posts = $query->latest()->get();
+
+    return view('komunitas', compact('posts'));
+
+})->name('komunitas.index');
+
+
+Route::get('/komunitas/create', function () {
+    return view('tambah-komunitas');
+})->name('komunitas.create');
+
+
+Route::post('/komunitas/store', function(Request $request){
+
+    $request->validate([
+        'judul'=>'required',
+        'isi'=>'required',
+        'kategori'=>'required'
+    ]);
+
+    Komunitas::create([
+        'nama_user'=>Auth::user()->name,
+        'judul'=>$request->judul,
+        'isi'=>$request->isi,
+        'kategori'=>$request->kategori,
+    ]);
+
+    return redirect()
+        ->route('komunitas.index')
+        ->with('success','Posting berhasil dibuat');
+
+})->name('komunitas.store');
+
+
+Route::get('/komunitas/{id}', function ($id) {
+
+    $post = Komunitas::findOrFail($id);
+
+    return view('komunitas-detail', compact('post'));
+
+})->name('komunitas.detail');
 
     Route::get('/chat', function () {
         $admin = \App\Models\User::where('role', 'admin')->first();
