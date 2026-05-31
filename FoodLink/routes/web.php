@@ -35,7 +35,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', function (Request $request) {
         if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
-        $donations = Donation::where('user_id', Auth::id())->orderBy('created_at', 'desc')->paginate(10);
+        
+        // --- BAGIAN YANG DIREVISI ---
+        // Menggunakan model KegiatanDonasi dan menghapus filter user_id 
+        // agar semua list donasi muncul di halaman dashboard (beranda) user
+        $donations = \App\Models\KegiatanDonasi::orderBy('created_at', 'desc')->paginate(10);
+        
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
@@ -44,7 +49,7 @@ Route::middleware('auth')->group(function () {
         if (Auth::user()->role === 'admin') { 
             return redirect()->route('admin.dashboard'); 
         }
-        $data = Donation::findOrFail($id);
+        $data = \App\Models\KegiatanDonasi::findOrFail($id);
         return view('detail-donasi-user', compact('data')); 
     })->name('user.donasi.detail');
 
@@ -71,7 +76,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $semuaDonasi = Donation::orderBy('created_at', 'desc')->get();
+            $semuaDonasi = \App\Models\KegiatanDonasi::orderBy('created_at', 'desc')->get();
             return view('admin.dashboardAdmin', compact('semuaDonasi'));
         })->name('dashboard');
 
@@ -88,7 +93,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{id}/return', [ValidasiProsesDonasiController::class, 'returnDonasi'])->name('validasi.return');
         });
 
-        Route::get('/donasi/tambah', function () { return view('admin.tambah-donasi'); })->name('donasi.create');
+        Route::get('/donasi/tambah', function () { return view('admin.create'); })->name('donasi.create');
 
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : null;
