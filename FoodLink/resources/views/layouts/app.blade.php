@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Foodlink - Dashboard')</title>
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Manrope:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     <style>
@@ -61,18 +61,17 @@
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
                 
-                {{-- Validasi Donasi (Link sudah diperbaiki) --}}
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-               <a href="{{ route('retur.index') }}"
-   class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-arrow-rotate-left"></i>
-    Retur Donasi
-</a>
-
-                <a href="#" class="nav-item">
+                {{-- Tautan Retur Donasi sudah diperbaiki agar tidak error 500 --}}
+                <a href="{{ route('admin.retur.index') }}" class="nav-item {{ request()->routeIs('admin.retur.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
+                </a>
+                
+                {{-- Tautan Penugasan Relawan ditambahkan --}}
+                <a href="{{ route('admin.penugasan.index') }}" class="nav-item {{ request()->routeIs('admin.penugasan.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
                 
@@ -80,9 +79,13 @@
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
 
-                {{-- MENU KERJASAMA MITRA (BARU DITAMBAHKAN) --}}
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
+                </a>
+
+                {{-- MENU DROP BOX (BARU DITAMBAHKAN) --}}
+                <a href="{{ route('dropbox.index') }}" class="nav-item {{ Request::is('admin/drop-box*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-box"></i> Drop Box
                 </a>
 
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
@@ -94,9 +97,6 @@
                 </a>
                 <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
-                </a>
-                 <a href="{{ route('tracking.index') }}"  class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
 
             @endif
