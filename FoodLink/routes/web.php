@@ -32,13 +32,36 @@ use App\Http\Controllers\TipsController;
 
 Route::get('/', function () { return view('welcome'); });
 
+// ======================
+// GUEST ROUTES
+// ======================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
+    // Rute Lupa Password
+    Route::get('/forgot-password', function () {
+        return view('auth.lupa-password'); 
+    })->name('password.request');
+
+    // Rute proses cek email
+    Route::post('/forgot-password/check', [AuthController::class, 'checkEmail'])->name('password.check');
+    
+    // RUTE EDIT PASSWORD (Dapat diakses Guest untuk reset)
+    Route::get('/edit-password', function () {
+        return view('auth.edit-password');
+    })->name('profil.edit-password');
 });
 
+// Rute Update Password tetap di luar agar bisa diakses oleh GUEST (Lupa Password) dan AUTH (Ganti Password)
+Route::post('/profil/update-password', [AuthController::class, 'updatePassword'])->name('profil.update-password');
+
+
+// ======================
+// AUTH USER & ADMIN ROUTES
+// ======================
 Route::middleware('auth')->group(function () {
 
     // ===== DASHBOARD USER (SUDAH DIPERBAIKI SINKRONISASI FILTER & SEARCH) =====
@@ -331,13 +354,12 @@ Route::middleware('auth')->group(function () {
             $now = time();
             $sessionUpdated = false;
 
-            // Update status teks berdasarkan waktu animasi jika user me-refresh halaman
             foreach ($dropboxes as $key => $box) {
                 if (isset($box['active_task'])) {
                     $task = $box['active_task'];
                     if ($now >= $task['waktu_selesai']) {
                         $dropboxes[$key]['update'] = 'Selesai mengantar';
-                        unset($dropboxes[$key]['active_task']); // Hapus tugas jika sudah selesai
+                        unset($dropboxes[$key]['active_task']);
                         $sessionUpdated = true;
                     } elseif ($now >= $task['waktu_sampai_dropbox']) {
                         $dropboxes[$key]['update'] = 'Barang sudah dijemput dan sedang menuju alamat pengantaran';
@@ -448,29 +470,26 @@ Route::middleware('auth')->group(function () {
             $petugas = $request->input('petugas');
             $waktuJemput = $request->input('waktu'); 
 
-            // Gudang Pusat (Titik Awal & Akhir)
             $latGudang = -6.1754; 
             $lngGudang = 106.8272; 
 
             foreach ($dropboxes as $key => $box) {
                 if ($box['id'] == $id) {
                     
-                    // Waktu animasi 2 Menit (120 Detik dibagi 2 rute)
                     $waktuMulaiAnimasi = time();
                     $durasiPerRute = 60; 
 
                     $dropboxes[$key]['active_task'] = [
                         'petugas' => $petugas,
                         'waktu_mulai' => $waktuMulaiAnimasi,
-                        'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute, // Tiba di Drop Box
-                        'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2), // Kembali ke Gudang
+                        'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute,
+                        'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2),
                         'lat_gudang' => $latGudang,
                         'lng_gudang' => $lngGudang,
                         'lat_dropbox' => $box['lat'],
                         'lng_dropbox' => $box['lng'],
                     ];
 
-                    // Format History Lebih Lengkap
                     $tanggal = date('d M Y');
                     $estimasiSelesai = date('H:i', $waktuMulaiAnimasi + ($durasiPerRute * 2));
                     
@@ -492,7 +511,7 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('dropbox.index');
         })->name('dropbox.jemput');
 
-    }); // Penutup Route::prefix('admin')->group
+    });
 
     // ================= PROFIL USER (SUDAH DISINKRONKAN) =================
     Route::get('/profil', function () {
@@ -535,4 +554,4 @@ Route::middleware('auth')->group(function () {
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-}); // Penutup Route::middleware('auth')->group
+});
