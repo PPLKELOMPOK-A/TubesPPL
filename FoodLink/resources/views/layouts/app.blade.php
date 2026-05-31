@@ -30,10 +30,7 @@
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #FFF9EE; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 25px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
-        
-        /* Modifikasi profil agar bisa diklik secara visual */
-        .profile-section { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: opacity 0.2s; }
-        .profile-section:hover { opacity: 0.8; }
+        .profile-section { display: flex; align-items: center; gap: 12px; }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
         .main-content-canvas { padding: 40px 50px; }
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
@@ -49,49 +46,35 @@
             <div class="brand">Foodlink</div>
             
             @if(Auth::check() && Auth::user()->role == 'admin')
+
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
-<<<<<<< HEAD
-=======
-                
-                {{-- Validasi Donasi --}}
->>>>>>> 20615fb48936d9173b0c712dd0ba81057277e848
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
-<<<<<<< HEAD
-                <a href="#" class="nav-item">
+                <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
-=======
-                
-               <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
-                </a>
-
->>>>>>> 5e03d7d8c0980a097657e7a884b9610cdc06e6bb
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
                 <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
-<<<<<<< HEAD
-=======
-
-                {{-- MENU KERJASAMA MITRA --}}
->>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
+                <a href="{{ route('dropbox.index') }}" class="nav-item {{ Request::is('admin/drop-box*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-box"></i> Drop Box
+                </a>
 
             @else
+
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-<<<<<<< HEAD
-                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donation') ? 'active' : '' }}">
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
                 <a href="{{ route('bukti.donasi') }}" class="nav-item {{ Request::is('bukti-donasi*') ? 'active' : '' }}">
@@ -99,14 +82,11 @@
                 </a>
                 <a href="{{ url('/tips') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-dollar"></i> Tips
-=======
-                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
->>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
                 </a>
+
             @endif
 
             <a href="#" class="nav-item">
@@ -115,6 +95,7 @@
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
+
         </div>
         
         <div class="logout-section">
@@ -130,19 +111,12 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            
-            <a href="{{ route('profile.edit') }}" class="profile-section">
+            <div class="profile-section">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                
-                {{-- PERBAIKAN LOGIKA: Deteksi foto profil real-time dari database --}}
-                @if(Auth::check() && !empty(Auth::user()->foto_profil))
-                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
-                @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
-                @endif
-            </a>
+                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+            </div>
         </div>
 
         @yield('content')
