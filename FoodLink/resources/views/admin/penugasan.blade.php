@@ -1,203 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin - Penugasan Relawan</title>
+@extends('layouts.app')
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            display: flex;
-            background: #f5f5f5;
-        }
+@section('title', 'Penugasan Relawan')
 
-        .sidebar {
-            width: 220px;
-            background: #e6cfa7;
-            height: 100vh;
-            padding: 20px;
-        }
+@section('content')
 
-        .menu a {
-            display: block;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            color: black;
-        }
+<style>
+.main-content{
+    /* Mengubah padding atas menjadi 60px dan memberikan jarak aman margin-top */
+    padding: 20px 40px 40px 40px; 
+    margin-top: 20px; 
+}
 
-        .menu a:hover {
-            background: #d2b48c;
-        }
+.header-section{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
 
-        .content {
-            flex: 1;
-            padding: 20px;
-        }
+.header-title h2{
+    margin-top: -25px;
+    color:#6B4F2A;
+    font-size:28px;
+    line-height: 1.2; /* Menjaga teks tinggi font tetap stabil */
+}
 
-        .header {
-            background: #5a3e1b;
-            color: white;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
+.header-title p{
+    margin-top:5px;
+    color:#777;
+    font-size:14px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
+.btn-add{
+    background:#6B4F2A;
+    color:white;
+    padding:12px 18px;
+    border-radius:10px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:0.2s;
+}
 
-        th {
-            background: #5a3e1b;
-            color: white;
-            padding: 10px;
-        }
+.btn-add:hover{
+    background:#5a4123;
+}
 
-        td {
-            padding: 8px;
-            text-align: center;
-        }
+.table-box{
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    overflow-x:auto;
+}
 
-        tr:nth-child(even) {
-            background: #f2f2f2;
-        }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-        .btn {
-            border: none;
-            padding: 5px 8px;
-            cursor: pointer;
-        }
+th{
+    background:#6B4F2A;
+    color:white;
+    padding:14px;
+    font-size:14px;
+}
 
-        .edit {
-            background: orange;
-            color: white;
-        }
+td{
+    padding:14px;
+    text-align:center;
+    font-size:14px;
+}
 
-        .delete {
-            background: red;
-            color: white;
-        }
+tr:nth-child(even){
+    background:#f8f8f8;
+}
 
-        .form-box {
-            background: white;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
+.action-icons{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+}
 
-        input {
-            padding: 8px;
-            margin: 5px;
-        }
+.action-icons a{
+    color:#6B4F2A;
+}
 
-        .submit-btn {
-            margin-top: 10px;
-            background: #5a3e1b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-        }
+.action-icons button{
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:#dc3545;
+}
 
-        .alert {
-            background: lightgreen;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
+.alert{
+    background:#d4edda;
+    color:#155724;
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+</style>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h3>Dashboard</h3>
-    <div class="menu">
-        <a href="/admin/dashboard">Dashboard</a>
-        <a href="#">Validasi Donasi</a>
-        <a href="#">Chat</a>
-        <a href="#">Data Organisasi</a>
-        <a href="/admin/penugasan">Penugasan Relawan</a>
-    </div>
-</div>
+<div class="main-content">
 
-<!-- Content -->
-<div class="content">
+    <div class="header-section">
 
-    <div class="header">
-        <strong>Admin - Penugasan Relawan</strong>
+        <div class="header-title">
+            
+        </div>
+
+        <a href="{{ route('admin.penugasan.create') }}" class="btn-add">
+            Tambah Relawan
+        </a>
+
     </div>
 
-    <!-- Notifikasi -->
     @if(session('success'))
         <div class="alert">
             {{ session('success') }}
         </div>
     @endif
 
-    <!-- FORM TAMBAH / EDIT -->
-    <div class="form-box">
-        <form method="POST"
-              action="{{ isset($edit) ? '/admin/penugasan/'.$edit->id : '/admin/penugasan' }}">
-            @csrf
+    <div class="table-box">
 
-            @if(isset($edit))
-                @method('PUT')
-            @endif
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Penugasan</th>
+                    <th>ID Donasi</th>
+                    <th>Nama Donatur</th>
+                    <th>Relawan</th>
+                    <th>Lokasi Pengambilan</th>
+                    <th>Lokasi Pengantaran</th>
+                    <th>Tanggal Penugasan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
 
-            <button class="submit-btn">
-                {{ isset($edit) ? 'Update' : 'Tambah Karyawan' }}
-            </button>
-        </form>
+            <tbody>
+                @forelse($data as $item)
+                <tr>
+                    <td>{{ $item->id_penugasan }}</td>
+                    <td>{{ $item->id_donasi }}</td>
+                    <td>{{ $item->nama_donatur }}</td>
+                    <td>{{ $item->relawan }}</td>
+                    <td>{{ $item->lokasi_pengambilan }}</td>
+                    <td>{{ $item->lokasi_pengantaran }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal_penugasan)->format('d-m-Y') }}</td>
+
+                    <td>
+                        <div class="action-icons">
+
+                            <a href="{{ route('admin.penugasan.edit', $item->id) }}">
+    <i class="fa-solid fa-pen"></i>
+</a>
+
+                            <form action="{{ route('admin.penugasan.destroy', $item->id) }}" method="POST">
+    @csrf
+    @method('DELETE')
+    <button type="submit">
+        <i class="fa-solid fa-trash"></i>
+    </button>
+</form>
+
+                        </div>
+                    </td>
+                </tr>
+
+                @empty
+                <tr>
+                    <td colspan="8">Belum ada data</td>
+                </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+
     </div>
-
-    <!-- TABEL -->
-    <h3>Data Penugasan</h3>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID Penugasan</th>
-                <th>ID Donasi</th>
-                <th>Nama Donatur</th>
-                <th>Relawan</th>
-                <th>Lokasi Pengambilan</th>
-                <th>Lokasi Pengantaran</th>
-                <th>Tanggal</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse($data as $item)
-            <tr>
-                <td>{{ $item->id_penugasan }}</td>
-                <td>{{ $item->id_donasi }}</td>
-                <td>{{ $item->nama_donatur }}</td>
-                <td>{{ $item->relawan }}</td>
-                <td>{{ $item->lokasi_pengambilan }}</td>
-                <td>{{ $item->lokasi_pengantaran }}</td>
-                <td>{{ \Carbon\Carbon::parse($item->tanggal_penugasan)->format('d-m-Y') }}</td>
-
-                <td>
-                    <a href="/admin/penugasan/edit/{{ $item->id }}" class="btn edit">Edit</a>
-
-                    <form action="/admin/penugasan/{{ $item->id }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn delete">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-
-            @empty
-            <tr>
-                <td colspan="8">Belum ada data</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
 
 </div>
 
-</body>
-</html>
+@endsection

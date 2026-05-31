@@ -11,30 +11,18 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR (DISESUAIKAN) --- */
+        /* --- SIDEBAR --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
         .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
-        
-        .nav-group { flex-grow: 1; padding: 0 15px; /* Memberi jarak agar tidak penuh ke pinggir */ }
-        
+        .nav-group { flex-grow: 1; padding: 0 15px; }
         .nav-item { 
-            display: flex; 
-            align-items: center; 
-            padding: 12px 20px; 
-            text-decoration: none; 
-            color: #4A4A4A; 
-            font-size: 14px; 
-            font-weight: 500; 
-            gap: 15px; 
-            margin-bottom: 6px; 
-            border-radius: 10px; /* Sudut kotak sewajarnya */
-            transition: 0.2s;
+            display: flex; align-items: center; padding: 12px 20px; text-decoration: none; 
+            color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; 
+            margin-bottom: 6px; border-radius: 10px; transition: 0.2s;
         }
-        
         .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; font-weight: 600; }
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         .nav-item.active i { color: #FFFFFF; }
-        
         .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
 
         .logout-section { padding: 25px 30px; margin-top: auto; }
@@ -48,9 +36,12 @@
         /* --- CONTAINER --- */
         .container { padding: 40px 60px; max-width: 1000px; width: 100%; margin-left: 0; margin-right: auto; }
 
-        /* Tombol Kembali UX Standar (Atas) */
-        .back-nav { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #eee; color: #444; text-decoration: none; margin-bottom: 20px; transition: 0.2s; }
-        .back-nav:hover { background: #e0e0e0; color: #000; }
+        /* Alert Notifikasi */
+        .alert-success {
+            background-color: #E6F4EA; border: 1px solid #1E8E3E; color: #1E8E3E;
+            padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px;
+            display: flex; align-items: center; gap: 10px; max-width: 600px;
+        }
 
         .header-info { margin-bottom: 30px; }
         .header-info h1 { font-size: 24px; font-weight: 700; color: #111; margin-bottom: 5px; }
@@ -70,12 +61,9 @@
         
         .btn-kembali { background: white; border: 1px solid #D0D0D0; color: #444; }
         .btn-hapus { background: #fdfdfd; border: 1px solid #d9534f; color: #d9534f; }
-        .btn-hapus { background: white; border: 1px solid #D0D0D0; color: #444; }
+        .btn-hapus:hover { background: #d9534f; color: white; }
         .btn-edit { background: #6B4F2A; color: white; border: none; }
         .btn-edit:hover { background-color: #563e21; }
-
-        /* Tambahan style untuk alert sukses */
-        .alert-success { background-color: #E6F4EA; border: 1px solid #1E8E3E; color: #1E8E3E; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 14px; display: flex; align-items: center; gap: 10px; max-width: 600px; }
     </style>
 </head>
 <body>
@@ -102,8 +90,8 @@
 
     <div class="main-panel">
         <div class="top-bar">
-            <i class="fa-regular fa-bell"></i>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            <i class="fa-regular fa-bell" style="cursor: pointer;"></i>
+            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar" alt="User">
         </div>
 
         <div class="container">
@@ -114,19 +102,15 @@
                 </div>
             @endif
 
-            <a href="{{ route('admin.dashboard') }}" class="back-nav" title="Kembali ke Beranda">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-
             <div class="header-info">
-                <h1>{{ $data->judul }}</h1>
-                <span class="category">{{ $data->kategori }}</span>
-                <p class="date">{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}</p>
+                <h1>{{ $data['judul'] }}</h1>
+                <span class="category">{{ $data['kategori'] }}</span>
+                <p class="date">{{ \Carbon\Carbon::parse($data['tanggal'])->translatedFormat('l, d F Y') }}</p>
             </div>
 
             <div class="image-container">
-                @if(!empty($data->foto))
-                    <img src="{{ asset('storage/' . $data->foto) }}" alt="Foto Donasi">
+                @if($data['foto'])
+                    <img src="{{ asset('storage/' . $data['foto']) }}" alt="Foto Donasi">
                 @else
                     <img src="https://via.placeholder.com/450x300/f5f5f5/cccccc?text=Belum+Ada+Foto" alt="Donasi">
                 @endif
@@ -134,23 +118,25 @@
 
             <div class="content-section">
                 <h3 class="section-title">Deskripsi Kegiatan</h3>
-                <p class="section-text">{{ $data->deskripsi }}</p>
+                <p class="section-text">{{ $data['deskripsi'] }}</p>
             </div>
 
             <div class="content-section">
                 <h3 class="section-title">Alamat</h3>
-                <p class="section-text">{{ $data->alamat }}</p>
+                <p class="section-text">{{ $data['alamat'] }}</p>
             </div>
 
             <div class="footer-actions">
                 <a href="{{ route('admin.dashboard') }}" class="btn btn-kembali">Kembali</a>
                 
-                <form action="{{ route('admin.donasi.delete', ['id' => $data->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
+                <!-- Gunakan form untuk hapus demi keamanan (CSRF protection) -->
+                <form action="#" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus donasi ini?')">
                     @csrf
+                    @method('DELETE')
                     <button type="submit" class="btn btn-hapus">Hapus</button>
                 </form>
-
-                <a href="{{ route('admin.donasi.edit', ['id' => $data->id]) }}" class="btn btn-edit">Edit</a>
+                
+                <a href="{{ route('admin.donasi.edit') }}" class="btn btn-edit">Edit</a>
             </div>
         </div>
     </div>
