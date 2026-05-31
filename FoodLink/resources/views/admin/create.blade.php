@@ -149,9 +149,9 @@
                             <label class="label-uppercase">KATEGORI PENERIMA</label>
                             <select name="kategori_penerima">
                                 <option value="">Pilih Kategori</option>
-                                <option value="Panti Asuhan">Panti Asuhan</option>
-                                <option value="Bencana Alam">Bencana Alam</option>
-                                <option value="Umum">Umum</option>
+                                <option value="Organisasi (Yayasan)">Organisasi (Yayasan)</option>
+                                <option value="Kegiatan Keagamaan">Kegiatan Keagamaan</option>
+                                <option value="Individu/Umum">Individu/Umum</option>
                             </select>
                             @error('kategori_penerima') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
                         </div>
