@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Donation;
+use App\Models\DonasiBukti;
 use Illuminate\Support\Facades\Auth;
 
 class BuktiDonasiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Donation::where('user_id', Auth::id());
+        $query = DonasiBukti::where('user_id', Auth::id())
+                            ->where('status', 'selesai');
         
         $search = $request->get('search');
         
@@ -24,7 +25,7 @@ class BuktiDonasiController extends Controller
         
         $donasi = $query->latest()->get();
         
-        return view('bukti-penyelesaian-donasi.bukti-donasi', [
+        return view('bukti-donasi', [
             'donasi' => $donasi,
             'search' => $search
         ]);
@@ -32,29 +33,13 @@ class BuktiDonasiController extends Controller
 
     public function showBukti($id)
     {
-        $donasi = (object)[
-            "id" => $id,
-            "judul" => "Hari Anak Nasional - Panti Bunda Kasih",
-            "deskripsi" => "Penyaluran donasi dilakukan kepada anak-anak panti asuhan",
-            "tanggal" => "19 April 2024",
-            "tujuan" => "Gerakan Peduli Anak",
-            "jenis" => "Bahan Makanan (Beras, Minyak, Telur, dll)",
-            "catatan" => "Donasi berupa bahan pangan",
-            "status" => "Selesai",
-            "galeri" => [
-                "donasi1.jpg",
-                "donasi2.jpg",
-                "donasi3.jpg",
-                "donasi4.jpg"
-            ]
-        ];
-
-        return view('bukti-penyelesaian-donasi.bukti-donasi-bukti', compact('donasi'));
+        $donasi = DonasiBukti::findOrFail($id);
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 
     public function show($id)
     {
-        $donation = Donation::findOrFail($id);
-        return view('bukti-penyelesaian-donasi.show', ['data' => $donation]);
+        $donation = DonasiBukti::findOrFail($id);
+        return view('show', ['data' => $donation]);
     }
 }

@@ -5,50 +5,38 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Donation extends Model
-{
+class Donation extends Model {
     use HasFactory;
 
-    protected $fillable = [
-        // 🔹 DATA LAMA
-        'judul',
-        'kategori',
-        'tanggal',
-        'foto',
-        'deskripsi',
-        'alamat',
-        'quantity',
-        'food_type',
-        'estimated_time',
-        'user_id',
-        'status', 
-        'rating',   // Tambahkan ini
-        'comment',
+    protected $table = 'kegiatan_donasis';
 
-        // 🔥 TAMBAHAN UNTUK VALIDASI
-        'status',
-        'validated_by'
-    ];
+    // Kolom yang ada di gambar phpMyAdmin kamu
+    protected $fillable = [
+    'judul_donasi',
+    'kategori_penerima',
+    'tanggal_kegiatan',
+    'foto_kegiatan',
+    'deskripsi',
+    'alamat_penyaluran',
+    'status'
+];
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 HELPER VALIDASI (BIAR CLEAN)
+    | HELPER VALIDASI / SCOPES
     |--------------------------------------------------------------------------
     */
 
-    // Scope: data menunggu
     public function scopeMenunggu($query)
     {
         return $query->where('status', 'menunggu');
     }
 
-    // Scope: disetujui
     public function scopeDisetujui($query)
     {
         return $query->where('status', 'disetujui');
     }
 
-    // Scope: ditolak
     public function scopeDitolak($query)
     {
         return $query->where('status', 'ditolak');
@@ -56,7 +44,7 @@ class Donation extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | 🔥 RELASI (OPTIONAL)
+    | RELATIONS
     |--------------------------------------------------------------------------
     */
 
@@ -70,3 +58,4 @@ class Donation extends Model
         return $this->belongsTo(User::class, 'validated_by');
     }
 }
+

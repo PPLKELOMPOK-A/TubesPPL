@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Manrope:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('CSS/style.css') }}">
 
     <style>
@@ -47,36 +46,26 @@
             <div class="brand">Foodlink</div>
             
             @if(Auth::check() && Auth::user()->role == 'admin')
-
-                {{-- MENU KHUSUS ADMIN --}}
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
-
-                {{-- Dari main: link validasi sudah ada route-nya --}}
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
-
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
-
                 <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
-
-                {{-- Dari main: menu kerjasama mitra --}}
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
 
             @else
-
-                {{-- MENU KHUSUS USER --}}
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
@@ -89,17 +78,14 @@
                 <a href="{{ url('/tips') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-dollar"></i> Tips
                 </a>
-
             @endif
 
-            {{-- MENU GLOBAL (ADMIN & USER) --}}
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
-
         </div>
         
         <div class="logout-section">
