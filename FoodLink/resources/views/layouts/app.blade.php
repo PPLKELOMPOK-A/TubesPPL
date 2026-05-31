@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Foodlink - Dashboard')</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Manrope:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     <style>
@@ -66,9 +66,11 @@
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-                <a href="#" class="nav-item">
+                {{-- DISESUAIKAN: Jika di web.php murni bernama 'retur.index' tanpa prefix admin --}}
+                <a href="{{ route('retur.index') }}" class="nav-item {{ Request::is('retur-donasi*') || request()->routeIs('retur.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
+
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
@@ -89,8 +91,11 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
-                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item">
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
+                </a>
+                 <a href="{{ route('tracking.index') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
 
             @endif
