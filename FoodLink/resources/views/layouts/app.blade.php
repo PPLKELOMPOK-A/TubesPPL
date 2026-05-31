@@ -58,11 +58,9 @@
                 </a>
 =======
                 
-               <a href="{{ route('retur.index') }}"
-   class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
-    <i class="fa-solid fa-arrow-rotate-left"></i>
-    Retur Donasi
-</a>
+               <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
+                </a>
 
 >>>>>>> 5e03d7d8c0980a097657e7a884b9610cdc06e6bb
                 <a href="#" class="nav-item">
@@ -71,6 +69,11 @@
                 <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
+<<<<<<< HEAD
+=======
+
+                {{-- MENU KERJASAMA MITRA --}}
+>>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
                 <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
@@ -79,6 +82,7 @@
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
+<<<<<<< HEAD
                 <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donation') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
@@ -87,6 +91,13 @@
                 </a>
                 <a href="{{ url('/tips') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-dollar"></i> Tips
+=======
+                <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
+                </a>
+                <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-location-dot"></i> Tracking
+>>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
                 </a>
             @endif
 

@@ -78,7 +78,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])->name('bukti-donasi.bukti');
     Route::get('/bukti-donasi/{id}/detail', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
     // ===== FITUR RIWAYAT & MANAJEMEN DONASI (Gabungan) =====
     Route::get('/riwayat-donasi', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
     Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
