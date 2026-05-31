@@ -43,7 +43,8 @@ class ReturDonasiController extends Controller
         $buktiPath = null;
 
         if ($request->hasFile('bukti')) {
-            $buktiPath = $request->file('bukti')->store('bukti_retur', 'public');
+            $buktiPath = $request->file('bukti')
+                ->store('bukti_retur', 'public');
         }
 
         // SIMPAN KE DATABASE

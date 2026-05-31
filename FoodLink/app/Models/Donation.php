@@ -31,7 +31,7 @@ class Donation extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | HELPER SCOPES
+    | HELPER VALIDASI / SCOPES
     |--------------------------------------------------------------------------
     */
 
@@ -66,3 +66,4 @@ class Donation extends Model
         return $this->belongsTo(User::class, 'validated_by'); 
     }
 }
+

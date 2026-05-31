@@ -3,9 +3,8 @@
 @section('title', 'Foodlink - Beranda')
 
 @section('content')
-<!-- CSS Khusus untuk Halaman Beranda User -->
 <style>
-    .container { max-width: 1100px; width: 100%; margin-left: 0; }
+    .container { padding: 30px 50px; max-width: 1100px; width: 100%; margin-left: 0; }
     
     .announcement { background-color: #FFFFFF; border: 1px solid #EAEAEA; border-radius: 12px; padding: 25px; text-align: center; color: #666; font-size: 13px; line-height: 1.6; margin-bottom: 30px; }
 
@@ -28,16 +27,14 @@
     /* --- DONASI LIST --- */
     .donasi-item { display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1.5px solid #eee; transition: 0.2s; }
     .donasi-item:hover { background-color: #fafafa; }
-    
     .donasi-content { display: flex; align-items: center; flex: 1; text-decoration: none; color: inherit; cursor: pointer; }
     .donasi-img { width: 110px; height: 80px; border-radius: 10px; object-fit: cover; margin-right: 25px; background-color: #f5f5f5; }
-    
     .donasi-info { flex: 1; }
     .donasi-info h3 { font-size: 17px; font-weight: 700; color: #000; margin-bottom: 5px; }
     .donasi-info .category { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: block; }
     .donasi-info .date { font-size: 13px; color: #999; }
 
-    .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-decoration: none; display: inline-block;}
+    .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-decoration: none; display: inline-block; }
     .btn-action:hover { background-color: #5a4223; }
     
     /* --- PAGINATION --- */
@@ -64,12 +61,12 @@
                 setTimeout(function() {
                     var alertBox = document.getElementById('success-alert');
                     if (alertBox) {
-                        alertBox.style.opacity = '0'; // Animasi memudar
+                        alertBox.style.opacity = '0';
                         setTimeout(function() {
-                            alertBox.style.display = 'none'; // Menghilangkan elemen dari halaman
-                        }, 500); // Tunggu animasi 0.5 detik selesai
+                            alertBox.style.display = 'none';
+                        }, 500);
                     }
-                }, 5000); // 5000 milidetik = 5 detik
+                }, 5000);
             </script>
         @endif
 
@@ -109,12 +106,9 @@
             </div>
         </form>
 
-        <!-- LOOPING DATA DARI DATABASE -->
         @forelse($donations as $item)
         <div class="donasi-item">
             <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                
-                {{-- Pengecekan Foto (Nama kolom sudah disesuaikan ke foto_kegiatan) --}}
                 @if(!empty($item->foto_kegiatan))
                     <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
@@ -124,7 +118,6 @@
                 @endif
                 
                 <div class="donasi-info">
-                    {{-- Nama kolom sudah disesuaikan dengan database --}}
                     <span class="category">{{ $item->kategori_penerima }}</span>
                     <h3>{{ $item->judul_donasi }}</h3>
                     <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
@@ -151,7 +144,6 @@
             <a href="#" class="page-node">10</a>
             <a href="#" class="page-node"><i class="fa-solid fa-chevron-right"></i></a>
         </div>
-
     </div>
 </div>
 

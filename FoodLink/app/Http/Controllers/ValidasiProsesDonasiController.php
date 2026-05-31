@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Donation;
+use App\Models\DonasiMakanan;
 use Illuminate\Http\Request;
-use Carbon\Carbon; // Ditambahkan untuk fungsi manipulasi tanggal
+use Carbon\Carbon;
 
 class ValidasiProsesDonasiController extends Controller
 {
@@ -15,17 +15,19 @@ class ValidasiProsesDonasiController extends Controller
     {
         // Menghitung statistik untuk ditampilkan di Card Atas
         $stats = [
-            'masuk_hari_ini' => Donation::whereDate('created_at', Carbon::today())->count(),
-            'perlu_validasi' => Donation::where('status', 'menunggu')->count(),
-            'sudah_diproses' => Donation::whereIn('status', ['disetujui', 'ditolak'])->count(),
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
 
-        // Mengambil data dengan pagination (5 data per halaman) agar desain figma berfungsi
-        $donations = Donation::where('status', 'menunggu')
+        // Mengambil data dengan pagination (5 data per halaman)
+        // UPDATE: Mengambil data dengan status 'menunggu' ATAU 'pending'
+        $donations = DonasiMakanan::whereIn('status', ['menunggu', 'pending'])
             ->latest()
             ->paginate(5);
 
-        return view('validasi_proses_donasi.index', compact('donations', 'stats'));
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 
     // ===============================
@@ -33,9 +35,10 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     public function setujui($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
 
-        if ($donasi->status !== 'menunggu') {
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -43,7 +46,7 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'disetujui'
         ]);
 
-        return redirect()->route('validasi.disetujui')
+        return redirect()->route('admin.validasi.disetujui')
             ->with('success', 'Donasi berhasil disetujui');
     }
 
@@ -52,9 +55,10 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     public function tolak($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
 
-        if ($donasi->status !== 'menunggu') {
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -62,7 +66,7 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'ditolak'
         ]);
 
-        return redirect()->route('validasi.ditolak')
+        return redirect()->route('admin.validasi.ditolak')
             ->with('success', 'Donasi berhasil ditolak');
     }
 
@@ -71,9 +75,10 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     public function returnDonasi($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
 
-        if ($donasi->status === 'menunggu') {
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (in_array($donasi->status, ['menunggu', 'pending'])) {
             return back()->with('info', 'Donasi sudah berada di antrian');
         }
 
@@ -81,33 +86,49 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'menunggu'
         ]);
 
-        return redirect()->route('validasi.index')
+        return redirect()->route('admin.validasi.index')
             ->with('info', 'Donasi dikembalikan ke antrian');
     }
 
     // ===============================
     // DISETUJUI
     // ===============================
-    public function disetujui()
+    public function halamanDisetujui()
     {
-        // Menggunakan paginate juga agar seragam dengan halaman index
-        $donations = Donation::where('status', 'disetujui')
+        // Wajib mengirim $stats agar card atas tidak error
+        $stats = [
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
+        ];
+
+        $donations = DonasiMakanan::where('status', 'disetujui')
             ->latest()
             ->paginate(5);
 
-        return view('validasi_proses_donasi.disetujui', compact('donations'));
+        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 
     // ===============================
     // DITOLAK
     // ===============================
-    public function ditolak()
+    public function halamanDitolak()
     {
-        // Menggunakan paginate juga agar seragam dengan halaman index
-        $donations = Donation::where('status', 'ditolak')
+        // Wajib mengirim $stats agar card atas tidak error
+        $stats = [
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
+        ];
+
+        $donations = DonasiMakanan::where('status', 'ditolak')
             ->latest()
             ->paginate(5);
 
-        return view('validasi_proses_donasi.ditolak', compact('donations'));
+        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 }
