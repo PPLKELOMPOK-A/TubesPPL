@@ -3,28 +3,21 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Donation;
+use Carbon\Carbon;
 
 class DonationSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('donations')->insert([
-            [
-                'judul' => 'Program Makan Sehat - Yayasan Peduli',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => '2026-05-30',
-                'foto' => 'makan_sehat.jpg',
-                'deskripsi' => 'Penyaluran donasi dilakukan kepada anak-anak panti asuhan dalam rangka Hari Anak Nasional',
-                'status' => 'Selesai',
-                'user_id' => 1,
-                'rating' => null,
-                'komentar' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            // tambah data contoh lain jika perlu
+        Donation::create([
+            'judul_donasi' => 'Program Makan Sehat',
+            'kategori_penerima' => 'Organisasi (Yayasan)',
+            'tanggal_kegiatan' => Carbon::now()->format('Y-m-d'),
+            'foto_kegiatan' => 'makan_sehat.jpg',
+            'deskripsi' => 'Penyaluran makanan untuk anak-anak panti asuhan.',
+            'alamat_penyaluran' => 'Jl. Merdeka No 1',
+            'status' => 'menunggu',
         ]);
     }
 }
-

@@ -3,36 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Donation;
+use App\Models\DonasiMakanan;
 use Illuminate\Support\Facades\Auth;
 
 class BuktiDonasiController extends Controller
 {
-    // ✅ HALAMAN LIST - Mengambil data dari database
     public function index(Request $request)
     {
-        // Ambil data donasi dari database berdasarkan user yang login
-        $query = Donation::where('user_id', Auth::id());
+        $query = DonasiMakanan::where('user_id', Auth::id())
+                              ->whereIn('status', ['selesai', 'disetujui']);
         
         $search = $request->get('search');
         
-        // Filter pencarian
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', '%' . $search . '%')
-                  ->orWhere('kategori', 'like', '%' . $search . '%')
-                  ->orWhere('tanggal', 'like', '%' . $search . '%');
+                $q->where('kategori_makanan', 'like', '%' . $search . '%')
+                  ->orWhere('kategori_penerima', 'like', '%' . $search . '%');
             });
         }
         
-        // Ambil data dan urutkan dari yang terbaru
-        $donasi = $query->latest()->get();
+        $donasi = $query->latest()->paginate(10);
         
-<<<<<<< HEAD
-        return view('bukti-penyelesaian-donasi.bukti-donasi', [
-=======
         return view('bukti-donasi', [
->>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
             'donasi' => $donasi,
             'search' => $search
         ]);
@@ -40,38 +32,13 @@ class BuktiDonasiController extends Controller
 
     public function showBukti($id)
     {
-        $donasi = (object)[
-            "id" => $id,
-            "judul" => "Hari Anak Nasional - Panti Bunda Kasih",
-            "deskripsi" => "Penyaluran donasi dilakukan kepada anak-anak panti asuhan",
-            "tanggal" => "19 April 2024",
-            "tujuan" => "Gerakan Peduli Anak",
-            "jenis" => "Bahan Makanan (Beras, Minyak, Telur, dll)",
-            "catatan" => "Donasi berupa bahan pangan",
-            "status" => "Selesai",
-            "galeri" => [
-                "donasi1.jpg",
-                "donasi2.jpg",
-                "donasi3.jpg",
-                "donasi4.jpg"
-            ]
-        ];
-
-<<<<<<< HEAD
-        return view('bukti-penyelesaian-donasi.bukti-donasi-bukti', compact('donasi'));
-=======
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
         return view('bukti-donasi-bukti', compact('donasi'));
->>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
     }
 
     public function show($id)
     {
-        $donation = Donation::findOrFail($id);
-<<<<<<< HEAD
-        return view('bukti-penyelesaian-donasi.show', ['data' => $donation]);
-=======
-        return view('show', ['data' => $donation]);
->>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 }
-

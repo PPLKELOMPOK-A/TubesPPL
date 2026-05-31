@@ -1,15 +1,14 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Bukti Penyelesaian Donasi')
 
 @section('styles')
 <style>
-    /* --- MEMAKSA KONTEN MEPEET KE KIRI & MELUAS PENUH SEPERTI MOCKUP --- */
     .page-content-container {
         width: 100%;
         max-width: 100%;
-        margin-left: -70px;
-        padding: 10px 40px 40px 0px;
+        margin-left: 0;
+        padding: 30px 40px;
         box-sizing: border-box;
     }
 
@@ -42,7 +41,6 @@
         border-radius: 8px 0 0 8px;
         border: 1px solid #e2e8f0;
         border-right: none;
-        font-family: 'Poppins', sans-serif;
         font-size: 14px;
         outline: none;
         box-sizing: border-box;
@@ -64,9 +62,7 @@
         transition: background 0.2s;
     }
 
-    .btn-search-icon:hover {
-        background: #422a16;
-    }
+    .btn-search-icon:hover { background: #422a16; }
 
     .card {
         display: flex;
@@ -80,15 +76,6 @@
     .left {
         display: flex;
         align-items: center;
-    }
-
-    .thumb {
-        width: 90px;
-        height: 65px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-right: 20px;
-        background: #f5f5f5;
     }
 
     .info h4 {
@@ -119,13 +106,10 @@
         font-weight: 600;
         text-decoration: none;
         font-size: 13px;
-        box-shadow: 0 2px 4px rgba(91, 58, 30, 0.15);
         transition: background 0.2s;
     }
 
-    .btn-primary:hover {
-        background: #422a16;
-    }
+    .btn-primary:hover { background: #422a16; }
 
     .btn-secondary {
         background: #ffffff;
@@ -136,7 +120,6 @@
         font-weight: 600;
         font-size: 13px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         transition: all 0.2s;
     }
 
@@ -145,7 +128,7 @@
         border-color: #46854d;
     }
 
-    .pagination {
+    .pagination-wrapper {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -154,29 +137,22 @@
         color: #666666;
     }
 
-    .pages {
-        display: flex;
-        gap: 5px;
+    .empty {
+        text-align: center;
+        padding: 40px;
+        color: #888888;
+        font-size: 14px;
     }
 
-    .pages button {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-family: 'Poppins', sans-serif;
-        transition: all 0.2s;
-    }
-    
-    .pages button.active {
-        background: #5b3a1e;
-        color: white;
-        border-color: #5b3a1e;
-    }
-
-    .pages button:hover:not(.active) {
-        background: #f8f9fa;
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #d4edda;
+        color: #155724;
+        margin-top: 4px;
     }
 </style>
 @endsection
@@ -191,47 +167,47 @@
         <div class="search-wrapper">
             <input type="text"
                    name="search"
-                   value="{{ request('search') }}"
+                   value="{{ $search ?? request('search') }}"
                    class="search"
-                   placeholder="Search">
+                   placeholder="Cari bukti donasi...">
             <button type="submit" class="btn-search-icon">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
     </form>
 
-    @foreach($donasi as $item)
+    @forelse($donasi as $item)
     <div class="card">
-
         <div class="left">
-            <img src="{{ $item->foto ? asset('img/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb">
-
             <div class="info">
-                <h4>{{ $item->judul }}</h4>
-                <p>{{ $item->kategori }}</p>
-                <p>{{ $item->tanggal }}</p>
+                <h4>Donasi ke {{ $item->kategori_penerima }}</h4>
+                <p>{{ $item->kategori_makanan }}</p>
+                <p>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</p>
+                <span class="status-badge">✅ {{ ucfirst($item->status) }}</span>
             </div>
         </div>
-
         <div class="actions">
             <a href="{{ route('bukti-donasi.bukti', $item->id) }}" class="btn-primary">
-                Lihat Bukti
-            </a>
-            <a href="{{ route('bukti-donasi.show', $item->id) }}" class="btn-secondary">
                 Detail
             </a>
         </div>
-
     </div>
-    @endforeach
+    @empty
+    <div class="empty">Belum ada donasi yang selesai.</div>
+    @endforelse
 
-    <div class="pagination">
-        <span>1-5 dari 10</span>
-
-        <div class="pages">
-            <button class="active">1</button>
-            <button>2</button>
-            <button>&gt;</button>
+    <div class="pagination-wrapper">
+        <span>
+            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $donasi->firstItem() ?? 0 }}-{{ $donasi->lastItem() ?? 0 }} dari {{ $donasi->total() }}
+            @else
+                {{ $donasi->count() }} data
+            @endif
+        </span>
+        <div>
+            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $donasi->links() }}
+            @endif
         </div>
     </div>
 

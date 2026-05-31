@@ -18,6 +18,12 @@ return new class extends Migration {
             $table->string('alamat');
 
             // ===============================
+            // TAMBAHAN UNTUK RELASI USER
+            // ===============================
+            // Baris ini yang sebelumnya kelupaan:
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+
+            // ===============================
             // TAMBAHAN UNTUK VALIDASI PROSES DONASI
             // ===============================
             $table->string('nama_makanan')->nullable();

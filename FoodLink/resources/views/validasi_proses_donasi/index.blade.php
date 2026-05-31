@@ -4,82 +4,152 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <h1 class="text-2xl font-bold mb-8">Validasi Proses Donasi</h1>
 
+    <h1 class="text-2xl font-bold mb-8">
+        Validasi Proses Donasi
+    </h1>
+
+    <!-- STATS (DINAMIS) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800">3</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Masuk Hari Ini</div>
+
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border">
+            <div class="text-3xl font-bold">
+                {{ \App\Models\Donation::where('status','menunggu')->count() }}
+            </div>
+            <div class="text-xs font-bold text-gray-500">
+                Menunggu
+            </div>
         </div>
-        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800">1</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Perlu Validasi</div>
+
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border">
+            <div class="text-3xl font-bold">
+                {{ \App\Models\Donation::where('status','disetujui')->count() }}
+            </div>
+            <div class="text-xs font-bold text-gray-500">
+                Disetujui
+            </div>
         </div>
-        <div class="bg-[#FFF9F0] p-6 rounded-xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800">2</div>
-            <div class="text-xs font-bold text-gray-500 uppercase tracking-tight">Sudah di Proses</div>
+
+        <div class="bg-[#FFF9F0] p-6 rounded-xl border">
+            <div class="text-3xl font-bold">
+                {{ \App\Models\Donation::where('status','ditolak')->count() }}
+            </div>
+            <div class="text-xs font-bold text-gray-500">
+                Ditolak
+            </div>
         </div>
+
     </div>
 
     <div class="flex space-x-2 mb-6">
-        <a href="{{ route('admin.validasi.index') }}" class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold shadow-sm">Menunggu Validasi</a>
-        <a href="{{ route('admin.validasi.disetujui') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Disetujui</a>
-        <a href="{{ route('admin.validasi.ditolak') }}" class="bg-white border border-gray-100 text-gray-400 px-6 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-gray-50 transition">Ditolak</a>
+        <a href="{{ route('validasi.index') }}"
+           class="bg-[#E5E7EB] text-gray-700 px-6 py-2 rounded-lg text-xs font-bold">
+            Menunggu Validasi
+        </a>
+
+        <a href="{{ route('validasi.disetujui') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Disetujui
+        </a>
+
+        <a href="{{ route('validasi.ditolak') }}"
+           class="bg-white border text-gray-400 px-6 py-2 rounded-lg text-xs font-bold hover:bg-gray-50">
+            Ditolak
+        </a>
     </div>
 
+    <!-- NOTIF -->
+    @if(session('success'))
+        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- LIST -->
     <div class="space-y-4">
         @forelse($donations as $item)
-        <div class="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col md:flex-row gap-6 relative shadow-sm">
-            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex-shrink-0 flex items-center justify-center border border-[#FBEBCE] overflow-hidden">
-                <img src="
-                    @if($item->foto)
-                        {{ asset('storage/'.$item->foto) }}
-                    @elseif(str_contains(strtolower($item->judul ?? ''), 'mie') || str_contains(strtolower($item->judul ?? ''), 'bakso'))
-                        {{ asset('img/mie ayam bakso.jpeg') }}
-                    @elseif(str_contains(strtolower($item->judul ?? ''), 'nasi'))
-                        {{ asset('img/nasi kotak.avif') }}
-                    @elseif(str_contains(strtolower($item->judul ?? ''), 'roti') || str_contains(strtolower($item->judul ?? ''), 'pastry'))
-                        {{ asset('img/roti pastry.jpg') }}
-                    @else
-                        https://cdn-icons-png.flaticon.com/512/3081/3081840.png
-                    @endif
-                " class="w-full h-full object-cover">
+
+        <div class="bg-white p-5 rounded-2xl flex gap-6 shadow-sm border">
+
+            <!-- IMAGE -->
+            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl overflow-hidden">
+                <img src="{{ $item->foto ? asset('storage/'.$item->foto) : 'https://cdn-icons-png.flaticon.com/512/3081/3081840.png' }}"
+                     class="w-full h-full object-cover">
             </div>
 
-            <div class="flex-1 pt-1">
-                <div class="flex justify-between items-start">
-                    <h2 class="text-base font-bold text-gray-800">{{ $item->judul }}</h2>
-                    <span class="text-[#D9A74A] text-[9px] font-bold px-3 py-1 rounded-full uppercase tracking-widest bg-[#FFF4E0]">Menunggu</span>
-                </div>
-                
-                <div class="text-[10px] text-gray-400 mt-1 flex gap-4">
-                    <span>Donatur: <span class="text-gray-500">{{ $item->kategori ?? 'Warung Pak Budi' }}</span></span>
-                    <span>Dikirim: {{ optional($item->created_at)->format('d M, H:i') }}</span>
+            <!-- INFO -->
+            <div class="flex-1">
+
+                <div class="flex justify-between">
+                    <h2 class="font-bold text-gray-800">
+                        {{ $item->judul }}
+                    </h2>
+
+                    <span class="bg-yellow-200 text-yellow-800 text-xs px-3 py-1 rounded-full">
+                        MENUNGGU
+                    </span>
                 </div>
 
-                <div class="flex flex-wrap gap-2 mt-3">
-                    <span class="bg-[#FFF4E0] text-[#D9A74A] text-[9px] font-bold px-3 py-1 rounded-md">{{ $item->quantity }} Porsi</span>
-                    <span class="bg-[#A0AEC0] text-white text-[9px] font-bold px-3 py-1 rounded-md">Layak konsumsi</span>
-                    @if($item->expired_at)
-                    <span class="bg-[#A0AEC0] text-white text-[9px] font-bold px-3 py-1 rounded-md">Expired: {{ \Carbon\Carbon::parse($item->expired_at)->format('d M H:i') }}</span>
-                    @endif
+                <p class="text-sm text-gray-500 mt-1">
+                    Donatur: {{ $item->kategori ?? '-' }}
+                </p>
+
+                <p class="text-xs text-gray-400">
+                    {{ optional($item->created_at)->format('d M Y H:i') }}
+                </p>
+
+                <!-- BADGE -->
+                <div class="flex gap-2 mt-3">
+                    <span class="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded">
+                        {{ $item->quantity }} Porsi
+                    </span>
+
+                    <span class="bg-gray-400 text-white text-xs px-3 py-1 rounded">
+                        Layak konsumsi
+                    </span>
                 </div>
 
+                <!-- ACTION -->
                 <div class="flex gap-2 mt-4">
-                    <form action="{{ route('admin.validasi.setujui', $item->id) }}" method="POST">
+                    
+                    <form action="{{ route('validasi.setujui', $item->id) }}" method="POST">
                         @csrf
-                        <button class="bg-[#81E6D9] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#4FD1C5] transition shadow-sm">Setujui</button>
+                        <button onclick="return confirm('Setujui donasi ini?')"
+                                class="bg-green-400 text-white px-4 py-1 rounded text-sm">
+                            Setujui
+                        </button>
                     </form>
-                    <form action="{{ route('admin.validasi.tolak', $item->id) }}" method="POST">
+
+                    <form action="{{ route('validasi.tolak', $item->id) }}" method="POST">
                         @csrf
-                        <button class="bg-[#FEB2B2] text-white font-bold py-1.5 px-8 rounded-lg text-[11px] hover:bg-[#FC8181] transition shadow-sm">Tolak</button>
+                        <button onclick="return confirm('Tolak donasi ini?')"
+                                class="bg-red-400 text-white px-4 py-1 rounded text-sm">
+                            Tolak
+                        </button>
                     </form>
+
                 </div>
+
             </div>
         </div>
+
         @empty
-            <div class="text-center py-10 text-gray-300 italic">Tidak ada data donasi.</div>
+            <p class="text-center text-gray-400 py-10">
+                Tidak ada donasi
+            </p>
         @endforelse
     </div>
+
+    <!-- PAGINATION INFO -->
+    <div class="mt-6 text-sm text-gray-500">
+        Total: {{ $donations->count() }} data
+    </div>
+
 </div>
 @endsection

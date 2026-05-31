@@ -1,4 +1,4 @@
-@extends('layouts.admin') {{-- Sesuaikan dengan nama file master layout Anda --}}
+@extends('layouts.app') {{-- Sesuaikan dengan nama file master layout Anda --}}
 
 @section('title', 'Foodlink - Dashboard Laporan')
 

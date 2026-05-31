@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Tabel Users (Sudah ada kolom ROLE)
+        // 1. Tabel Users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -16,6 +16,16 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default('user'); // Kolom role ditaruh di sini
+            
+            // ==========================================
+            // TAMBAHAN KOLOM UNTUK FITUR PROFIL
+            // ==========================================
+            $table->string('foto_profil')->nullable();
+            $table->string('nik')->nullable();
+            $table->string('telepon')->nullable();
+            $table->string('lokasi')->nullable();
+            $table->string('alamat')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });
