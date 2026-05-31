@@ -24,10 +24,8 @@
     <div class="subtitle">Lihat dan verifikasi hasil distribusi donasi makanan Anda</div>
 
     <div class="gallery">
-        @if($donasi->galeri && count($donasi->galeri) > 0)
-            @foreach($donasi->galeri as $foto)
-                <img src="{{ asset('img/'.$foto) }}" alt="Bukti Donasi">
-            @endforeach
+        @if($donasi->foto)
+            <img src="{{ asset('img/' . $donasi->foto) }}" alt="Bukti Donasi" onerror="this.src='https://via.placeholder.com/300x250?text=Foto+Tidak+Tersedia'">
         @else
             <p style="color: gray; font-style: italic;">Tidak ada foto bukti tersedia.</p>
         @endif
@@ -36,12 +34,13 @@
     <div class="info-box">
         <h3>Informasi Penyelesaian Donasi</h3>
         <div class="status-box">
-            <span>✔ Status: <b>Selesai</b></span>
+            <span>✔ Status: <b>{{ ucfirst($donasi->status ?? 'Selesai') }}</b></span>
         </div>
-        <div class="info-item">📅 &nbsp; <b>Tanggal Donasi:</b> &nbsp; 19 April, 2024</div>
-        <div class="info-item">🎯 &nbsp; <b>Tujuan Donasi:</b> &nbsp; Gerakan Peduli Anak</div>
-        <div class="info-item">🍚 &nbsp; <b>Jenis Makanan:</b> &nbsp; Beras, Minyak, Telur, dll</div>
-        <div class="info-item">📝 &nbsp; <b>Catatan:</b> &nbsp; Donasi untuk anak yatim</div>
+        <div class="info-item">📅 &nbsp; <b>Tanggal Donasi:</b> &nbsp; {{ $donasi->tanggal ?? '-' }}</div>
+        <div class="info-item">🏷️ &nbsp; <b>Kategori:</b> &nbsp; {{ $donasi->kategori ?? '-' }}</div>
+        <div class="info-item">🍚 &nbsp; <b>Nama Makanan:</b> &nbsp; {{ $donasi->nama_makanan ?? '-' }}</div>
+        <div class="info-item">📝 &nbsp; <b>Deskripsi:</b> &nbsp; {{ $donasi->deskripsi ?? '-' }}</div>
+        <div class="info-item">📍 &nbsp; <b>Alamat:</b> &nbsp; {{ $donasi->alamat ?? '-' }}</div>
         <div class="status-final">
             ✔ Status Penyelesaian:
             <span class="badge">Selesai Dikirim</span>

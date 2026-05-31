@@ -52,9 +52,19 @@
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
+<<<<<<< HEAD
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
+=======
+                
+               <a href="{{ route('retur.index') }}"
+   class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+    <i class="fa-solid fa-arrow-rotate-left"></i>
+    Retur Donasi
+</a>
+
+>>>>>>> 5e03d7d8c0980a097657e7a884b9610cdc06e6bb
                 <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
