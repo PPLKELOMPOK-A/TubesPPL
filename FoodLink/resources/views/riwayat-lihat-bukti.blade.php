@@ -44,7 +44,7 @@
             <a href="javascript:history.back()" class="btn-back"><i class="fas fa-chevron-left"></i></a>
             <div class="title-section-bukti">
                 <span class="status-badge-bukti">Selesai Disalurkan</span>
-                <h2>{{ $donasi->judul ?? 'Donasi ke ' . ($donasi->kategori_penerima ?? 'Penerima') }}</h2>
+                <h2>Donasi ke {{ $donasi->kategori_penerima ?? 'Penerima' }}</h2>
             </div>
         </div>
 
@@ -56,32 +56,29 @@
                 </div>
                 <div class="info-row">
                     <span>Tanggal Penyaluran</span>
-                    <span>{{ $donasi->tanggal ?? '-' }}</span>
+                    <span>{{ $donasi->created_at ? \Carbon\Carbon::parse($donasi->created_at)->translatedFormat('d F Y') : '-' }}</span>
                 </div>
                 <div class="info-row">
                     <span>Tujuan Penyaluran</span>
-                    <span>{{ $donasi->tujuan ?? '-' }}</span>
+                    <span>{{ $donasi->kategori_penerima ?? '-' }}</span>
                 </div>
                 <div class="info-row">
                     <span>Jenis Donasi</span>
-                    <span>{{ $donasi->jenis ?? '-' }}</span>
+                    <span>{{ $donasi->kategori_makanan ?? '-' }}</span>
                 </div>
             </div>
 
             <div class="description-box">
                 <strong>Catatan Penyaluran:</strong><br>
-                {{ $donasi->deskripsi ?? 'Tidak ada catatan.' }} <br><br>
-                <em>*{{ $donasi->catatan ?? '' }}</em>
+                {{ $donasi->deskripsi ?? 'Tidak ada catatan.' }}
             </div>
 
             <h3 class="gallery-title">Dokumentasi Penyaluran</h3>
             <div class="gallery-grid">
-                @if(isset($donasi->galeri) && (is_array($donasi->galeri) || is_object($donasi->galeri)))
-                    @foreach($donasi->galeri as $foto)
+                @if(!empty($donasi->foto_makanan))
                     <div class="gallery-item">
-                        <img src="{{ asset('storage/' . $foto) }}" alt="Bukti Foto" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+Dokumentasi'">
+                        <img src="{{ asset('storage/' . $donasi->foto_makanan) }}" alt="Bukti Foto" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+Dokumentasi'">
                     </div>
-                    @endforeach
                 @else
                     <p style="color: #999; font-style: italic; font-size: 14px;">Belum ada dokumentasi yang diunggah.</p>
                 @endif

@@ -1,12 +1,11 @@
 <?php
 
-// app/Http/Controllers/DonasiMakananController.php
-
 namespace App\Http\Controllers;
 
 use App\Models\DonasiMakanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth; // <-- PENTING: Tambahkan Auth untuk mengambil user_id
 
 class DonasiMakananController extends Controller
 {
@@ -19,8 +18,8 @@ class DonasiMakananController extends Controller
     // Memproses data form
     public function store(Request $request)
     {
+        // 1. HAPUS validasi 'judul_donasi' karena tidak ada di form maupun tabel
         $validatedData = $request->validate([
-            'judul_donasi'      => 'required|string|max:255', // <-- TAMBAHAN: Kolom Judul Donasi
             'nama_donatur'      => 'required|string|max:255',
             'no_telp'           => 'required|string|max:20',
             'email'             => 'required|email|max:255',
@@ -40,6 +39,9 @@ class DonasiMakananController extends Controller
 
         // Set default status saat pertama kali dibuat
         $validatedData['status'] = 'Pending';
+        
+        // 2. TAMBAHKAN user_id dari user yang sedang login
+        $validatedData['user_id'] = Auth::id();
 
         DonasiMakanan::create($validatedData);
 
@@ -74,8 +76,8 @@ class DonasiMakananController extends Controller
             return redirect()->route('riwayat-donasi.index')->with('error', 'Aksi ditolak. Donasi sudah diproses.');
         }
 
+        // 3. HAPUS juga validasi 'judul_donasi' di fungsi update
         $validatedData = $request->validate([
-            'judul_donasi'      => 'required|string|max:255', // <-- TAMBAHAN: Kolom Judul Donasi bisa diedit
             'kategori_makanan'  => 'required|string',
             'waktu_layak'       => 'required|string',
             'deskripsi'         => 'nullable|string',
