@@ -8,9 +8,36 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller {
-    
+
+    public function showLogin() {
+        return view('auth.login');
+    }
+
     public function showRegister() {
         return view('auth.register');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials, $request->has('remember'))) {
+
+            $request->session()->regenerate();
+
+            // Jika role adalah admin, arahkan ke dashboard admin
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Jika user biasa, arahkan ke dashboard user
+            return redirect('/dashboard');
+        }
+
+        return back()->with('error', 'Email atau password salah');
     }
 
     public function register(Request $request) {
@@ -24,27 +51,27 @@ class AuthController extends Controller {
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', 
+            'role' => 'user',
         ]);
 
-        Auth::login($user);
-        return redirect('/dashboard');
+        // Dialihkan ke form login agar user melakukan login manual setelah mendaftar
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 
-public function checkEmail(Request $request)
-{
-    $request->validate(['email' => 'required|email']);
-    $user = \App\Models\User::where('email', $request->email)->first();
+    public function checkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-    if (!$user) {
-        return back()->withErrors(['email' => 'Email tidak terdaftar!']);
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email tidak terdaftar!']);
+        }
+
+        // Simpan di session agar edit-password tahu user mana yang direset
+        session(['reset_user_id' => $user->id]);
+
+        return redirect()->route('profil.edit-password');
     }
-
-    // Simpan di session agar edit-password tahu user mana yang direset
-    session(['reset_user_id' => $user->id]);
-
-    return redirect()->route('profil.edit-password');
-}
 
     // --- FUNGSI UPDATE PASSWORD ---
     public function updatePassword(Request $request) {

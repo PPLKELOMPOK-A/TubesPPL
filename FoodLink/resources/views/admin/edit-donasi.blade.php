@@ -13,21 +13,39 @@
 
         /* --- SIDEBAR --- */
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; }
-        .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
+        .brand { padding: 0 30px; margin-bottom: 35px; font-weight: 700; font-size: 24px; color: #6B4F2A; }
         .nav-group { flex-grow: 1; padding: 0 15px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 20px; text-decoration: none; color: #4A4A4A; font-size: 14px; font-weight: 500; gap: 15px; margin-bottom: 6px; border-radius: 10px; }
-        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; }
+        .nav-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 20px; 
+            text-decoration: none; 
+            color: #4A4A4A; 
+            font-size: 14px; 
+            font-weight: 500; 
+            gap: 15px; 
+            margin-bottom: 6px; 
+            border-radius: 10px; 
+            transition: 0.2s;
+        }
+        .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; font-weight: 600; }
         .nav-item i { width: 20px; font-size: 18px; color: #6B4F2A; }
         .nav-item.active i { color: #FFFFFF; }
-        .logout-section { padding: 0 15px; margin-top: auto; }
-        .logout-btn { border: none; background: none; width: 100%; text-align: left; cursor: pointer; color: #d9534f; display: flex; align-items: center; gap: 15px; padding: 12px 20px; font-size: 14px; font-weight: 500; }
+        .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
+
+        .logout-section { padding: 25px 30px; margin-top: auto; }
+        .logout-btn { border: none; background: none; cursor: pointer; color: #4A4A4A; display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 500; }
 
         /* --- MAIN CONTENT --- */
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; border-bottom: 1px solid #f0f0f0; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; margin-left: 15px; }
+        
+        /* Interactive Profile Section */
+        .profile-section { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: opacity 0.2s; }
+        .profile-section:hover { opacity: 0.8; }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; }
 
-        /* --- CONTAINER (REVISI: MERAPAT KE KIRI) --- */
+        /* --- CONTAINER --- */
         .container { 
             padding: 40px 60px; 
             max-width: 1000px; 
@@ -55,7 +73,7 @@
         .preview-box img { width: 100%; height: 100%; object-fit: cover; }
         .btn-edit-foto { background: white; border: 1px solid #D0D0D0; padding: 10px 15px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
 
-        /* Actions (REVISI: MERAPAT KE KIRI) */
+        /* Actions */
         .footer-actions { 
             display: flex; 
             justify-content: flex-start; 
@@ -74,18 +92,22 @@
 </head>
 <body>
 
-    <div class="sidebar">
+<div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda Admin</a>
+            <a href="{{ route('admin.validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard Laporan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-handshake"></i> Kerjasama Mitra</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Koordinasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
         </div>
         <div class="logout-section">
-            <form action="{{ route('logout') }}" method="POST">@csrf
-                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+             <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</button>
             </form>
         </div>
     </div>
@@ -93,32 +115,38 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            <a href="{{ route('profile.edit') }}" class="profile-section">
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Admin Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar" alt="Admin Avatar">
+                @endif
+            </a>
         </div>
 
         <div class="container">
-            <!-- REVISI 1: FORM ACTION SEKARANG MENGARAH KE ROUTE UPDATE DENGAN ID -->
-            <form action="{{ route('admin.donasi.update', ['id' => $data['id']]) }}" method="POST" enctype="multipart/form-data">
+            {{-- PERBAIKAN: Diubah menembak ke 'admin.donasi.store' sesuai konfigurasi routes/web.php --}}
+            <form action="{{ route('admin.donasi.update', $data->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label>Judul</label>
-                    <input type="text" name="judul" value="{{ $data['judul'] }}">
+                    <input type="text" name="judul" value="{{ $data->judul_donasi ?? $data->judul }}">
                 </div>
 
                 <div class="form-group">
                     <label>Kategori Penerima</label>
                     <select name="kategori">
-                        <option value="Organisasi (Yayasan)" {{ $data['kategori'] == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
-                        <option value="Kegiatan Keagamaan" {{ $data['kategori'] == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
-                        <option value="Individu" {{ $data['kategori'] == 'Individu' ? 'selected' : '' }}>Individu</option>
+                        <option value="Organisasi (Yayasan)" {{ ($data->kategori_penerima ?? $data->kategori) == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
+                        <option value="Kegiatan Keagamaan" {{ ($data->kategori_penerima ?? $data->kategori) == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
+                        <option value="Individu" {{ ($data->kategori_penerima ?? $data->kategori) == 'Individu/Umum' ? 'selected' : '' }}>Individu/Umum</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Tanggal</label>
                     <div class="date-container">
-                        <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data['tanggal'] }}">
-                        <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data['tanggal'])->translatedFormat('l, d F Y') }}" readonly>
+                        <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data->tanggal_kegiatan ?? $data->tanggal }}">
+                        <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data->tanggal_kegiatan ?? $data->tanggal)->translatedFormat('l, d F Y') }}" readonly>
                         <i class="fa-regular fa-calendar-days calendar-icon"></i>
                     </div>
                 </div>
@@ -126,7 +154,7 @@
                 <div class="form-group">
                     <div class="image-container">
                         <div class="preview-box">
-                            <img id="img-preview" src="{{ !empty($data['foto']) ? asset('storage/' . $data['foto']) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
+                            <img id="img-preview" src="{{ !empty($data->foto_kegiatan) ? asset('storage/' . $data->foto_kegiatan) : (!empty($data->foto) ? asset('storage/' . $data->foto) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi') }}" alt="Preview">
                         </div>
                         <input type="file" id="file-input" name="foto" accept="image/*">
                         <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
@@ -137,17 +165,16 @@
 
                 <div class="form-group">
                     <label>Deskripsi Kegiatan</label>
-                    <textarea name="deskripsi" rows="4">{{ $data['deskripsi'] }}</textarea>
+                    <textarea name="deskripsi" rows="4">{{ $data->deskripsi }}</textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Alamat</label>
-                    <input type="text" name="alamat" value="{{ $data['alamat'] }}">
+                    <input type="text" name="alamat" value="{{ $data->alamat_penyaluran ?? $data->alamat }}">
                 </div>
 
                 <div class="footer-actions">
-                    <!-- REVISI 2: TOMBOL KEMBALI MENGARAH KE DETAIL DONASI DENGAN ID YANG SESUAI -->
-                    <a href="{{ route('admin.donasi.detail', ['id' => $data['id']]) }}" class="btn-base btn-kembali">Kembali</a>
+                    <a href="{{ route('admin.donasi.detail', ['id' => $data->id]) }}" class="btn-base btn-kembali">Kembali</a>
                     <button type="submit" class="btn-simpan btn-base">Simpan</button>
                 </div>
             </form>
