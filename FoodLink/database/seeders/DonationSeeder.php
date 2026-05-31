@@ -20,3 +20,4 @@ class DonationSeeder extends Seeder
             'status' => 'menunggu',
         ]);
     }
+}
