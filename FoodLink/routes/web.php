@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -90,9 +90,69 @@ Route::middleware('auth')->group(function () {
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
 
-    Route::get('/komunitas/{id}', function ($id) {
-        return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
-    })->name('komunitas.detail');
+    // ======================
+// KOMUNITAS
+// ======================
+
+Route::get('/komunitas', function (Request $request) {
+
+    $query = Komunitas::query();
+
+    // search
+    if ($request->search) {
+        $query->where(function($q) use ($request){
+            $q->where('judul', 'like', '%' . $request->search . '%')
+              ->orWhere('isi', 'like', '%' . $request->search . '%')
+              ->orWhere('nama_user', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    // filter kategori
+    if ($request->kategori) {
+        $query->where('kategori', $request->kategori);
+    }
+
+    $posts = $query->latest()->get();
+
+    return view('komunitas', compact('posts'));
+
+})->name('komunitas.index');
+
+
+Route::get('/komunitas/create', function () {
+    return view('tambah-komunitas');
+})->name('komunitas.create');
+
+
+Route::post('/komunitas/store', function(Request $request){
+
+    $request->validate([
+        'judul'=>'required',
+        'isi'=>'required',
+        'kategori'=>'required'
+    ]);
+
+    Komunitas::create([
+        'nama_user'=>Auth::user()->name,
+        'judul'=>$request->judul,
+        'isi'=>$request->isi,
+        'kategori'=>$request->kategori,
+    ]);
+
+    return redirect()
+        ->route('komunitas.index')
+        ->with('success','Posting berhasil dibuat');
+
+})->name('komunitas.store');
+
+
+Route::get('/komunitas/{id}', function ($id) {
+
+    $post = Komunitas::findOrFail($id);
+
+    return view('komunitas-detail', compact('post'));
+
+})->name('komunitas.detail');
 
     Route::get('/chat', function () {
         $admin = \App\Models\User::where('role', 'admin')->first();
@@ -179,6 +239,7 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil dihapus!');
         })->name('donasi.delete');
 
+        // Retur, Penugasan, Report
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
@@ -194,9 +255,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/kerjasama-mitra', function (Request $request) {
             if (!session()->has('mitra_data')) {
                 session()->put('mitra_data', [
-                    ['id' => 1, 'nama_mitra' => 'Restoran Sederhana', 'status' => 'aktif', 'kategori' => 'Restoran', 'lokasi' => 'Jakarta Selatan', 'keterangan_waktu' => 'Bergabung Jan 2025', 'total_donasi' => '142', 'porsi_tersalur' => '1.2k', 'logo' => null, 'deskripsi' => 'Restoran Sederhana merupakan mitra kuliner berjenis Restoran yang berlokasi di Jakarta Selatan. Mitra ini berkomitmen penuh untuk mendukung program FoodLink dalam mendistribusikan makanan layak konsumsi guna mengurangi food waste dan membantu masyarakat sekitar.'],
-                    ['id' => 2, 'nama_mitra' => 'Yayasan Peduli Pangan', 'status' => 'pengajuan', 'kategori' => 'NGO', 'lokasi' => 'Jakarta Timur', 'keterangan_waktu' => 'Diajukan 20 Mar 2026', 'total_donasi' => 0, 'porsi_tersalur' => 0, 'logo' => null, 'deskripsi' => 'Yayasan Peduli Pangan merupakan lembaga swadaya masyarakat berjenis NGO yang berfokus di Jakarta Timur. Bermitra dengan FoodLink, yayasan ini aktif bergerak dalam pengelolaan sisa makanan secara higienis untuk disalurkan kepada pihak yang membutuhkan.'],
-                    ['id' => 3, 'nama_mitra' => 'Kantin Kampus UI', 'status' => 'tidak_aktif', 'kategori' => 'Kantin', 'lokasi' => 'Depok', 'keterangan_waktu' => 'Terakhir aktif Nov 2025', 'total_donasi' => '23', 'porsi_tersalur' => '180', 'logo' => null, 'deskripsi' => 'Kantin Kampus UI merupakan area kuliner berjenis Kantin yang terletak di Depok. Melalui kolaborasi bersama FoodLink, para pelaku usaha di kantin ini ikut berkontribusi nyata dalam mendonasikan surplus makanan layak makan bagi lingkungan sekitar.'],
+                    ['id' => 1, 'nama_mitra' => 'Restoran Sederhana', 'status' => 'aktif', 'kategori' => 'Restoran', 'lokasi' => 'Jakarta Selatan', 'keterangan_waktu' => 'Bergabung Jan 2025', 'total_donasi' => '142', 'porsi_tersalur' => '1.2k', 'logo' => null, 'deskripsi' => 'Restoran Sederhana merupakan mitra kuliner...'],
                 ]);
             }
             $allMitras = collect(session('mitra_data'))->map(function($item) { return (object) $item; });
@@ -204,6 +263,7 @@ Route::middleware('auth')->group(function () {
             $kategori = $request->query('kategori');
             $search = $request->query('search');
             $mitras = $allMitras;
+            
             if ($status) $mitras = $mitras->where('status', $status);
             if ($kategori) $mitras = $mitras->where('kategori', $kategori);
             if ($search) {
