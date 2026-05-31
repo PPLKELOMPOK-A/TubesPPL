@@ -31,7 +31,11 @@
         /* --- MAIN CONTENT --- */
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; border-bottom: 1px solid #f0f0f0; }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; margin-left: 15px; }
+        
+        /* Interactive Profile Section */
+        .profile-section { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; transition: opacity 0.2s; }
+        .profile-section:hover { opacity: 0.8; }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #F8E7C1; }
 
         /* --- CONTAINER --- */
         .container { padding: 40px 60px; max-width: 1000px; width: 100%; margin-left: 0; margin-right: auto; }
@@ -63,18 +67,22 @@
 </head>
 <body>
 
-    <div class="sidebar">
+<div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="{{ route('validasi.index') }}" class="nav-item active"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
-            <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda Admin</a>
+            <a href="{{ route('admin.validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard Laporan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-handshake"></i> Kerjasama Mitra</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Koordinasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
         </div>
         <div class="logout-section">
-            <form action="{{ route('logout') }}" method="POST">@csrf
-                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+             <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</button>
             </form>
         </div>
     </div>
@@ -82,7 +90,13 @@
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar">
+            <a href="{{ route('profile.edit') }}" class="profile-section">
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="Admin Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=6B4F2A&color=fff" class="user-avatar" alt="Admin Avatar">
+                @endif
+            </a>
         </div>
 
         <div class="container">

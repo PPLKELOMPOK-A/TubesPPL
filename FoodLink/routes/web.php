@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 // Models
 use App\Models\Donation;
@@ -41,6 +42,16 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/forgot-password', function () {
+        return view('auth.lupa-password');
+    })->name('password.request');
+
+    Route::post('/forgot-password/check', [AuthController::class, 'checkEmail'])->name('password.check');
+
+    Route::get('/edit-password', function () {
+        return view('auth.edit-password');
+    })->name('profil.edit-password');
 });
 
 // ================== AUTH ==================

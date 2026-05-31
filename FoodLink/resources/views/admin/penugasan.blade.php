@@ -107,7 +107,7 @@ tr:nth-child(even){
     <div class="header-section">
 
         <div class="header-title">
-            <h2>Penugasan Relawan</h2>
+            
         </div>
 
         <a href="{{ route('admin.penugasan.create') }}" class="btn-add">

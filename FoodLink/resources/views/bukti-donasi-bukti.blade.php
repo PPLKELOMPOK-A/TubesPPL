@@ -14,43 +14,41 @@
     .status-box { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: #28a745; font-weight: bold; }
     .status-final { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd; font-weight: bold; }
     .badge { background: #28a745; color: white; padding: 5px 15px; border-radius: 50px; font-size: 13px; margin-left: 10px; }
-    .btn-kembali { display: inline-flex; align-items: center; background: #5b3a1e; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.3s; }
+    .btn-kembali { display: inline-flex; align-items: center; background: #5b3a1e; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.3s; width: fit-content; }
 </style>
 @endsection
 
 @section('content')
-        <div class="title">{{ $donasi->judul }}</div>
-        <div class="subtitle">Lihat dan verifikasi hasil distribusi donasi makanan Anda</div>
+<div style="padding: 30px 40px;">
+    <div class="title">{{ $donasi->judul }}</div>
+    <div class="subtitle">Lihat dan verifikasi hasil distribusi donasi makanan Anda</div>
 
-        <div class="gallery">
-            @if($donasi->galeri && count($donasi->galeri) > 0)
-                @foreach($donasi->galeri as $foto)
-                    <img src="{{ asset('img/'.$foto) }}" alt="Bukti Donasi">
-                @endforeach
-            @else
-                <p style="color: gray; font-style: italic;">Tidak ada foto bukti tersedia.</p>
-            @endif
+    <div class="gallery">
+        @if($donasi->foto)
+            <img src="{{ asset('img/' . $donasi->foto) }}" alt="Bukti Donasi" onerror="this.src='https://via.placeholder.com/300x250?text=Foto+Tidak+Tersedia'">
+        @else
+            <p style="color: gray; font-style: italic;">Tidak ada foto bukti tersedia.</p>
+        @endif
+    </div>
+
+    <div class="info-box">
+        <h3>Informasi Penyelesaian Donasi</h3>
+        <div class="status-box">
+            <span>✔ Status: <b>{{ ucfirst($donasi->status ?? 'Selesai') }}</b></span>
         </div>
-
-        <div class="info-box">
-            <h3>Informasi Penyelesaian Donasi</h3>
-            <div class="status-box">
-                <span>✔ Status: <b>Selesai</b></span>
-            </div>
-
-            <div class="info-item">📅 &nbsp; <b>Tanggal Donasi:</b> &nbsp; 19 April, 2024</div>
-            <div class="info-item">🎯 &nbsp; <b>Tujuan Donasi:</b> &nbsp; Gerakan Peduli Anak</div>
-            <div class="info-item">🍚 &nbsp; <b>Jenis Makanan:</b> &nbsp; Beras, Minyak, Telur, dll</div>
-            <div class="info-item">📝 &nbsp; <b>Catatan:</b> &nbsp; Donasi untuk anak yatim</div>
-
-            <div class="status-final">
-                ✔ Status Penyelesaian:
-                <span class="badge">Selesai Dikirim</span>
-            </div>
+        <div class="info-item">📅 &nbsp; <b>Tanggal Donasi:</b> &nbsp; {{ $donasi->tanggal ?? '-' }}</div>
+        <div class="info-item">🏷️ &nbsp; <b>Kategori:</b> &nbsp; {{ $donasi->kategori ?? '-' }}</div>
+        <div class="info-item">🍚 &nbsp; <b>Nama Makanan:</b> &nbsp; {{ $donasi->nama_makanan ?? '-' }}</div>
+        <div class="info-item">📝 &nbsp; <b>Deskripsi:</b> &nbsp; {{ $donasi->deskripsi ?? '-' }}</div>
+        <div class="info-item">📍 &nbsp; <b>Alamat:</b> &nbsp; {{ $donasi->alamat ?? '-' }}</div>
+        <div class="status-final">
+            ✔ Status Penyelesaian:
+            <span class="badge">Selesai Dikirim</span>
         </div>
+    </div>
 
-        <a href="{{ route('bukti.donasi') }}" class="btn-kembali">
-            <span>←</span> Kembali 
-        </a>
-
+    <a href="{{ route('bukti.donasi') }}" class="btn-kembali">
+        <span>←</span> Kembali
+    </a>
+</div>
 @endsection

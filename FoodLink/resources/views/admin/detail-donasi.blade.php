@@ -71,16 +71,19 @@
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda</a>
-            <a href="{{ route('validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
-            <a href="{{ route('admin.retur.index') }}" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><i class="fa-solid fa-house"></i> Beranda Admin</a>
+            <a href="{{ route('admin.validasi.index') }}" class="nav-item"><i class="fa-solid fa-check-to-slot"></i> Validasi Donasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi</a>
             <a href="#" class="nav-item"><i class="fa-solid fa-users-gear"></i> Penugasan Relawan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard Laporan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-handshake"></i> Kerjasama Mitra</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Koordinasi</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-comments"></i> Chat</a>
         </div>
         <div class="logout-section">
              <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Keluar Akun</button>
             </form>
         </div>
     </div>
