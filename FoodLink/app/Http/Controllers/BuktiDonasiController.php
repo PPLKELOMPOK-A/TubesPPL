@@ -3,55 +3,63 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Donation;
+use Illuminate\Support\Facades\Auth;
 
 class BuktiDonasiController extends Controller
 {
-    public function index()
+    // ✅ HALAMAN LIST - Mengambil data dari database
+    public function index(Request $request)
     {
-        $donasi = collect([
-            (object)[
-                'judul' => 'Hari Anak Nasional - Panti Bunda Kasih',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi1.jpg'
-            ],
-            (object)[
-                'judul' => 'Program Makan Sehat - Yayasan Peduli Sesama',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi2.jpg'
-            ],
-            (object)[
-                'judul' => 'Donasi Kasih Natal - Gereja Santo Paulus',
-                'kategori' => 'Organisasi (Yayasan)',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi3.jpg'
-            ],
-            (object)[
-                'judul' => 'Jumat Berkah - Masjid Agung',
-                'kategori' => 'Kegiatan keagamaan',
-                'tanggal' => 'Kamis, 30 Mei 2025',
-                'foto' => 'donasi4.jpg'
-            ],
+        // Ambil data donasi dari database berdasarkan user yang login
+        $query = Donation::where('user_id', Auth::id());
+        
+        $search = $request->get('search');
+        
+        // Filter pencarian
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                  ->orWhere('kategori', 'like', '%' . $search . '%')
+                  ->orWhere('tanggal', 'like', '%' . $search . '%');
+            });
+        }
+        
+        // Ambil data dan urutkan dari yang terbaru
+        $donasi = $query->latest()->get();
+        
+        return view('bukti-donasi', [
+            'donasi' => $donasi,
+            'search' => $search
         ]);
+    }
 
-        return view('bukti-donasi.index', compact('donasi'));
+    public function showBukti($id)
+    {
+        $donasi = (object)[
+            "id" => $id,
+            "judul" => "Hari Anak Nasional - Panti Bunda Kasih",
+            "deskripsi" => "Penyaluran donasi dilakukan kepada anak-anak panti asuhan",
+            "tanggal" => "19 April 2024",
+            "tujuan" => "Gerakan Peduli Anak",
+            "jenis" => "Bahan Makanan (Beras, Minyak, Telur, dll)",
+            "catatan" => "Donasi berupa bahan pangan",
+            "status" => "Selesai",
+            "galeri" => [
+                "donasi1.jpg",
+                "donasi2.jpg",
+                "donasi3.jpg",
+                "donasi4.jpg"
+            ]
+        ];
+
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 
     public function show($id)
-{
-    $data = (object)[
-        'judul' => 'Bukti Penyelesaian Donasi',
-        'deskripsi' => 'Penyaluran donasi dilakukan kepada anak-anak panti asuhan dalam rangka Hari Anak Nasional',
-        'foto_utama' => 'donasi-utama.jpg',
-        'galeri' => [
-            'donasi1.jpg',
-            'donasi2.jpg',
-            'donasi3.jpg',
-            'donasi4.jpg'
-        ]
-    ];
+    {
+        $donation = Donation::findOrFail($id);
+        return view('show', ['data' => $donation]);
+    }
+}
 
-    return view('detailbuktipenyelesaiandonasi', compact('data'));
-}
-}

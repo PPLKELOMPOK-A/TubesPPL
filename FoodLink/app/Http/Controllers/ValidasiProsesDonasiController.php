@@ -2,31 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Donation;
+use App\Models\DonasiMakanan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ValidasiProsesDonasiController extends Controller
 {
     // ===============================
-    // HALAMAN MENUNGGU VALIDASI
+    // MENUNGGU VALIDASI
     // ===============================
     public function index()
     {
-        $donations = Donation::where('status', 'menunggu')
-            ->latest()
-            ->get();
+        // Menghitung statistik untuk ditampilkan di Card Atas
+        $stats = [
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
+        ];
 
-        return view('validasi_proses_donasi.index', compact('donations'));
+        // Mengambil data dengan pagination (5 data per halaman)
+        // UPDATE: Mengambil data dengan status 'menunggu' ATAU 'pending'
+        $donations = DonasiMakanan::whereIn('status', ['menunggu', 'pending'])
+            ->latest()
+            ->paginate(5);
+
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 
     // ===============================
-    // SETUJUI DONASI
+    // SETUJUI
     // ===============================
     public function setujui($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
 
-        if ($donasi->status !== 'menunggu') {
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -34,18 +46,19 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'disetujui'
         ]);
 
-        return redirect()->route('validasi.disetujui')
+        return redirect()->route('admin.validasi.disetujui')
             ->with('success', 'Donasi berhasil disetujui');
     }
 
     // ===============================
-    // TOLAK DONASI
+    // TOLAK
     // ===============================
     public function tolak($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
 
-        if ($donasi->status !== 'menunggu') {
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -53,46 +66,69 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'ditolak'
         ]);
 
-        return redirect()->route('validasi.ditolak')
-            ->with('error', 'Donasi ditolak');
+        return redirect()->route('admin.validasi.ditolak')
+            ->with('success', 'Donasi berhasil ditolak');
     }
 
     // ===============================
-    // RETURN KE ANTRIAN
+    // RETURN
     // ===============================
     public function returnDonasi($id)
     {
-        $donasi = Donation::findOrFail($id);
+        $donasi = DonasiMakanan::findOrFail($id);
+
+        // UPDATE: Pengecekan agar mencakup status pending juga
+        if (in_array($donasi->status, ['menunggu', 'pending'])) {
+            return back()->with('info', 'Donasi sudah berada di antrian');
+        }
 
         $donasi->update([
             'status' => 'menunggu'
         ]);
 
-        return redirect()->route('validasi.index')
+        return redirect()->route('admin.validasi.index')
             ->with('info', 'Donasi dikembalikan ke antrian');
     }
 
     // ===============================
-    // HALAMAN DISETUJUI
+    // DISETUJUI
     // ===============================
-    public function disetujui()
+    public function halamanDisetujui()
     {
-        $donations = Donation::where('status', 'disetujui')
-            ->latest()
-            ->get();
+        // Wajib mengirim $stats agar card atas tidak error
+        $stats = [
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
+        ];
 
-        return view('validasi_proses_donasi.disetujui', compact('donations'));
+        $donations = DonasiMakanan::where('status', 'disetujui')
+            ->latest()
+            ->paginate(5);
+
+        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 
     // ===============================
-    // HALAMAN DITOLAK
+    // DITOLAK
     // ===============================
-    public function ditolak()
+    public function halamanDitolak()
     {
-        $donations = Donation::where('status', 'ditolak')
-            ->latest()
-            ->get();
+        // Wajib mengirim $stats agar card atas tidak error
+        $stats = [
+            'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
+            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
+        ];
 
-        return view('validasi_proses_donasi.ditolak', compact('donations'));
+        $donations = DonasiMakanan::where('status', 'ditolak')
+            ->latest()
+            ->paginate(5);
+
+        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
+        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 }
