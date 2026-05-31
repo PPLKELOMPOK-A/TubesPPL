@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,6 +53,7 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         .remember {
@@ -70,7 +71,7 @@
         }
 
         .remember input[type="checkbox"] {
-            width: auto; /* penting biar ga full width */
+            width: auto;
         }
 
         button {
@@ -113,6 +114,13 @@
                 <h2>Welcome back</h2>
                 <p>Take a moment. Let's continue.</p>
 
+                {{-- Notifikasi Sukses Registrasi Akun / Reset Password --}}
+                @if(session('success'))
+                    <p style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 6px; font-size: 12px; text-align: center;">
+                        {{ session('success') }}
+                    </p>
+                @endif
+
                 {{-- Notifikasi Error Jika Login Gagal --}}
                 @if($errors->any())
                     <p style="color: red; font-size: 12px; text-align: center;">{{ $errors->first() }}</p>
@@ -127,13 +135,13 @@
                         <label>
                             <input type="checkbox" name="remember"> Remember me
                         </label>
-
+                        {{-- Fitur Reset Password Tetap Dipertahankan --}}
+                        <a href="{{ route('password.request') }}">Forgot Password</a>
                     </div>
 
                     <button type="submit">Login</button>
                 </form>
                 
-
                 <div class="register">
                     New here? <a href="{{ route('register') }}">Create an account</a>
                 </div>
