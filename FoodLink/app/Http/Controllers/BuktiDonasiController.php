@@ -28,7 +28,11 @@ class BuktiDonasiController extends Controller
         // Ambil data dan urutkan dari yang terbaru
         $donasi = $query->latest()->get();
         
+<<<<<<< HEAD
         return view('bukti-penyelesaian-donasi.bukti-donasi', [
+=======
+        return view('bukti-donasi', [
+>>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
             'donasi' => $donasi,
             'search' => $search
         ]);
@@ -53,13 +57,21 @@ class BuktiDonasiController extends Controller
             ]
         ];
 
+<<<<<<< HEAD
         return view('bukti-penyelesaian-donasi.bukti-donasi-bukti', compact('donasi'));
+=======
+        return view('bukti-donasi-bukti', compact('donasi'));
+>>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
     }
 
     public function show($id)
     {
         $donation = Donation::findOrFail($id);
+<<<<<<< HEAD
         return view('bukti-penyelesaian-donasi.show', ['data' => $donation]);
+=======
+        return view('show', ['data' => $donation]);
+>>>>>>> 781dfe6035543f17c793d959b622e76a7875e23c
     }
 }
 
