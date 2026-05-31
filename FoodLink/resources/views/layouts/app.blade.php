@@ -64,7 +64,7 @@
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
                 
-                {{-- Validasi Donasi (Link sudah diperbaiki) --}}
+                {{-- Validasi Donasi --}}
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
@@ -126,13 +126,17 @@
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
             
-            {{-- SEKARANG SUDAH MENGGUNAKAN TAG <a> AGAR BISA DIPENCET --}}
-            {{-- Silakan ganti route('profile.edit') sesuai dengan nama route profil di project Laravel kamu --}}
             <a href="{{ route('profile.edit') }}" class="profile-section">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                
+                {{-- PERBAIKAN LOGIKA: Deteksi foto profil real-time dari database --}}
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                @endif
             </a>
         </div>
 
