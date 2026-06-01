@@ -49,17 +49,17 @@ class ReturDonasiController extends Controller
 
         // SIMPAN KE DATABASE
         ReturDonasi::create([
-            'id_donasi' => $request->id_donasi,
-            'nama_makanan' => $request->nama_makanan,
-            'jumlah' => $request->jumlah,
-            'kategori' => $request->kategori,
-            'alasan' => $request->alasan,
-            'tanggal_pengajuan' => $request->tanggal_pengajuan,
-            'deskripsi' => $request->deskripsi,
-            'bukti' => $buktiPath,
+            'id_donasi'          => $request->id_donasi,
+            'nama_makanan'       => $request->nama_makanan,
+            'jumlah'             => $request->jumlah,
+            'kategori'           => $request->kategori,
+            'alasan'             => $request->alasan,
+            'tanggal_pengajuan'  => $request->tanggal_pengajuan,
+            'deskripsi'          => $request->deskripsi,
+            'bukti'              => $request->bukti,
         ]);
 
-        // REDIRECT DENGAN PESAN SUKSES
+        // REDIRECT DENGAN PESAN SUKSES (SUDAH DIPERBAIKI)
         return redirect()
             ->route('admin.retur.index')
             ->with('success', 'Retur berhasil diajukan dan disimpan!');

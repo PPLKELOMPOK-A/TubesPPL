@@ -16,14 +16,13 @@ class ValidasiProsesDonasiController extends Controller
         // Menghitung statistik untuk ditampilkan di Card Atas
         $stats = [
             'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
-            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
-            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            // Ditambahkan 'Pending' kapital agar aman di berbagai jenis database
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending', 'Pending'])->count(),
             'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
 
         // Mengambil data dengan pagination (5 data per halaman)
-        // UPDATE: Mengambil data dengan status 'menunggu' ATAU 'pending'
-        $donations = DonasiMakanan::whereIn('status', ['menunggu', 'pending'])
+        $donations = DonasiMakanan::whereIn('status', ['menunggu', 'pending', 'Pending'])
             ->latest()
             ->paginate(5);
 
@@ -37,8 +36,10 @@ class ValidasiProsesDonasiController extends Controller
     {
         $donasi = DonasiMakanan::findOrFail($id);
 
-        // UPDATE: Pengecekan agar mencakup status pending juga
-        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
+        // PENYELESAIAN: Ubah status dari database menjadi huruf kecil semua agar aman
+        $statusAman = strtolower(trim($donasi->status ?? ''));
+
+        if (!in_array($statusAman, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -57,8 +58,10 @@ class ValidasiProsesDonasiController extends Controller
     {
         $donasi = DonasiMakanan::findOrFail($id);
 
-        // UPDATE: Pengecekan agar mencakup status pending juga
-        if (!in_array($donasi->status, ['menunggu', 'pending'])) {
+        // PENYELESAIAN: Ubah status dari database menjadi huruf kecil semua agar aman
+        $statusAman = strtolower(trim($donasi->status ?? ''));
+
+        if (!in_array($statusAman, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
@@ -71,14 +74,15 @@ class ValidasiProsesDonasiController extends Controller
     }
 
     // ===============================
-    // RETURN
+    // RETURN (Kembalikan ke antrian)
     // ===============================
     public function returnDonasi($id)
     {
         $donasi = DonasiMakanan::findOrFail($id);
 
-        // UPDATE: Pengecekan agar mencakup status pending juga
-        if (in_array($donasi->status, ['menunggu', 'pending'])) {
+        $statusAman = strtolower(trim($donasi->status ?? ''));
+
+        if (in_array($statusAman, ['menunggu', 'pending'])) {
             return back()->with('info', 'Donasi sudah berada di antrian');
         }
 
@@ -95,11 +99,9 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     public function halamanDisetujui()
     {
-        // Wajib mengirim $stats agar card atas tidak error
         $stats = [
             'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
-            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
-            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending', 'Pending'])->count(),
             'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
 
@@ -107,7 +109,6 @@ class ValidasiProsesDonasiController extends Controller
             ->latest()
             ->paginate(5);
 
-        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
         return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
     }
 
@@ -116,11 +117,9 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     public function halamanDitolak()
     {
-        // Wajib mengirim $stats agar card atas tidak error
         $stats = [
             'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
-            // UPDATE: Menghitung status 'menunggu' DAN 'pending'
-            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending'])->count(),
+            'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending', 'Pending'])->count(),
             'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
 
@@ -128,7 +127,6 @@ class ValidasiProsesDonasiController extends Controller
             ->latest()
             ->paginate(5);
 
-        // Kita arahkan ke index.blade.php yang sama, karena UI-nya ada di situ
         return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
    }
 }
