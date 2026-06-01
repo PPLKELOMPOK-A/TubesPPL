@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -124,7 +124,6 @@
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
-
             @endif
 
             {{-- MENU GLOBAL (BISA DIAKSES ADMIN & USER) --}}
@@ -134,7 +133,6 @@
             <a href="{{ route('chat.user') }}" class="nav-item {{ Request::is('chat*') ? 'active' : '' }}">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
-
         </div>
         
         <div class="logout-section">
@@ -160,7 +158,12 @@
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                @endif
             </a>
         </div>
 

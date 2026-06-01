@@ -34,10 +34,7 @@ class DonasiMakananController extends Controller
             'foto_makanan'      => 'required|image|mimes:jpeg,png,jpg,webp|max:5120', 
         ]);
 
-<<<<<<< HEAD
         // 2. Proses upload foto
-=======
->>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
         if ($request->hasFile('foto_makanan')) {
             $path = $request->file('foto_makanan')->store('donasi_foto', 'public');
             $validatedData['foto_makanan'] = $path;
@@ -51,7 +48,6 @@ class DonasiMakananController extends Controller
 
         DonasiMakanan::create($validatedData);
 
-<<<<<<< HEAD
         /* ========================================================
            4. PROSES PENGIRIMAN NOTIFIKASI KE ADMIN
            ======================================================== */
@@ -80,8 +76,6 @@ class DonasiMakananController extends Controller
         /* ======================================================== */
 
         // 5. Redirect kembali dengan pesan sukses
-=======
->>>>>>> 0318b472c7e814449c8accb87866566fd3c80ade
         return redirect()->route('dashboard')->with('success', 'Berhasil! Donasi baru telah ditambahkan dan sedang menunggu kurasi.');
     }
 

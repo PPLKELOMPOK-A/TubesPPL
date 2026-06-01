@@ -71,7 +71,7 @@
                 <select name="kategori">
                     <option value="Organisasi (Yayasan)" {{ ($data->kategori_penerima ?? $data->kategori) == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
                     <option value="Kegiatan Keagamaan" {{ ($data->kategori_penerima ?? $data->kategori) == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
-                    <option value="Individu" {{ ($data->kategori_penerima ?? $data->kategori) == 'Individu/Umum' ? 'selected' : '' }}>Individu/Umum</option>
+                    <option value="Individu" {{ ($data->kategori_penerima ?? $data->kategori) == 'Individu' || ($data->kategori_penerima ?? $data->kategori) == 'Individu/Umum' ? 'selected' : '' }}>Individu/Umum</option>
                 </select>
             </div>
 
@@ -90,10 +90,12 @@
                     <div class="preview-box">
                         <img id="img-preview" src="{{ !empty($data->foto_kegiatan) ? asset('storage/' . $data->foto_kegiatan) : (!empty($data->foto) ? asset('storage/' . $data->foto) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi') }}" alt="Preview">
                     </div>
-                    <input type="file" id="file-input" name="foto" accept="image/*">
-                    <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
-                        <i class="fa-regular fa-pen-to-square"></i> Edit Foto
-                    </button>
+                    <div>
+                        <input type="file" id="file-input" name="foto" accept="image/*">
+                        <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
+                            <i class="fa-regular fa-pen-to-square"></i> Edit Foto
+                        </button>
+                    </div>
                 </div>
             </div>
 

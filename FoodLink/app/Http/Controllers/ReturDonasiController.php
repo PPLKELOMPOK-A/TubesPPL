@@ -18,25 +18,25 @@ class ReturDonasiController extends Controller
     {
         // VALIDASI INPUT
         $request->validate([
-            'id_donasi'          => 'required',
-            'nama_makanan'       => 'required',
-            'jumlah'             => 'required|numeric|min:1',
-            'kategori'           => 'required',
-            'alasan'             => 'required',
-            'tanggal_pengajuan'  => 'required|date',
-            'deskripsi'          => 'required',
-            'bukti'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'id_donasi' => 'required',
+            'nama_makanan' => 'required',
+            'jumlah' => 'required|numeric|min:1',
+            'kategori' => 'required',
+            'alasan' => 'required',
+            'tanggal_pengajuan' => 'required|date',
+            'deskripsi' => 'required',
+            'bukti' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ], [
-            'id_donasi.required'         => 'ID Donasi wajib diisi',
-            'nama_makanan.required'      => 'Nama makanan wajib diisi',
-            'jumlah.required'            => 'Jumlah retur wajib diisi',
-            'kategori.required'          => 'Kategori wajib dipilih',
-            'alasan.required'            => 'Alasan retur wajib diisi',
+            'id_donasi.required' => 'ID Donasi wajib diisi',
+            'nama_makanan.required' => 'Nama makanan wajib diisi',
+            'jumlah.required' => 'Jumlah retur wajib diisi',
+            'kategori.required' => 'Kategori wajib dipilih',
+            'alasan.required' => 'Alasan retur wajib diisi',
             'tanggal_pengajuan.required' => 'Tanggal pengajuan wajib diisi',
-            'deskripsi.required'         => 'Deskripsi retur wajib diisi',
-            'bukti.image'                => 'File harus berupa gambar',
-            'bukti.mimes'                => 'Format gambar harus jpg, jpeg, atau png',
-            'bukti.max'                  => 'Ukuran gambar maksimal 2MB'
+            'deskripsi.required' => 'Deskripsi retur wajib diisi',
+            'bukti.image' => 'File harus berupa gambar',
+            'bukti.mimes' => 'Format gambar harus jpg, jpeg, atau png',
+            'bukti.max' => 'Ukuran gambar maksimal 2MB'
         ]);
 
         // SIMPAN FILE BUKTI JIKA ADA
