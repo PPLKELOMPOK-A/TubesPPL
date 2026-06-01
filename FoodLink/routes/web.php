@@ -70,16 +70,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
-<<<<<<< Updated upstream
     
     // ===== FITUR TRACKING & BUKTI DONASI =====
-=======
+
     Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
     Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
 
     // --- FITUR TRACKING & BUKTI DONASI ---
->>>>>>> Stashed changes
+
     Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); 
     Route::get('/tracking/{id}', function ($id) { 
         return view('tracking.trackingdetail', [
@@ -102,10 +101,6 @@ Route::middleware('auth')->group(function () {
     // ===== FITUR BARU: TIPS & KOMUNITAS =====
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
-<<<<<<< Updated upstream
-=======
-    Route::post('/tips/checkout', [TipsController::class, 'checkoutMidtrans'])->name('tips.checkout');
->>>>>>> Stashed changes
     Route::get('/komunitas/{id}', function ($id) {
         return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
     })->name('komunitas.detail');
@@ -241,11 +236,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
 
-<<<<<<< Updated upstream
-    });
-
-=======
->>>>>>> Stashed changes
     // ==========================================
     // GRUP ROUTE TANPA PREFIX NAMA ADMIN
     // ==========================================
@@ -551,8 +541,6 @@ Route::middleware('auth')->group(function () {
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-<<<<<<< Updated upstream
 }); // Penutup Route::middleware('auth')->group
-=======
 });
->>>>>>> Stashed changes
+
