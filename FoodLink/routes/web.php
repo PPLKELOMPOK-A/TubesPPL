@@ -233,6 +233,11 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.komunitas.index'); 
         })->name('komunitas.index');
 
+        Route::get('/kerjasama-mitra', function () {
+        // Sesuaikan 'admin.mitra.index' dengan lokasi file blade Anda
+            return view('admin.kerjasamamitra'); 
+        })->name('mitra.index');        
+
     });
 
     // LOGOUT
