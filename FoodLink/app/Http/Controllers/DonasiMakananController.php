@@ -8,13 +8,19 @@ use App\Notifications\SistemNotifikasi; // <-- TAMBAHKAN INI UNTUK MENGIRIM NOTI
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth; // <-- PENTING: Tambahkan Auth untuk mengambil user_id
+use App\Models\DropBox;
 
 class DonasiMakananController extends Controller
 {
     // Menampilkan form Blade
+    // Menampilkan form Blade
     public function create()
     {
-        return view('donasi.create'); 
+        // Mengambil semua data lokasi dropbox dari database
+        // (Kamu juga bisa memfilter dengan ->where('status', 'tersedia') jika diperlukan)
+        $dropboxes = DropBox::all(); 
+        
+        return view('donasi.create', compact('dropboxes')); 
     }
 
     // Memproses data form
@@ -147,4 +153,5 @@ class DonasiMakananController extends Controller
 
         return redirect()->route('riwayat-donasi.index')->with('error', 'Donasi sudah diproses dan tidak dapat dibatalkan.');
     }
+    
 }

@@ -175,7 +175,13 @@ Route::middleware('auth')->group(function () {
         });
 
         // ===== MANAJEMEN DONASI =====
-        Route::get('/donasi/tambah', function () { return view('admin.create'); })->name('donasi.create');
+        Route::get('/donasi/tambah', function () { 
+            // Ambil semua data lokasi dropbox dari database
+            $dropboxes = \App\Models\DropBox::all(); 
+            
+            // Kirim variabel $dropboxes ke view
+            return view('admin.create', compact('dropboxes')); 
+        })->name('donasi.create');
 
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : 'donasi/default.jpg';
