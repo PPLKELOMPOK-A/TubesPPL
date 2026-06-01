@@ -6,21 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-{
-    Schema::table('kegiatan_donasis', function (Blueprint $table) {
-        // Menambahkan kolom status dengan nilai default 'pending' atau 'menunggu'
-        $table->string('status')->default('pending')->after('alamat_penyaluran');
-    });
-}
-
-    public function down()
+    public function up(): void
     {
-        Schema::table('kegiatan_donasis', function (Blueprint $table) {
-            $table->dropColumn('status');
-        });
+        if (!Schema::hasTable('kegiatan_donasis')) {
+            return;
+        }
+
+        if (!Schema::hasColumn('kegiatan_donasis', 'status')) {
+            Schema::table('kegiatan_donasis', function (Blueprint $table) {
+                $table->string('status')
+                    ->default('pending')
+                    ->after('alamat_penyaluran');
+            });
+        }
+    }
+
+    public function down(): void
+    {
+        if (!Schema::hasTable('kegiatan_donasis')) {
+            return;
+        }
+
+        if (Schema::hasColumn('kegiatan_donasis', 'status')) {
+            Schema::table('kegiatan_donasis', function (Blueprint $table) {
+                $table->dropColumn('status');
+            });
+        }
     }
 };

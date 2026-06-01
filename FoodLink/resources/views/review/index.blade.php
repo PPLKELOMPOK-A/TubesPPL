@@ -4,96 +4,167 @@
 
 @section('content')
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
 .main-content{
-    padding: 20px 40px 40px;
+    padding: 30px 40px 50px;
+    
 }
 
 /* CARD */
 .rating-container{
-    background: white;
-    border-radius: 20px;
-    /* overflow: hidden;  <-- DIHAPUS agar efek meluap/pop-out gambar tidak terpotong */
-    max-width: 620px;
+    max-width: 650px;
     margin: auto;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    position: relative; /* Menjaga konteks tata letak */
+    border-radius: 30px;
+
+    background: rgba(255,255,255,.9);
+
+    backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.08),
+        0 5px 15px rgba(0,0,0,.05);
+
+    overflow: visible;
+    position: relative;
+
+    transition: .3s ease;
+}
+
+.rating-container:hover{
+    transform: translateY(-3px);
 }
 
 /* HEADER */
 .rating-header{
-    background: #6B4F2A;
-    padding: 25px 20px 20px; /* Sedikit disesuaikan */
+    background: linear-gradient(
+        135deg,
+        #6B4F2A,
+        #7A5930,
+        #8A673A
+    );
+
+    padding: 30px 20px 20px;
+
     text-align: center;
-   border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    position: relative; /* Agar z-index bekerja jika dibutuhkan */
+
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+
+    position: relative;
+    overflow: hidden;
 }
 
-/* JUDUL */
+.rating-header::before{
+    content: "";
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.08);
+
+    top: -80px;
+    right: -60px;
+}
+
+.rating-header::after{
+    content: "";
+    position: absolute;
+
+    width: 150px;
+    height: 150px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.05);
+
+    bottom: -60px;
+    left: -40px;
+}
+
 .rating-header h2{
     color: white;
     margin: 0;
-    font-size: 24px;
+
+    font-size: 30px;
     font-weight: 700;
+
+    position: relative;
+    z-index: 2;
 }
 
-/* BOX GAMBAR (PLANET) */
+/* BOX GAMBAR */
 .planet-box{
-    width: 380px;
-    height: 180px;
-    margin: 25px auto -90px; /* Mengatur jarak bawah negatif agar melompati header */
+    width: 400px;
+    height: 190px;
 
-    background: rgba(255,255,255,0.45);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.6);
-    border-radius: 28px;
+    margin: 30px auto -95px;
+
+    background: rgba(255,255,255,.28);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255,255,255,.45);
+
+    border-radius: 30px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    
-    /* SOLUSI UTAMA: Mengangkat box ke paling depan */
     position: relative;
-    z-index: 10; 
+    z-index: 10;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.12);
 }
 
-/* GAMBAR PLANET */
+/* GAMBAR */
 .rating-img{
     width: 250px;
-    transform: translateY(-50px); /* Disesuaikan posisi vertikal maskotnya */
-    margin-top: -20px;
-    margin-bottom: -10px;
 
-    filter: drop-shadow(
-        0 10px 20px rgba(0,0,0,.15)
-    );
+    transform: translateY(-65px);
+
+    filter:
+        drop-shadow(
+            0 15px 25px rgba(0,0,0,.15)
+        );
+
+    transition: .4s ease;
 }
 
-/* --- FORM --- */
-.rating-form {
-    /* Kembalikan padding atas menjadi normal agar tidak mendorong isi form terlalu jauh */
-    padding: 30px 30px 30px; 
+.rating-img:hover{
+    transform: translateY(-50px) scale(1.03);
 }
 
-/* --- STAR RATING --- */
-.star-rating {
+/* FORM */
+.rating-form{
+    padding: 45px 35px 35px;
+}
+
+/* STAR */
+.star-rating{
     display: flex;
     justify-content: center;
     flex-direction: row-reverse;
-    gap: 8px;
 
-    /* SOLUSI: Berikan margin-top negatif untuk menarik bintang ke atas */
-    margin-top: -30px; 
-    margin-bottom: 60px;
+    gap: 10px;
 
-    /* Pastikan bintang berada di lapisan atas agar tidak tertutup */
+    margin-top: -60px;
+    margin-bottom: 40px;
+
     position: relative;
-    z-index: 15; 
+    z-index: 20;
 }
 
 .star-rating input{
@@ -101,73 +172,146 @@
 }
 
 .star-rating label{
-    font-size: 38px;
-    color: #d1d1d1;
+    font-size: 42px;
+    color: #d6d6d6;
+
     cursor: pointer;
-    transition: .2s;
+
+    transition: .25s ease;
 }
 
-.star-rating input:checked ~ label,
 .star-rating label:hover,
-.star-rating label:hover ~ label{
-    color: #FFC107;
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label{
+    color: #FFD54F;
+
+    transform: scale(1.15);
+
+    text-shadow:
+        0 0 10px rgba(255,213,79,.8),
+        0 0 25px rgba(255,213,79,.4);
 }
 
 /* INPUT */
 .form-group{
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .form-control{
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    outline: none;
+
+    padding: 14px 18px;
+
+    border-radius: 14px;
+
+    border: 1px solid #e5e5e5;
+
+    background: #fff;
+
     font-size: 14px;
-    transition: .2s;
+
+    transition: .3s ease;
+}
+
+.form-control:hover{
+    border-color: #c7b39a;
 }
 
 .form-control:focus{
-    border-color: #6B4F2A;
-    box-shadow: 0 0 0 3px rgba(107,79,42,.08);
+    outline: none;
+
+    border-color: #8A673A;
+
+    box-shadow:
+        0 0 0 4px rgba(138,103,58,.12);
+
+    transform: translateY(-2px);
 }
 
 /* TEXTAREA */
 textarea{
     resize: none;
-    height: 90px;
+    min-height: 110px;
 }
 
 /* BUTTON */
 .btn-box{
     text-align: center;
-    margin-top: 10px;
+    margin-top: 25px;
 }
 
 .btn-submit{
-    background: #6B4F2A;
+    background: linear-gradient(
+        135deg,
+        #6B4F2A,
+        #8A673A
+    );
+
     color: white;
+
     border: none;
-    padding: 12px 30px;
-    border-radius: 10px;
-    cursor: pointer;
+
+    padding: 14px 40px;
+
+    border-radius: 50px;
+
+    font-size: 15px;
     font-weight: 600;
-    transition: .3s;
+
+    cursor: pointer;
+
+    transition: .3s ease;
+
+    box-shadow:
+        0 10px 25px rgba(107,79,42,.25);
 }
 
 .btn-submit:hover{
-    background: #8A673A;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 15px 30px rgba(107,79,42,.35);
+}
+
+.btn-submit:active{
+    transform: scale(.98);
 }
 
 /* ALERT */
 .success{
     background: #d4edda;
     color: #155724;
-    padding: 12px;
-    border-radius: 10px;
+
+    padding: 12px 15px;
+
+    border-radius: 12px;
+
     margin-bottom: 20px;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+
+    .main-content{
+        padding: 20px;
+    }
+
+    .planet-box{
+        width: 90%;
+        height: 170px;
+    }
+
+    .rating-img{
+        width: 220px;
+    }
+
+    .rating-header h2{
+        font-size: 24px;
+    }
+
+    .rating-form{
+        padding: 40px 20px 25px;
+    }
 }
 
 </style>
@@ -245,7 +389,7 @@ textarea{
 
                 <div class="btn-box">
                     <button type="submit" class="btn-submit">
-                        Kirim
+                        Kirim Review
                     </button>
                 </div>
 

@@ -28,40 +28,53 @@
     backdrop-filter: blur(3px);
     padding: 40px;
     box-sizing: border-box;
+    
+    /* MANTRA UNTUK KETENGAH (VERTIKAL & HORIZONTAL) */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Memastikan form membentang rapi dan lebih besar di tengah */
+.form-wrapper {
+    width: 100%;
+    max-width: 1000px; /* DIPERBESAR DARI 820px */
 }
 
 /* ================= HEADER COKELAT ================= */
 .penugasan-header {
     background: #9A6827;
     color: white;
-    width: fit-content;
-    min-width: 550px;
+    width: 100%;
+    max-width: 1000px; /* DIPERBESAR SEJAJAR DENGAN FORM */
     border-radius: 18px;
-    padding: 22px 35px;
+    padding: 25px 40px;
     margin: 0 auto 40px auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 18px;
     box-shadow: 0 5px 14px rgba(0,0,0,0.15);
+    box-sizing: border-box;
 }
 
 .penugasan-header i, 
 .penugasan-header svg {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     color: white;
 }
 
 .header-text h2 {
-    font-size: 20px;
+    font-size: 22px; /* Teks diperbesar */
     font-weight: 700;
-    margin: 0 0 2px 0;
+    margin: 0 0 4px 0;
     line-height: 1.3;
 }
 
 .header-text p {
-    font-size: 12px;
+    font-size: 13px; /* Teks diperbesar */
     margin: 0;
     opacity: 0.9;
 }
@@ -71,19 +84,16 @@
     display: flex;
     flex-direction: row; 
     justify-content: center;
-    align-items: stretch; /* MEMAKSA KOTAK SEJAJAR ATAS & BAWAH */
-    gap: 30px;
+    align-items: stretch; 
+    gap: 40px; /* Jarak antar kotak diperlebar */
     width: 100%;
-    max-width: 820px; 
-    margin: 0 auto;
 }
 
 .form-card {
     background: rgba(255, 255, 255, 0.95);
     flex: 1; 
-    min-width: 380px;
     border-radius: 22px;
-    padding: 28px;
+    padding: 35px; /* Padding di dalam kotak diperbesar */
     box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     box-sizing: border-box;
     display: flex;
@@ -92,7 +102,7 @@
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 20px; /* Jarak antar input diperbesar */
     text-align: left;
 }
 
@@ -102,19 +112,19 @@
 
 .form-card label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    font-size: 15px; /* Huruf label diperbesar */
     font-weight: 600;
     color: #333;
 }
 
 .form-card input {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 14px 16px; /* Kotak input diperbesar */
+    border-radius: 12px;
     border: 1px solid #ccc;
     background: white;
-    font-size: 13px;
+    font-size: 14px; /* Huruf input diperbesar */
     box-sizing: border-box;
     transition: border-color 0.2s;
 }
@@ -133,23 +143,23 @@
 /* ================= SUBMIT & ACTION BUTTONS ================= */
 .submit-outer-wrapper {
     width: 100%;
-    max-width: 820px;
-    margin: 25px auto 0 auto;
+    max-width: 1000px;
+    margin: 30px auto 0 auto;
 }
 
 .submit-wrapper {
     display: flex;
     justify-content: flex-end; 
-    gap: 12px;
+    gap: 15px;
 }
 
 .submit-btn {
     background: #9A6827;
     color: white;
     border: none;
-    padding: 12px 40px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 14px 45px; /* Tombol lebih besar */
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all .2s;
@@ -165,9 +175,9 @@
     background: #e4e4e4;
     color: #333;
     text-decoration: none;
-    padding: 12px 30px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 14px 35px; /* Tombol lebih besar */
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -183,47 +193,44 @@
 .alert-success {
     background: #d4edda;
     color: #155724;
-    padding: 14px;
+    padding: 16px;
     border-radius: 12px;
-    max-width: 820px;
+    width: 100%;
+    max-width: 1000px;
     margin: 0 auto 20px auto;
+    font-size: 15px;
 }
 
 .alert-error {
     background: #f8d7da;
     color: #721c24;
-    padding: 14px;
+    padding: 16px;
     border-radius: 12px;
-    max-width: 820px;
+    width: 100%;
+    max-width: 1000px;
     margin: 0 auto 20px auto;
+    font-size: 15px;
 }
 
 .error-msg {
     color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
+    font-size: 13px;
+    margin-top: 6px;
     display: block;
 }
 
 /* RESPONSIVE JIKA LAYAR KECIL */
-@media(max-width: 930px) {
+@media(max-width: 1050px) {
     .form-container {
         flex-direction: column;
         align-items: center;
     }
     .form-card {
         width: 100%;
-        max-width: 450px;
+        max-width: 550px;
     }
-    .submit-outer-wrapper {
-        max-width: 450px;
-    }
-    .penugasan-header {
-        width: 100%;
-        min-width: unset;
-    }
-    .alert-success, .alert-error {
-        max-width: 450px;
+    .submit-outer-wrapper, .penugasan-header, .alert-success, .alert-error {
+        max-width: 550px;
     }
 }
 </style>
@@ -255,80 +262,82 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.penugasan.update', $penugasan->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+        <div class="form-wrapper">
+            <form action="{{ route('admin.penugasan.update', $penugasan->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-            <div class="form-container">
-                
-                <div class="form-card">
-                    <div class="form-group">
-                        <label>ID Penugasan</label>
-                        <input type="text" name="id_penugasan" value="{{ old('id_penugasan', $penugasan->id_penugasan) }}" class="field-readonly" readonly>
+                <div class="form-container">
+                    
+                    <div class="form-card">
+                        <div class="form-group">
+                            <label>ID Penugasan</label>
+                            <input type="text" name="id_penugasan" value="{{ old('id_penugasan', $penugasan->id_penugasan) }}" class="field-readonly" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ID Donasi</label>
+                            <input type="text" name="id_donasi" value="{{ old('id_donasi', $penugasan->id_donasi) }}" class="field-readonly" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nama Donatur</label>
+                            <input type="text" name="nama_donatur" value="{{ old('nama_donatur', $penugasan->nama_donatur) }}" placeholder="Masukkan Nama Donatur">
+                            @error('nama_donatur')
+                                <span class="error-msg">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nama Relawan</label>
+                            <input type="text" name="relawan" value="{{ old('relawan', $penugasan->relawan) }}" placeholder="Masukkan Nama Relawan">
+                            @error('relawan')
+                                <span class="error-msg">{{ $message }}</span>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>ID Donasi</label>
-                        <input type="text" name="id_donasi" value="{{ old('id_donasi', $penugasan->id_donasi) }}" class="field-readonly" readonly>
+                    <div class="form-card">
+                        <div class="form-group">
+                            <label>Lokasi Pengambilan</label>
+                            <input type="text" name="lokasi_pengambilan" value="{{ old('lokasi_pengambilan', $penugasan->lokasi_pengambilan) }}" placeholder="Masukkan Lokasi">
+                            @error('lokasi_pengambilan')
+                                <span class="error-msg">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lokasi Pengantaran</label>
+                            <input type="text" name="lokasi_pengantaran" value="{{ old('lokasi_pengantaran', $penugasan->lokasi_pengantaran) }}" placeholder="Masukkan Lokasi">
+                            @error('lokasi_pengantaran')
+                                <span class="error-msg">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tanggal Penugasan</label>
+                            <input type="datetime-local" name="tanggal_penugasan" value="{{ old('tanggal_penugasan', \Carbon\Carbon::parse($penugasan->tanggal_penugasan)->format('Y-m-d\TH:i')) }}">
+                            @error('tanggal_penugasan')
+                                <span class="error-msg">{{ $message }}</span>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Nama Donatur</label>
-                        <input type="text" name="nama_donatur" value="{{ old('nama_donatur', $penugasan->nama_donatur) }}" placeholder="Masukkan Nama Donatur">
-                        @error('nama_donatur')
-                            <span class="error-msg">{{ $message }}</span>
-                        @enderror
-                    </div>
+                </div>
 
-                    <div class="form-group">
-                        <label>Nama Relawan</label>
-                        <input type="text" name="relawan" value="{{ old('relawan', $penugasan->relawan) }}" placeholder="Masukkan Nama Relawan">
-                        @error('relawan')
-                            <span class="error-msg">{{ $message }}</span>
-                        @enderror
+                <div class="submit-outer-wrapper">
+                    <div class="submit-wrapper">
+                        <a href="{{ route('admin.penugasan.index') }}" class="cancel-btn">
+                            Batal
+                        </a>
+                        <button type="submit" class="submit-btn">
+                            Update
+                        </button>
                     </div>
                 </div>
 
-                <div class="form-card">
-                    <div class="form-group">
-                        <label>Lokasi Pengambilan</label>
-                        <input type="text" name="lokasi_pengambilan" value="{{ old('lokasi_pengambilan', $penugasan->lokasi_pengambilan) }}" placeholder="Masukkan Lokasi">
-                        @error('lokasi_pengambilan')
-                            <span class="error-msg">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label>Lokasi Pengantaran</label>
-                        <input type="text" name="lokasi_pengantaran" value="{{ old('lokasi_pengantaran', $penugasan->lokasi_pengantaran) }}" placeholder="Masukkan Lokasi">
-                        @error('lokasi_pengantaran')
-                            <span class="error-msg">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tanggal Penugasan</label>
-                        <input type="date" name="tanggal_penugasan" value="{{ old('tanggal_penugasan', $penugasan->tanggal_penugasan) }}">
-                        @error('tanggal_penugasan')
-                            <span class="error-msg">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="submit-outer-wrapper">
-                <div class="submit-wrapper">
-                    <a href="{{ route('admin.penugasan.index') }}" class="cancel-btn">
-                        Batal
-                    </a>
-                    <button type="submit" class="submit-btn">
-                        Update
-                    </button>
-                </div>
-            </div>
-
-        </form>
+            </form>
+        </div>
 
     </div>
 </div>
