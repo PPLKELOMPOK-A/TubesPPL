@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Foodlink - Dashboard')</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Manrope:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
@@ -41,7 +41,7 @@
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
-            
+
             @if(Auth::check() && Auth::user()->role == 'admin')
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
@@ -93,7 +93,7 @@
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
         </div>
-        
+
         <div class="logout-section">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
