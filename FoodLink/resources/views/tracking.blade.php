@@ -1,195 +1,343 @@
 @extends('layouts.app')
 
+@section('title', 'Tracking Pengiriman')
+
 @section('content')
+<style>
+    .tracking-container {
+        padding: 40px 50px;
+        background: #FFF9EE;
+        min-height: calc(100vh - 70px);
+    }
 
-<div class="main-content-canvas">
-
-    <!-- HEADER -->
-    <div style="
-        background: linear-gradient(135deg, #6B4F2A, #9A7B4F);
-        border-radius: 24px;
-        padding: 35px;
+    .tracking-hero {
+        background: linear-gradient(135deg, #6B4F2A, #9B7644);
         color: white;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    ">
-        <h1 style="
-            font-size: 34px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        ">
-            Tracking Pengiriman
-        </h1>
+        padding: 34px;
+        border-radius: 24px;
+        margin-bottom: 28px;
+    }
 
-        <p style="
-            opacity: .9;
-            font-size: 15px;
-        ">
-            Monitor pengiriman donasi makanan secara real-time
-        </p>
-    </div>
+    .tracking-hero h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        font-weight: 800;
+        color: #ffffff;
+    }
 
-    <!-- STATISTIK -->
-    <div style="
+    .tracking-hero p {
+        margin: 0;
+        font-size: 15px;
+        color: #ffffff;
+        opacity: 0.92;
+    }
+
+    .tracking-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 35px;
-    ">
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
 
-        <!-- TOTAL -->
-        <div style="
-            background: white;
-            padding: 25px;
-            border-radius: 22px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        ">
-            <p style="color:#888; font-size:14px;">TOTAL DONASI</p>
-            <h2 id="total-donasi" style="
-                margin-top:10px;
-                font-size:32px;
-                color:#6B4F2A;
-            ">
-                {{ $total }}
-            </h2>
-        </div>
+    .tracking-stat-card {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
 
-        <!-- TERKIRIM -->
-        <div style="
-            background: white;
-            padding: 25px;
-            border-radius: 22px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        ">
-            <p style="color:#888; font-size:14px;">TERKIRIM</p>
-            <h2 id="terkirim" style="
-                margin-top:10px;
-                font-size:32px;
-                color:#2E7D32;
-            ">
-                {{ $terkirim }}
-            </h2>
-        </div>
+    .tracking-stat-card span {
+        display: block;
+        color: #8b8b8b;
+        font-size: 13px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
 
-        <!-- DALAM PERJALANAN -->
-        <div style="
-            background: white;
-            padding: 25px;
-            border-radius: 22px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        ">
-            <p style="color:#888; font-size:14px;">DALAM PERJALANAN</p>
-            <h2 id="dalam-perjalanan" style="
-                margin-top:10px;
-                font-size:32px;
-                color:#E69500;
-            ">
-                {{ $dalamPerjalanan }}
-            </h2>
-        </div>
+    .tracking-stat-card strong {
+        font-size: 32px;
+        color: #6B4F2A;
+        font-weight: 800;
+    }
 
+    .tracking-stat-card .green {
+        color: #16803c;
+    }
+
+    .tracking-stat-card .orange {
+        color: #e68a00;
+    }
+
+    .tracking-search-card {
+        background: #ffffff;
+        padding: 18px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    }
+
+    .tracking-search-form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .tracking-search-input {
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 14px;
+        outline: none;
+        color: #374151;
+        background: #ffffff;
+    }
+
+    .tracking-search-input:focus {
+        border-color: #6B4F2A;
+        box-shadow: 0 0 0 2px rgba(107, 79, 42, 0.15);
+    }
+
+    .tracking-search-button {
+        border: none;
+        border-radius: 12px;
+        background: #6B4F2A;
+        color: #ffffff;
+        padding: 0 20px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .tracking-search-button:hover {
+        background: #563d1f;
+    }
+
+    .tracking-list {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .tracking-list-title {
+        margin: 0 0 18px;
+        font-size: 20px;
+        font-weight: 800;
+        color: #1f2937;
+    }
+
+    .tracking-card {
+        border: 1px solid #eee4d2;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        background: #ffffff;
+    }
+
+    .tracking-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .tracking-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #f0e5d2;
+    }
+
+    .tracking-card h3 {
+        margin: 0 0 5px;
+        color: #3f2c14;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .tracking-card .sub-id {
+        margin: 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .tracking-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 24px;
+    }
+
+    .tracking-info-block {
+        background: #FFF9EE;
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
+
+    .tracking-info-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #8b6a3d;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .tracking-info-value {
+        margin: 0;
+        color: #1f2937;
+        font-size: 14px;
+        line-height: 1.5;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 13px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .empty-tracking {
+        text-align: center;
+        color: #888;
+        padding: 40px;
+        font-size: 14px;
+    }
+
+    .pagination-wrapper {
+        margin-top: 22px;
+    }
+
+    @media (max-width: 900px) {
+        .tracking-container {
+            padding: 24px;
+        }
+
+        .tracking-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .tracking-search-form {
+            flex-direction: column;
+        }
+
+        .tracking-search-button {
+            height: 44px;
+        }
+
+        .tracking-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tracking-card-header {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="tracking-container">
+    <div class="tracking-hero">
+        <h1>Tracking Pengiriman</h1>
+        <p>Monitor pengiriman donasi makanan berdasarkan data penugasan relawan dari admin.</p>
     </div>
 
-    <!-- LIST DONASI -->
-    <div id="donation-list" style="
-        display:grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 24px;
-    ">
+    <div class="tracking-stats">
+        <div class="tracking-stat-card">
+            <span>Total Donasi</span>
+            <strong>{{ $total ?? 0 }}</strong>
+        </div>
 
-        @php
-            $statusStyles = [
-                'menunggu' => 'background:#FFE5E5;color:#D32F2F;',
-                'dalam_perjalanan' => 'background:#FFF4D6;color:#E69500;',
-                'terkirim' => 'background:#DDF8E4;color:#2E7D32;',
-            ];
-        @endphp
+        <div class="tracking-stat-card">
+            <span>Terkirim</span>
+            <strong class="green">{{ $terkirim ?? 0 }}</strong>
+        </div>
 
-     @forelse ($donations as $d)
+        <div class="tracking-stat-card">
+            <span>Dalam Perjalanan</span>
+            <strong class="orange">{{ $dalamPerjalanan ?? 0 }}</strong>
+        </div>
+    </div>
 
-<a href="{{ route('tracking.detail', $d->id) }}" style="
-    text-decoration:none;
-">
+    <div class="tracking-search-card">
+        <form action="{{ route('donation.tracking') }}" method="GET" class="tracking-search-form">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                class="tracking-search-input"
+                placeholder="Cari berdasarkan ID donasi, nama donatur, relawan, atau lokasi..."
+            >
 
-<div style="
-    background:white;
-    border-radius:24px;
-    padding:24px;
-    box-shadow:0 5px 18px rgba(0,0,0,0.05);
-    transition:.2s;
-    cursor:pointer;
-">
-            <!-- STATUS -->
-            <span style="
-                {{ $statusStyles[$d->status] ?? '' }}
-                padding:8px 14px;
-                border-radius:999px;
-                font-size:13px;
-                font-weight:600;
-                display:inline-block;
-            ">
-                {{ ucfirst(str_replace('_',' ', $d->status)) }}
-            </span>
+            <button type="submit" class="tracking-search-button">
+                Cari
+            </button>
+        </form>
+    </div>
 
-            <!-- JUDUL -->
-            <h3 style="
-                margin-top:18px;
-                font-size:22px;
-                color:#333;
-                font-weight:700;
-            ">
-                {{ $d->judul_donasi }}
-            </h3>
+    <div class="tracking-list">
+        <h2 class="tracking-list-title">Daftar Tracking Penugasan Relawan</h2>
 
-            <!-- DETAIL -->
-            <div style="
-                margin-top:18px;
-                display:flex;
-                flex-direction:column;
-                gap:10px;
-                color:#555;
-                font-size:14px;
-            ">
+        @forelse ($donations as $donation)
+            <div class="tracking-card">
+                <div class="tracking-card-header">
+                    <div>
+                        <h3>Donasi #{{ $donation->id_donasi ?? '-' }}</h3>
+                        <p class="sub-id">ID Penugasan: {{ $donation->id_penugasan ?? '-' }}</p>
+                    </div>
 
-                <div>
-                    🍱 Kategori:
-                    <strong>{{ $d->kategori_penerima }}</strong>
+                    <span class="status-badge">
+                        Dalam Perjalanan
+                    </span>
                 </div>
 
-                <div>
-                    📍 {{ $d->alamat_penyaluran }}
-                </div>
+                <div class="tracking-grid">
+                    <div class="tracking-info-block">
+                        <span class="tracking-info-label">Nama Donatur</span>
+                        <p class="tracking-info-value">{{ $donation->nama_donatur ?? '-' }}</p>
+                    </div>
 
-                <div>
-                    📅 {{ $d->tanggal_kegiatan }}
-                </div>
+                    <div class="tracking-info-block">
+                        <span class="tracking-info-label">Relawan Bertugas</span>
+                        <p class="tracking-info-value">{{ $donation->relawan ?? '-' }}</p>
+                    </div>
 
+                    <div class="tracking-info-block">
+                        <span class="tracking-info-label">Lokasi Pengambilan</span>
+                        <p class="tracking-info-value">{{ $donation->lokasi_pengambilan ?? '-' }}</p>
+                    </div>
+
+                    <div class="tracking-info-block">
+                        <span class="tracking-info-label">Lokasi Pengantaran</span>
+                        <p class="tracking-info-value">{{ $donation->lokasi_pengantaran ?? '-' }}</p>
+                    </div>
+
+                    <div class="tracking-info-block">
+                        <span class="tracking-info-label">Tanggal Penugasan</span>
+                        <p class="tracking-info-value">
+                            @if (!empty($donation->tanggal_penugasan))
+                                {{ \Carbon\Carbon::parse($donation->tanggal_penugasan)->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                            @else
+                                -
+                            @endif
+                        </p>
+                    </div>
+                </div>
             </div>
-
-        </div>
-</a>
         @empty
-
-        <div style="
-            grid-column:1/-1;
-            background:white;
-            padding:60px;
-            border-radius:24px;
-            text-align:center;
-            color:#888;
-        ">
-            Belum ada data tracking donasi.
-        </div>
-
+            <div class="empty-tracking">
+                Belum ada data tracking donasi dari penugasan relawan.
+            </div>
         @endforelse
 
+        @if (method_exists($donations, 'links'))
+            <div class="pagination-wrapper">
+                {{ $donations->links() }}
+            </div>
+        @endif
     </div>
-
-    <!-- PAGINATION -->
-    <div style="margin-top:35px;">
-        {{ $donations->links() }}
-    </div>
-
 </div>
-
 @endsection

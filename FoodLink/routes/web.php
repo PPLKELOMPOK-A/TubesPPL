@@ -19,6 +19,7 @@ use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
@@ -91,12 +92,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
 
     // --- FITUR TRACKING & BUKTI DONASI ---
-    Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); 
-    Route::get('/tracking/{id}', function ($id) { 
-        return view('tracking.trackingdetail', [
-            'donation' => Donation::findOrFail($id)
-        ]);
-    })->name('tracking.detail');
+Route::get('/tracking', [TrackingController::class, 'index'])
+    ->name('donation.tracking');
+
+Route::get('/tracking/detail/{id}', [TrackingController::class, 'show'])
+    ->name('tracking.show');
 
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
