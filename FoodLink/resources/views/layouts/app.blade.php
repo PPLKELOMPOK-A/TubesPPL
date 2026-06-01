@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Foodlink - Dashboard')</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;700&family=Manrope:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -31,12 +33,15 @@
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; font-family: 'Montserrat', sans-serif; }
         .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     </style>
+
     @yield('styles')
 </head>
 <body>
+
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
+
             @if(Auth::check() && Auth::user()->role == 'admin')
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
@@ -59,6 +64,7 @@
                 <a href="{{ route('dropbox.index') }}" class="nav-item {{ Request::is('admin/drop-box*') ? 'active' : '' }}">
                     <i class="fa-solid fa-box"></i> Drop Box
                 </a>
+
             @else
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
@@ -76,6 +82,7 @@
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
             @endif
+
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
@@ -83,6 +90,7 @@
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
         </div>
+
         <div class="logout-section">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
@@ -92,6 +100,7 @@
             </form>
         </div>
     </div>
+
     <div class="main-panel">
         <div class="top-bar">
             <i class="fa-regular fa-bell"></i>
@@ -106,8 +115,11 @@
                 @endif
             </div>
         </div>
+
         @yield('content')
     </div>
+
     @stack('scripts')
+
 </body>
 </html>
