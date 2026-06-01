@@ -12,7 +12,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { display: flex; background-color: #fdfdfd; height: 100vh; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
         .sidebar { width: 280px; background-color: #F8E7C1; display: flex; flex-direction: column; padding: 25px 0; border-right: 1px solid #e0e0e0; flex-shrink: 0; }
         .brand { padding: 0 30px; margin-bottom: 30px; font-weight: 700; font-size: 24px; color: #6B4F2A; letter-spacing: -0.5px; }
         .nav-group { flex-grow: 1; padding: 0 15px; }
@@ -21,12 +20,10 @@
         .nav-item.active { background-color: #6B4F2A; color: #FFFFFF; }
         .nav-item.active i { color: #FFFFFF; }
         .nav-item:hover:not(.active) { background-color: rgba(107, 79, 42, 0.1); }
-        
         .logout-section { padding: 0 15px; margin-top: auto; }
         .logout-btn { border: none; background: none; width: 100%; text-align: left; cursor: pointer; color: #d9534f; display: flex; align-items: center; gap: 15px; padding: 12px 20px; font-size: 14px; font-weight: 500; border-radius: 10px; transition: 0.2s; }
         .logout-btn i { width: 20px; font-size: 18px; text-align: center; }
         .logout-btn:hover { background-color: rgba(217, 83, 79, 0.1); }
-
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #FFF9EE; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 25px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
@@ -46,17 +43,16 @@
             <div class="brand">Foodlink</div>
             
             @if(Auth::check() && Auth::user()->role == 'admin')
-
                 <a href="{{ url('/admin/dashboard') }}" class="nav-item {{ Request::is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
-                <a href="{{ route('admin.retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.retur.index') }}" class="nav-item {{ request()->routeIs('admin.retur.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
-               <a href="{{ route('admin.penugasan.index') }}" class="nav-item {{ Request::is('admin/penugasan*') ? 'active' : '' }}">
+                <a href="#" class="nav-item">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
                 <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
@@ -70,7 +66,6 @@
                 </a>
 
             @else
-
                 <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Beranda
                 </a>
@@ -86,10 +81,9 @@
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
-                 <a href="{{ route('komunitas.index') }}" class="nav-item {{ Request::is('komunitas*') ? 'active' : '' }}">
+                   <a href="{{ route('komunitas.index') }}" class="nav-item {{ Request::is('komunitas*') ? 'active' : '' }}">
                      <i class="fa-solid fa-users"></i> Komunitas
                 </a>
-
             @endif
 
             <a href="#" class="nav-item">
@@ -98,7 +92,6 @@
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
-
         </div>
         
         <div class="logout-section">
@@ -118,7 +111,11 @@
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
-                <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                @if(Auth::check() && !empty(Auth::user()->foto_profil))
+                    <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" class="user-avatar" alt="User Avatar">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user() ? Auth::user()->name : 'User') }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
+                @endif
             </div>
         </div>
 

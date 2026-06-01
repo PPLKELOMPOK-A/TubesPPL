@@ -3,27 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\DonasiBukti;
+use App\Models\DonasiMakanan;
 use Illuminate\Support\Facades\Auth;
 
 class BuktiDonasiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DonasiBukti::where('user_id', Auth::id())
-                            ->where('status', 'selesai');
+        $query = DonasiMakanan::where('user_id', Auth::id())
+                              ->whereIn('status', ['selesai', 'disetujui']);
         
         $search = $request->get('search');
         
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', '%' . $search . '%')
-                  ->orWhere('kategori', 'like', '%' . $search . '%')
-                  ->orWhere('tanggal', 'like', '%' . $search . '%');
+                $q->where('kategori_makanan', 'like', '%' . $search . '%')
+                  ->orWhere('kategori_penerima', 'like', '%' . $search . '%');
             });
         }
         
-        $donasi = $query->latest()->get();
+        $donasi = $query->latest()->paginate(10);
         
         return view('bukti-donasi', [
             'donasi' => $donasi,
@@ -33,13 +32,13 @@ class BuktiDonasiController extends Controller
 
     public function showBukti($id)
     {
-        $donasi = DonasiBukti::findOrFail($id);
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
         return view('bukti-donasi-bukti', compact('donasi'));
     }
 
     public function show($id)
     {
-        $donation = DonasiBukti::findOrFail($id);
-        return view('show', ['data' => $donation]);
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 }
