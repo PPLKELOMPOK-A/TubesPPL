@@ -75,8 +75,13 @@
                 <a href="{{ route('bukti.donasi') }}" class="nav-item {{ Request::is('bukti-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-file-invoice"></i> Bukti Donasi
                 </a>
+<<<<<<< Updated upstream
                 <a href="{{ url('/tips') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-dollar"></i> Tips
+=======
+                <a href="{{ route('tips.index') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-coins"></i> Beri Tips
+>>>>>>> Stashed changes
                 </a>
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
@@ -86,7 +91,11 @@
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
+<<<<<<< Updated upstream
             <a href="#" class="nav-item">
+=======
+            <a href="{{ route('chat.user') }}" class="nav-item {{ Request::is('chat*') ? 'active' : '' }}">
+>>>>>>> Stashed changes
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
         </div>
