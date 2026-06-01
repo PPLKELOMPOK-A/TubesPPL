@@ -3,60 +3,42 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\DonasiMakanan;
+use Illuminate\Support\Facades\Auth;
 
 class BuktiDonasiController extends Controller
 {
     public function index(Request $request)
     {
-        $donasiList = collect([
-            [
-                "id" => 1,
-                "judul" => "Hari Anak Nasional - Panti Bunda Kasih",
-                "organisasi" => "Organisasi (Yayasan)",
-                "tanggal" => "Kamis, 30 Mei 2025",
-                "gambar" => "https://via.placeholder.com/72x54?text=Img"
-            ],
-            [
-                "id" => 2,
-                "judul" => "Program Makan Sehat - Yayasan Peduli Sesama",
-                "organisasi" => "Organisasi (Yayasan)",
-                "tanggal" => "Kamis, 30 Mei 2025",
-                "gambar" => "https://via.placeholder.com/72x54?text=Img"
-            ],
-            [
-                "id" => 3,
-                "judul" => "Donasi Kasih Natal - Gereja Santo Paulus",
-                "organisasi" => "Organisasi (Yayasan)",
-                "tanggal" => "Kamis, 30 Mei 2025",
-                "gambar" => "https://via.placeholder.com/72x54?text=Img"
-            ],
-            [
-                "id" => 4,
-                "judul" => "Jumat Berkah - Masjid Agung",
-                "organisasi" => "Kegiatan keagamaan",
-                "tanggal" => "Kamis, 30 Mei 2025",
-                "gambar" => "https://via.placeholder.com/72x54?text=Img"
-            ],
-            [
-                "id" => 5,
-                "judul" => "Hari Anak Nasional - Yayasan Sejahtera",
-                "organisasi" => "Organisasi (Yayasan)",
-                "tanggal" => "Kamis, 30 Mei 2025",
-                "gambar" => "https://via.placeholder.com/72x54?text=Img"
-            ],
-        ]);
-
+        $query = DonasiMakanan::where('user_id', Auth::id())
+                              ->whereIn('status', ['selesai', 'disetujui']);
+        
         $search = $request->get('search');
-
+        
         if ($search) {
-            $donasiList = $donasiList->filter(function ($item) use ($search) {
-                return str_contains(strtolower($item['judul']), strtolower($search)) ||
-                       str_contains(strtolower($item['organisasi']), strtolower($search)) ||
-                       str_contains(strtolower($item['tanggal']), strtolower($search));
-            })->values();
+            $query->where(function($q) use ($search) {
+                $q->where('kategori_makanan', 'like', '%' . $search . '%')
+                  ->orWhere('kategori_penerima', 'like', '%' . $search . '%');
+            });
         }
+        
+        $donasi = $query->latest()->paginate(10);
+        
+        return view('bukti-donasi', [
+            'donasi' => $donasi,
+            'search' => $search
+        ]);
+    }
 
-        return view('bukti-donasi', compact('donasiList', 'search'));
-        return view('detail-bukti-donasi', compact('data'));
+    public function showBukti($id)
+    {
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
+        return view('bukti-donasi-bukti', compact('donasi'));
+    }
+
+    public function show($id)
+    {
+        $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 }

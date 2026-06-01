@@ -38,11 +38,13 @@
     .donasi-info .category { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: block; }
     .donasi-info .date { font-size: 13px; color: #999; }
     
-    .action-icons { display: flex; gap: 20px; padding: 0 10px; align-items: center; }
-    .action-icons a, .action-icons i { font-size: 20px; color: #333; cursor: pointer; text-decoration: none; transition: 0.2s; }
-    .action-icons a:hover, .action-icons button:hover i { color: #6B4F2A; }
+    .action-icons { display: flex; gap: 12px; padding: 0 10px; align-items: center; }
+    .btn-edit { text-decoration: none; font-size: 13px; font-weight: 600; color: #444; border: 1px solid #ccc; padding: 6px 14px; border-radius: 6px; background: #fff; transition: 0.2s; }
+    .btn-edit:hover { background: #f5f5f5; color: #6B4F2A; border-color: #6B4F2A; }
+    .btn-delete { font-size: 13px; font-weight: 600; color: #d32f2f; border: 1px solid #d32f2f; padding: 6px 14px; border-radius: 6px; background: #fff; cursor: pointer; transition: 0.2s; }
+    .btn-delete:hover { background: #fdf2f2; }
 
-    /* --- PAGINATION (Ditambahkan dari tampilan User) --- */
+    /* --- PAGINATION --- */
     .pagination-footer { display: flex; justify-content: flex-end; align-items: center; margin-top: 30px; gap: 10px; font-size: 12px; color: #888; }
     .page-node { padding: 5px 10px; border: 1px solid #E0E0E0; border-radius: 4px; text-decoration: none; color: #444; }
     .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
@@ -77,7 +79,7 @@
             Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari <strong>SENIN s.d. MINGGU Pukul 08.00 - 20.00 WIB</strong>. Donasi yang masuk di luar jam operasional akan diproses untuk koordinasi penjemputan pada keesokan harinya mulai pukul 08.00 WIB.
         </div>
 
-        <form action="{{ route('admin.dashboard') }}" method="GET" class="search-filter-row" id="filterForm">
+        <form action="/admin/dashboard" method="GET" class="search-filter-row" id="filterForm">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
@@ -107,12 +109,6 @@
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
                         </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Individu" 
-                                   onchange="document.getElementById('filterForm').submit();"
-                                   {{ in_array('Individu', request('kategori', [])) ? 'checked' : '' }}> 
-                            Individu
-                        </label>
                     </div>
                 </div>
             </div>
@@ -120,31 +116,37 @@
 
         @forelse($semuaDonasi as $item)
         <div class="donasi-item">
-            <a href="{{ route('admin.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
+            <a href="/admin/donasi/detail/{{ $item->id }}" class="donasi-content">                
                 @if(!empty($item->foto_kegiatan))
                     <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
+                @elseif(!empty($item->foto))
+                    <img src="{{ asset('storage/' . $item->foto) }}" class="donasi-img" alt="Foto Donasi">
                 @else
-                    <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb; background-color:#f5f5f5;">
-                        <i class="fa-solid fa-image fa-2x"></i>
+                    <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb; background-color:#f5f5f5; font-size: 11px; font-weight: bold;">
+                        [ NO IMG ]
                     </div> 
                 @endif
                 
                 <div class="donasi-info">
-                    <span class="category">{{ $item->kategori_penerima }}</span>
-                    <h3>{{ $item->judul_donasi }}</h3>
-                    <div class="date">{{ \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') }}</div>
+                    <span class="category">{{ $item->kategori_penerima ?? $item->kategori ?? 'Umum' }}</span>
+                    <h3>{{ $item->judul_donasi ?? $item->nama_donasi ?? $item->judul ?? 'Judul Donasi' }}</h3>
+                    <div class="date">
+                        {{ isset($item->tanggal_kegiatan) ? \Carbon\Carbon::parse($item->tanggal_kegiatan)->translatedFormat('l, d F Y') : \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, d F Y') }}
+                    </div>
                 </div>
             </a>
             
             <div class="action-icons">
-                <form action="{{ route('admin.donasi.delete', ['id' => $item->id]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="margin: 0; padding: 0;">
+                <a href="/admin/donasi/{{ $item->id }}/edit" class="btn-edit">
+                    Edit
+                </a>
+                
+                <form action="/admin/donasi/{{ $item->id }}/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="display: inline; margin: 0; padding: 0;">
                     @csrf
-                    <button type="submit" style="background: none; border: none; cursor: pointer; padding: 0; color: #333;">
-                        <i class="fa-regular fa-trash-can"></i>
+                    <button type="submit" class="btn-delete">
+                        Hapus
                     </button>
                 </form>
-
-                <a href="{{ route('admin.donasi.edit', ['id' => $item->id]) }}"><i class="fa-regular fa-pen-to-square"></i></a>
             </div>
         </div>
         @empty
@@ -165,7 +167,7 @@
     </div>
 </div>
 
-<a href="{{ route('admin.donasi.create') }}" class="fab">
+<a href="/admin/donasi/baru" class="fab">
     <i class="fa-solid fa-plus"></i>
 </a>
 
@@ -174,7 +176,6 @@
         document.getElementById("filterDropdown").classList.toggle("show");
     }
 
-    // Menutup dropdown jika user melakukan klik di luar kotak filter
     window.onclick = function(event) {
         if (!event.target.closest('.filter-wrapper')) {
             var dropdowns = document.getElementsByClassName("filter-dropdown");

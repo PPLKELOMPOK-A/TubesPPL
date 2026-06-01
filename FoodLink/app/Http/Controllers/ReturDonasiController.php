@@ -43,7 +43,8 @@ class ReturDonasiController extends Controller
         $buktiPath = null;
 
         if ($request->hasFile('bukti')) {
-            $buktiPath = $request->file('bukti')->store('bukti_retur', 'public');
+            $buktiPath = $request->file('bukti')
+                ->store('bukti_retur', 'public');
         }
 
         // SIMPAN KE DATABASE
@@ -59,8 +60,8 @@ class ReturDonasiController extends Controller
         ]);
 
         // REDIRECT DENGAN PESAN SUKSES
-       return redirect()
-    ->route('retur.index')
-    ->with('success', 'Retur berhasil diajukan dan disimpan!');
-}
+        return redirect()
+            ->route('admin.retur.index')
+            ->with('success', 'Retur berhasil diajukan dan disimpan!');
+    }
 }
