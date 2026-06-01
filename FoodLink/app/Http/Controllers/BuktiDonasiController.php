@@ -18,8 +18,7 @@ class BuktiDonasiController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('kategori_makanan', 'like', '%' . $search . '%')
-                  ->orWhere('kategori_penerima', 'like', '%' . $search . '%')
-                  ->orWhere('created_at', 'like', '%' . $search . '%');
+                  ->orWhere('kategori_penerima', 'like', '%' . $search . '%');
             });
         }
         
@@ -40,6 +39,6 @@ class BuktiDonasiController extends Controller
     public function show($id)
     {
         $donasi = DonasiMakanan::where('user_id', Auth::id())->findOrFail($id);
-        return view('show', ['data' => $donasi]);
+        return view('bukti-donasi-bukti', compact('donasi'));
     }
 }

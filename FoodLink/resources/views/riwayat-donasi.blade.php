@@ -5,10 +5,8 @@
 @section('content')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <style>
-    [x-cloak] { display: none !important; }
     .page-wrapper { padding: 30px 50px; }
     .search-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
     .search-bar { flex: 1; height: 42px; padding: 0 16px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; background: white; outline: none; box-sizing: border-box; }
@@ -22,36 +20,24 @@
     .tab-btn.tab-ditolak.active { background: #dc3545; border-color: #dc3545; }
     .tab-btn.tab-diretur.active { background: #6c757d; border-color: #6c757d; }
     .donation-card { background: white; padding: 20px; border-bottom: 1px solid #eee; display: flex; gap: 20px; position: relative; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-    .thumb-img { width: 130px; height: 100px; border-radius: 10px; object-fit: cover; background: #f5f5f5; flex-shrink: 0; border: 1px solid #eaeaea; }
     .info-section { flex: 1; }
     .info-section h4 { margin: 0 0 5px 0; font-size: 18px; color: #333; }
     .category { color: #888; font-size: 14px; margin-bottom: 3px; font-weight: 600; }
     .date { color: #bbb; font-size: 13px; margin-bottom: 10px; }
-    .status-badge { font-size: 12px; font-weight: bold; margin-top: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; margin-bottom: 5px;}
+    .status-badge { font-size: 12px; font-weight: bold; margin-top: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; margin-bottom: 5px; }
     .status-selesai { background: #d4edda; color: #155724; }
     .status-disetujui { background: #cce5ff; color: #004085; }
     .status-diproses { background: #e0f2f1; color: #00897b; }
     .status-pending { background: #fff4e5; color: #f39c12; }
     .status-ditolak { background: #f8d7da; color: #721c24; }
+    .status-diretur { background: #e2e3e5; color: #383d41; }
     .action-group { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; flex-shrink: 0; min-width: 140px; }
-    .btn-edit { background-color: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box;}
+    .btn-edit { background-color: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box; }
     .btn-edit:hover { background-color: #e67e22; color: white; }
-    .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box;}
+    .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box; }
     .btn-delete:hover { background-color: #c0392b; }
-    .btn-view-proof { background: #fff5e6; color: #5b3a1e; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #dec9a7; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box;}
+    .btn-view-proof { background: #fff5e6; color: #5b3a1e; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #dec9a7; display: inline-flex; align-items: center; gap: 6px; justify-content: center; width: 100%; box-sizing: border-box; }
     .btn-view-proof:hover { background: #faebd7; }
-    .rating-display { margin-top: 10px; color: #f1c40f; font-size: 16px; }
-    .comment-text { font-style: italic; color: #555; margin-top: 5px; font-size: 14px; background: #fef9ef; padding: 8px 12px; border-radius: 6px; display: inline-block; border: 1px solid #f9eedc;}
-    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-    .btn-empty { background: #fff5e6; color: #8a6d3b; padding: 8px 20px; border-radius: 6px; font-size: 13px; border: none; }
-    .btn-rate { background: #5b3a1e; color: white; padding: 8px 25px; border-radius: 6px; font-size: 13px; border: none; cursor: pointer; transition: 0.3s; font-weight: 600;}
-    .btn-rate:hover { background: #4a2f18; }
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #fff5e6; padding: 30px; border-radius: 20px; width: 400px; text-align: center; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .close-modal { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; color: #5b3a1e; }
-    .star-rating { font-size: 35px; color: #ddd; margin: 20px 0; cursor: pointer; }
-    .star-rating .active { color: #f1c40f; }
-    .textarea-rating { width: 100%; height: 100px; border-radius: 10px; border: 1px solid #dec9a7; padding: 12px; margin-bottom: 20px; resize: none; background: white; box-sizing: border-box; font-family: inherit;}
     .empty-state { text-align: center; padding: 50px; color: #888; background: #fff; border-radius: 12px; border: 1px solid #EAEAEA; }
 </style>
 
@@ -93,80 +79,46 @@
         </a>
     </div>
 
-    <div x-data="{ openModal: false, selectedId: null, hover: 0, rating: 0, comment: '',
-        submitRating() {
-            if(this.rating === 0) return Swal.fire('Opps!', 'Pilih bintang dulu ya', 'warning');
-            Swal.fire({ title: 'Mengirim...', didOpen: () => Swal.showLoading() });
-            let form = document.getElementById('form-rating');
-            form.action = '/riwayat-donasi/rating/' + this.selectedId;
-            form.submit();
-        }
-    }" x-cloak>
-
+    <div>
         @forelse($donations as $item)
         @php 
-            $status = strtolower($item->status ?? 'pending'); 
-            $isPending = in_array($status, ['pending', 'menunggu validasi', '']);
+            $isRetur = isset($item->_is_retur) && $item->_is_retur;
+            $status = $isRetur ? 'diretur' : strtolower($item->status ?? 'pending'); 
+            $isPending = !$isRetur && in_array($status, ['pending', 'menunggu', 'menunggu validasi', '']);
         @endphp
         
         <div class="donation-card" id="card-{{ $item->id }}">
-            @if(!empty($item->foto_makanan))
-                <img src="{{ asset('storage/' . $item->foto_makanan) }}" class="thumb-img" alt="Foto Donasi" onerror="this.src='https://via.placeholder.com/120x90'">
-            @else
-                <div class="thumb-img" style="display:flex; align-items:center; justify-content:center; color:#bbb;">
-                    <i class="fa-solid fa-image fa-2x"></i>
-                </div> 
-            @endif
-            
             <div class="info-section">
-                <h4>Donasi ke {{ $item->kategori_penerima ?? 'Penerima' }}</h4>
-                <p class="category">{{ $item->kategori_makanan }}</p>
-                <p class="date">{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, d F Y') : '-' }}</p>
-                
-                @if($status == 'selesai')
-                    <span class="status-badge status-selesai"><i class="fas fa-check-circle"></i> Selesai</span>
-                @elseif($status == 'disetujui')
-                    <span class="status-badge status-disetujui"><i class="fas fa-thumbs-up"></i> Disetujui</span>
-                @elseif($status == 'diproses')
-                    <span class="status-badge status-diproses"><i class="fas fa-truck"></i> Diproses</span>
-                @elseif($status == 'ditolak' || $status == 'diretur')
-                    <span class="status-badge status-ditolak"><i class="fas fa-times-circle"></i> {{ ucfirst($status) }}</span>
+                @if($isRetur)
+                    <h4>Retur: {{ $item->nama_makanan ?? '-' }}</h4>
+                    <p class="category">{{ $item->kategori ?? '-' }}</p>
+                    <p class="date">{{ $item->tanggal_pengajuan ? \Carbon\Carbon::parse($item->tanggal_pengajuan)->translatedFormat('l, d F Y') : '-' }}</p>
+                    <span class="status-badge status-diretur"><i class="fas fa-undo"></i> Diretur</span>
+                    <br>
+                    <span style="font-size: 12px; color: #666; font-weight: 500;">
+                        <i class="fa-solid fa-circle-info"></i> Alasan: {{ $item->alasan ?? '-' }}
+                    </span>
                 @else
-                    <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending (Menunggu Validasi)</span>
-                @endif
+                    <h4>Donasi ke {{ $item->kategori_penerima ?? 'Penerima' }}</h4>
+                    <p class="category">{{ $item->kategori_makanan }}</p>
+                    <p class="date">{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, d F Y') : '-' }}</p>
+                    
+                    @if($status == 'selesai')
+                        <span class="status-badge status-selesai"><i class="fas fa-check-circle"></i> Selesai</span>
+                    @elseif($status == 'disetujui')
+                        <span class="status-badge status-disetujui"><i class="fas fa-thumbs-up"></i> Disetujui</span>
+                    @elseif($status == 'diproses')
+                        <span class="status-badge status-diproses"><i class="fas fa-truck"></i> Diproses</span>
+                    @elseif($status == 'ditolak')
+                        <span class="status-badge status-ditolak"><i class="fas fa-times-circle"></i> Ditolak</span>
+                    @else
+                        <span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending (Menunggu Validasi)</span>
+                    @endif
 
-                <br>
-                <span style="font-size: 12px; color: #666; font-weight: 500;">
-                    <i class="fa-regular fa-clock"></i> Batas Layak: {{ $item->waktu_layak ?? '-' }}
-                </span>
-
-                @if($status == 'selesai' || $status == 'disetujui')
-                    <div style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px;">
-                        @if($item->rating)
-                            <div style="font-size: 12px; color: #888; font-weight: 600;">Penilaian Anda:</div>
-                            <div class="rating-display">
-                                @for($i=1; $i<=5; $i++)
-                                    <i class="{{ $i <= $item->rating ? 'fas' : 'far' }} fa-star"></i>
-                                @endfor
-                            </div>
-                            @if($item->komentar)    
-                                <div class="comment-text">"{{ $item->komentar }}"</div>
-                            @else
-                                <div class="comment-text" style="color: #bbb;">(Tidak ada pesan tambahan)</div>
-                            @endif  
-                        @else
-                            <div class="btn-group">
-                                <button class="btn-empty">Belum ada penilaian</button>
-                                <button class="btn-rate" @click="openModal = true; selectedId = {{ $item->id }}"><i class="fa-regular fa-star"></i> Beri Rating</button>
-                            </div>
-                        @endif
-                    </div>
-                @endif
-                
-                @if($status == 'ditolak')
-                    <p style="color: #dc3545; font-size: 13px; margin-top: 8px;">
-                        <i class="fas fa-info-circle"></i> Donasi ini ditolak dan masuk ke daftar retur.
-                    </p>
+                    <br>
+                    <span style="font-size: 12px; color: #666; font-weight: 500;">
+                        <i class="fa-regular fa-clock"></i> Batas Layak: {{ $item->waktu_layak ?? '-' }}
+                    </span>
                 @endif
             </div>
 
@@ -184,7 +136,7 @@
                     </form>
                 @endif
 
-                @if($status == 'selesai' || $status == 'disetujui')
+                @if(in_array($status, ['selesai', 'disetujui', 'ditolak', 'diretur', 'diproses']))
                     <a href="{{ route('riwayat-donasi.bukti', $item->id) }}" class="btn-view-proof">
                         <i class="fa-solid fa-file-invoice"></i> Lihat Bukti
                     </a>
@@ -196,26 +148,6 @@
             <p>Belum ada riwayat donasi yang Anda daftarkan.</p>
         </div>
         @endforelse
-
-        <div x-show="openModal" class="modal-overlay" x-transition>
-            <div class="modal-content" @click.away="openModal = false">
-                <span class="close-modal" @click="openModal = false">&times;</span>
-                <h3 style="margin-top: 0; color: #5b3a1e;">Beri Penilaian</h3>
-                <p style="font-size: 14px; color: #8a6d3b;">Bagaimana kualitas makanan dan koordinasi donasi ini?</p>
-                <form id="form-rating" method="POST">
-                    @csrf
-                    <input type="hidden" name="rating" :value="rating" required>
-                    <div class="star-rating">
-                        <template x-for="i in 5">
-                            <i class="fa-star" :class="i <= (hover || rating) ? 'fas active' : 'far'"
-                               @mouseover="hover = i" @mouseleave="hover = 0" @click="rating = i"></i>
-                        </template>
-                    </div>
-                    <textarea name="komentar" x-model="comment" class="textarea-rating" placeholder="Tuliskan pesan singkat Anda..."></textarea>
-                    <button type="button" @click="submitRating()" class="btn-rate" style="width: 100%; padding: 12px; font-size: 16px; font-weight: bold;">Kirim Penilaian</button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 
