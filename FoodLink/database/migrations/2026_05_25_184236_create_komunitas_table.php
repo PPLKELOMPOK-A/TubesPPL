@@ -6,24 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-   public function up(): void
+    public function up(): void
     {
-        Schema::create('komunitas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_user');
-            $table->string('judul');
-            $table->text('isi');
-            $table->string('kategori')->nullable(); // Boleh kosong
-            $table->timestamps(); // Otomatis membuat created_at dan updated_at
-        });
+        if (!Schema::hasTable('komunitas')) {
+            Schema::create('komunitas', function (Blueprint $table) {
+                $table->id();
+                $table->string('nama_user');
+                $table->string('judul');
+                $table->text('isi');
+                $table->string('kategori')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('komunitas');

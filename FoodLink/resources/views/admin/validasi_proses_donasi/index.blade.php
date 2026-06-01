@@ -118,15 +118,18 @@
 
                 <div class="donasi-content">
                     
+                    {{-- Tambahkan variabel ini untuk menetralkan huruf besar/kecil --}}
+                    @php $statusAman = strtolower(trim($donasi->status ?? '')); @endphp
+
                     <div>
                         <div class="donasi-header-row">
                             <h3 class="donasi-name">{{ $donasi->kategori_makanan ?? 'Kategori Makanan' }}</h3>
                             
-                            @if($donasi->status == 'menunggu' || $donasi->status == 'pending')
+                            @if($statusAman == 'menunggu' || $statusAman == 'pending')
                                 <div class="status-label status-menunggu">MENUNGGU</div>
-                            @elseif($donasi->status == 'disetujui')
+                            @elseif($statusAman == 'disetujui')
                                 <div class="status-label status-disetujui">DISETUJUI</div>
-                            @elseif($donasi->status == 'ditolak')
+                            @elseif($statusAman == 'ditolak')
                                 <div class="status-label status-ditolak">DITOLAK</div>
                             @else
                                 <div class="status-label status-menunggu">{{ strtoupper($donasi->status) }}</div>
@@ -145,7 +148,7 @@
                     </div>
 
                     <div>
-                        @if($donasi->status == 'menunggu' || $donasi->status == 'pending')
+                        @if($statusAman == 'menunggu' || $statusAman == 'pending')
                             <div class="action-buttons">
                                 <form action="{{ route('admin.validasi.setujui', $donasi->id) }}" method="POST">
                                     @csrf
@@ -157,7 +160,7 @@
                                 </form>
                             </div>
                             
-                        @elseif($donasi->status == 'disetujui')
+                        @elseif($statusAman == 'disetujui')
                             <div class="progress-timeline">
                                 <div class="pt-item"><div class="pt-dot active"></div><span class="pt-text active">Diterima</span></div>
                                 <i class="fa-solid fa-chevron-right pt-arrow"></i>
@@ -170,7 +173,7 @@
                                 <div class="pt-item"><div class="pt-dot"></div><span class="pt-text">Selesai</span></div>
                             </div>
                             
-                        @elseif($donasi->status == 'ditolak')
+                        @elseif($statusAman == 'ditolak')
                             <div class="reject-reason-box">
                                 <div class="reject-title">Keterangan Penolakan:</div>
                                 <div class="reject-desc">

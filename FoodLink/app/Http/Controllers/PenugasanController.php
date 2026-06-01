@@ -9,7 +9,6 @@ class PenugasanController extends Controller
 {
     public function index()
     {
-        // Menggunakan latest() untuk mengurutkan dari data yang paling baru dibuat
         $data = Penugasan::latest()->get();
         return view('admin.penugasan', compact('data'));
     }
@@ -22,7 +21,6 @@ class PenugasanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // Tambahkan 'unique:penugasans,id_penugasan' di bawah ini
             'id_penugasan'       => 'required|unique:penugasans,id_penugasan',
             'id_donasi'          => 'required',
             'nama_donatur'       => 'required',
@@ -30,7 +28,6 @@ class PenugasanController extends Controller
             'lokasi_pengantaran' => 'required',
             'tanggal_penugasan'  => 'required|date',
         ], [
-            // Opsional: Custom pesan error dalam bahasa Indonesia
             'id_penugasan.unique' => 'ID Penugasan ini sudah digunakan, silakan gunakan ID lain!',
         ]);
 
@@ -44,7 +41,7 @@ class PenugasanController extends Controller
             'tanggal_penugasan'  => $request->tanggal_penugasan,
         ]);
 
-        return redirect('/admin/penugasan')->with('success', 'Data berhasil ditambahkan');
+        return redirect()->route('admin.penugasan.index')->with('success', 'Data berhasil ditambahkan');
     }
 
     public function destroy($id)
@@ -52,9 +49,7 @@ class PenugasanController extends Controller
         $data = Penugasan::findOrFail($id);
         $data->delete();
 
-        // 3. REVISI REDIRECT: Lebih aman diarahkan langsung ke index penugasan 
-        // daripada back() untuk menghindari crash jika di-refresh setelah hapus data
-        return redirect('/admin/penugasan')->with('success', 'Data berhasil dihapus');
+        return redirect()->route('admin.penugasan.index')->with('success', 'Data berhasil dihapus');
     }
 
     public function edit($id)
@@ -70,21 +65,56 @@ class PenugasanController extends Controller
             'nama_donatur'       => 'required',
             'relawan'            => 'required',
             'lokasi_pengantaran' => 'required',
-            'tanggal_penugasan'  => 'required|date',
+            'tanggal_penugasan'  => 'required',
         ]);
 
         $item = Penugasan::findOrFail($id);
 
+        // Simpan nama lama untuk dicari dan diganti di Drop Box
+        $relawanLama = $item->relawan;
+        $relawanBaru = $request->relawan;
+
         $item->update([
             'id_penugasan'       => $request->id_penugasan,
-            'id_donasi'          => $request->id_donasi ?? $item->id_donasi, // REVISI: Jika kosong, gunakan data lama (jangan hardcode angka 1)
+            'id_donasi'          => $request->id_donasi ?? $item->id_donasi,
             'nama_donatur'       => $request->nama_donatur,
-            'relawan'            => $request->relawan,
+            'relawan'            => $relawanBaru,
             'lokasi_pengambilan' => $request->lokasi_pengambilan ?? '-',
             'lokasi_pengantaran' => $request->lokasi_pengantaran,
             'tanggal_penugasan'  => $request->tanggal_penugasan,
         ]);
 
-        return redirect('/admin/penugasan')->with('success', 'Data berhasil diupdate');
+        // =========================================================
+        // LOGIKA OTOMATIS: UBAH NAMA RELAWAN DI FITUR DROP BOX JUGA
+        // =========================================================
+        if ($relawanLama !== $relawanBaru) {
+            $box = \App\Models\DropBox::find($item->id_donasi);
+            
+            if ($box) {
+                // 1. Ganti nama di animasi motor & status aktif
+                $task = $box->active_task;
+                if ($task) {
+                    $task['petugas'] = $relawanBaru;
+                    $box->active_task = $task;
+                    
+                    if (strpos($box->keterangan_status, $relawanLama) !== false) {
+                        $box->keterangan_status = str_replace($relawanLama, $relawanBaru, $box->keterangan_status);
+                    }
+                }
+
+                // 2. Ganti nama di Riwayat (History) Drop Box
+                $history = $box->history ?? [];
+                foreach ($history as $key => $hist) {
+                    if (strpos($hist, $relawanLama) !== false) {
+                        $history[$key] = str_replace($relawanLama, $relawanBaru, $hist);
+                    }
+                }
+                $box->history = $history;
+                
+                $box->save();
+            }
+        }
+
+        return redirect()->route('admin.penugasan.index')->with('success', 'Data berhasil diupdate dan disinkronkan dengan Drop Box');
     }
 }

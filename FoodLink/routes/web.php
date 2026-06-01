@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Donation;
 use App\Models\Chat;
 use App\Models\Komunitas;
+use App\Models\KegiatanDonasi;
+use App\Models\Penugasan; 
 
 // Controllers
 use App\Http\Controllers\AuthController;
@@ -17,12 +19,17 @@ use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\TipsController; 
+use App\Http\Controllers\UserChatController;
+use App\Http\Controllers\AdminChatController;
+use App\Http\Controllers\ReviewController; // <-- BERHASIL DITAMBAHKAN
 
 /*
 |--------------------------------------------------------------------------
@@ -37,15 +44,26 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
+    Route::get('/forgot-password', function () {
+        return view('auth.lupa-password');
+    })->name('password.request');
+    Route::post('/forgot-password/check', [AuthController::class, 'checkEmail'])->name('password.check');
 });
 
 Route::middleware('auth')->group(function () {
 
-    // ===== DASHBOARD USER (SUDAH DIPERBAIKI SINKRONISASI FILTER & SEARCH) =====
+    // --- AREA PUSAT NOTIFIKASI ---
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+    Route::post('/notifikasi/mark-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.markAllAsRead');
+    Route::get('/notifikasi/{id}/baca', [NotifikasiController::class, 'markSingleAsRead'])->name('notifikasi.markSingleAsRead');
+    Route::get('/notifikasi/{id}/detail', [NotifikasiController::class, 'show'])->name('notifikasi.show');
+
+    // ===== DASHBOARD USER =====
     Route::get('/dashboard', function (Request $request) {
         if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
         
-        $query = \App\Models\KegiatanDonasi::query();
+        $query = KegiatanDonasi::query();
         
         // Logika Input Search Box
         if ($request->filled('search')) {
@@ -64,7 +82,7 @@ Route::middleware('auth')->group(function () {
     // ===== FITUR PENGAJUAN DONASI & DETAIL =====
     Route::get('/donasi/detail/{id}', function ($id) {
         if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
-        $data = \App\Models\KegiatanDonasi::findOrFail($id);
+        $data = KegiatanDonasi::findOrFail($id);
         return view('detail-donasi-user', compact('data')); 
     })->name('user.donasi.detail');
 
@@ -72,7 +90,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
     
     // ===== FITUR TRACKING & BUKTI DONASI =====
-
     Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
     Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
@@ -86,50 +103,105 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('tracking.detail');
 
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('donation.tracking');
+    Route::get('/tracking/detail/{id}', [TrackingController::class, 'show'])->name('tracking.show');
+
+
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
     Route::get('/bukti-donasi/{id}/bukti', [BuktiDonasiController::class, 'showBukti'])->name('bukti-donasi.bukti');
 
-    // ===== FITUR RIWAYAT & MANAJEMEN DONASI (Gabungan) =====
+    // ===== FITUR RIWAYAT & MANAJEMEN DONASI =====
     Route::get('/riwayat-donasi', [RiwayatDonationController::class, 'index'])->name('riwayat-donasi.index');
-    Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
-    Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
-    Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
     Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.bukti');
     Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating'); 
+
+    // ==========================================
+    // ===== FITUR REVIEW (KHUSUS USER) =========
+    // ==========================================
+    Route::get('/review', function () {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return app(ReviewController::class)->index();
+    })->name('review.index');
+
+    Route::post('/review/store', function (Request $request) {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return app(ReviewController::class)->store($request);
+    })->name('review.store');
+
+    Route::get('/review/success', function () {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return view('review.success');
+    })->name('review.success');
 
     // ===== FITUR BARU: TIPS & KOMUNITAS =====
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
+
+    // ======================
+    // KOMUNITAS
+    // ======================
+    Route::get('/komunitas', function (Request $request) {
+        $query = Komunitas::query();
+
+        // search
+        if ($request->search) {
+            $query->where(function($q) use ($request){
+                $q->where('judul', 'like', '%' . $request->search . '%')
+                  ->orWhere('isi', 'like', '%' . $request->search . '%')
+                  ->orWhere('nama_user', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // filter kategori
+        if ($request->kategori) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        $posts = $query->latest()->get();
+        return view('komunitas', compact('posts'));
+    })->name('komunitas.index');
+
+    Route::get('/komunitas/create', function () {
+        return view('tambah-komunitas');
+    })->name('komunitas.create');
+
+    Route::post('/komunitas/store', function(Request $request){
+        $request->validate([
+            'judul'=>'required',
+            'isi'=>'required',
+            'kategori'=>'required'
+        ]);
+
+        Komunitas::create([
+            'nama_user'=>Auth::user()->name,
+            'judul'=>$request->judul,
+            'isi'=>$request->isi,
+            'kategori'=>$request->kategori,
+        ]);
+
+        return redirect()
+            ->route('komunitas.index')
+            ->with('success','Posting berhasil dibuat');
+    })->name('komunitas.store');
+
     Route::get('/komunitas/{id}', function ($id) {
-        return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
+        $post = Komunitas::findOrFail($id);
+        return view('komunitas-detail', compact('post'));
     })->name('komunitas.detail');
 
-    // ===== FITUR BARU: CHAT =====
-    Route::get('/chat', function () {
-        $admin = \App\Models\User::where('role', 'admin')->first();
-        if (!$admin) abort(500, 'Admin tidak ada');
-
-        $chats = Chat::where(function ($q) use ($admin) {
-            $q->where('sender_id', auth()->id())->where('receiver_id', $admin->id);
-        })
-        ->orWhere(function ($q) use ($admin) {
-            $q->where('sender_id', $admin->id)->where('receiver_id', auth()->id());
-        })
-        ->latest()->get();
-
-        return view('chat.user', compact('chats', 'admin'));
-    })->name('chat.user');
-
-    Route::post('/chat/send', function (Request $request) {
-        $admin = \App\Models\User::where('role', 'admin')->first();
-        Chat::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $admin->id,
-            'message' => $request->message,
-        ]);
-        return back();
-    })->name('chat.send');
+    // ================= CHAT USER KE ADMIN =================
+    Route::get('/chat', [UserChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/messages', [UserChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/send', [UserChatController::class, 'send'])->name('chat.send');
+    Route::put('/chat/messages/{message}', [UserChatController::class, 'updateMessage'])->name('chat.messages.update');
+    Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMessage'])->name('chat.messages.delete');
 
 
     // ==========================================
@@ -137,11 +209,11 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        // --- DASHBOARD ADMIN (Model KegiatanDonasi + Search/Filter) ---
+        // --- DASHBOARD ADMIN ---
         Route::get('/dashboard', function (Request $request) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
             
-            $query = \App\Models\KegiatanDonasi::query();
+            $query = KegiatanDonasi::query();
             
             if ($request->search) {
                 $query->where('judul_donasi', 'like', "%{$request->search}%");
@@ -169,12 +241,11 @@ Route::middleware('auth')->group(function () {
 
         // ===== MANAJEMEN DONASI =====
         Route::get('/donasi/tambah', function () { return view('admin.create'); })->name('donasi.create');
-        
-        // 1. Jalur murni khusus untuk TAMBAH DATA BARU
+
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : 'donasi/default.jpg';
 
-            Donation::create([
+            KegiatanDonasi::create([
                 'judul_donasi' => $request->judul, 
                 'kategori_penerima' => $request->kategori, 
                 'tanggal_kegiatan' => $request->tanggal,
@@ -187,9 +258,8 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('admin.dashboard')->with('success', 'Berhasil ditambahkan!');
         })->name('donasi.store');
 
-        // 2. Jalur terpisah khusus untuk EDIT / UPDATE DATA LAMA
         Route::post('/donasi/update-data/{id}', function (Request $request, $id) {
-            $donasi = Donation::findOrFail($id);
+            $donasi = KegiatanDonasi::findOrFail($id);
 
             if ($request->hasFile('foto')) {
                 if ($donasi->foto_kegiatan && $donasi->foto_kegiatan !== 'donasi/default.jpg') {
@@ -214,31 +284,46 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/donasi/detail/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $data = Donation::findOrFail($id);
+            $data = KegiatanDonasi::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
         })->name('donasi.detail');
 
         Route::get('/donasi/edit/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            $data = Donation::findOrFail($id);
+            $data = KegiatanDonasi::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
         })->name('donasi.edit');
 
         Route::post('/donasi/hapus/{id}', function ($id) {
-            $donasi = Donation::findOrFail($id);
-            if ($donasi->foto) { Storage::disk('public')->delete($donasi->foto); }
+            $donasi = KegiatanDonasi::findOrFail($id);
+            if ($donasi->foto_kegiatan && $donasi->foto_kegiatan !== 'donasi/default.jpg') { Storage::disk('public')->delete($donasi->foto_kegiatan); }
             $donasi->delete();
             return redirect()->route('admin.dashboard')->with('success', 'Data berhasil dihapus!');
         })->name('donasi.delete');
 
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
+        
+        //Penugasan Relawan
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
+        Route::get('/penugasan/create', [PenugasanController::class, 'create'])->name('penugasan.create');
+        Route::post('/penugasan/store', [PenugasanController::class, 'store'])->name('penugasan.store');
+        Route::get('/penugasan/{id}/edit', [PenugasanController::class, 'edit'])->name('penugasan.edit');
+        Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
+        Route::delete('/penugasan/{id}', [PenugasanController::class, 'destroy'])->name('penugasan.destroy');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+    });
 
-    // ==========================================
-    // GRUP ROUTE TANPA PREFIX NAMA ADMIN
-    // ==========================================
+    // ================= CHAT ADMIN KE USER =================
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
+        Route::get('/chat/{conversation}/messages', [AdminChatController::class, 'messages'])->name('chat.messages');
+        Route::post('/chat/{conversation}/send', [AdminChatController::class, 'send'])->name('chat.send');
+        Route::put('/chat/{conversation}/messages/{message}', [AdminChatController::class, 'updateMessage'])->name('chat.messages.update');
+        Route::delete('/chat/{conversation}/messages/{message}', [AdminChatController::class, 'deleteMessage'])->name('chat.messages.delete');
+    });
+
     Route::prefix('admin')->group(function () {
         
         // ===== FITUR KERJASAMA MITRA =====
@@ -299,212 +384,155 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('mitra.index', ['status' => $statusBaru]);
         })->name('mitra.updateStatus');
 
-
-        // ===== FITUR DROP BOX =====
+        // ===== FITUR DROP BOX (SUDAH TERHUBUNG DATABASE) =====
         Route::get('/drop-box', function (Request $request) {
             date_default_timezone_set('Asia/Jakarta');
             
-            if (!session()->has('dropbox_data')) {
-                session()->put('dropbox_data', [
-                    [
-                        'id' => 1, 
-                        'nama' => 'Drop Box Sudirman', 
-                        'status' => 'tersedia', 
-                        'lokasi' => 'Jl. Jend. Sudirman No.1', 
-                        'mitra' => 'Gedung Artha', 
-                        'kapasitas' => '12/20',
-                        'update' => '2 Jam yang lalu',
-                        'lat' => -6.2250, 
-                        'lng' => 106.8100, 
-                        'history' => []
-                    ],
-                    [
-                        'id' => 2, 
-                        'nama' => 'Drop Box Matraman', 
-                        'status' => 'hampir_penuh', 
-                        'lokasi' => 'Jl. Matraman Raya', 
-                        'mitra' => 'Toko Segar', 
-                        'kapasitas' => '16/20',
-                        'update' => '10 Menit yang lalu',
-                        'lat' => -6.2023, 
-                        'lng' => 106.8646, 
-                        'history' => []
-                    ]
-                ]);
-            }
-            
-            $dropboxes = session('dropbox_data');
+            $dropboxes = \App\Models\DropBox::all();
             $now = time();
-            $sessionUpdated = false;
+            
+            foreach ($dropboxes as $box) {
+                if ($box->active_task) {
+                    $task = $box->active_task;
+                    $updated = false;
 
-            // Update status teks berdasarkan waktu animasi jika user me-refresh halaman
-            foreach ($dropboxes as $key => $box) {
-                if (isset($box['active_task'])) {
-                    $task = $box['active_task'];
                     if ($now >= $task['waktu_selesai']) {
-                        $dropboxes[$key]['update'] = 'Selesai mengantar';
-                        unset($dropboxes[$key]['active_task']); // Hapus tugas jika sudah selesai
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Selesai mengantar';
+                        $box->active_task = null; 
+                        $updated = true;
                     } elseif ($now >= $task['waktu_sampai_dropbox']) {
-                        $dropboxes[$key]['update'] = 'Barang sudah dijemput dan sedang menuju alamat pengantaran';
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Barang sudah dijemput dan sedang menuju alamat pengantaran';
+                        $updated = true;
                     } else {
-                        $dropboxes[$key]['update'] = 'Kurir ' . $task['petugas'] . ' sedang menjemput barang';
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Kurir ' . $task['petugas'] . ' sedang menjemput barang';
+                        $updated = true;
+                    }
+
+                    if ($updated) {
+                        $box->save(); 
                     }
                 }
             }
-
-            if ($sessionUpdated) {
-                session()->put('dropbox_data', $dropboxes);
-            }
-
-            $dropboxesObj = collect($dropboxes)->map(function($item) { return (object) $item; });
             
-            $totalLokasi = count($dropboxesObj);
-            $tersedia = $dropboxesObj->where('status', 'tersedia')->count();
-            $hampirPenuh = $dropboxesObj->where('status', 'hampir_penuh')->count();
-            $penuh = $dropboxesObj->where('status', 'penuh')->count();
+            $totalLokasi = $dropboxes->count();
+            $tersedia = $dropboxes->where('status', 'tersedia')->count();
+            $hampirPenuh = $dropboxes->where('status', 'hampir_penuh')->count();
+            $penuh = $dropboxes->where('status', 'penuh')->count();
             
-            return view('admin.dropbox', [
-                'dropboxes' => $dropboxesObj,
-                'totalLokasi' => $totalLokasi,
-                'tersedia' => $tersedia,
-                'hampirPenuh' => $hampirPenuh,
-                'penuh' => $penuh
-            ]);
+            return view('admin.dropbox', compact('dropboxes', 'totalLokasi', 'tersedia', 'hampirPenuh', 'penuh'));
         })->name('dropbox.index');
 
         Route::post('/drop-box/store', function (Request $request) {
-            $dropboxes = session('dropbox_data', []);
-            $newId = rand(10, 100); 
-            
             $nama = $request->input('nama');
             $lokasiDetail = $request->input('lokasi');
 
             $lat = -6.2088; 
             $lng = 106.8456; 
-            
             $namaLokasiBersih = str_ireplace(['Drop Box ', 'Dropbox ', 'Drop ', 'Box '], '', strtolower($nama));
 
             $daftarLokasi = [
-                'monas' => [-6.1754, 106.8272],
-                'cempaka putih' => [-6.1825, 106.8718],
-                'tebet' => [-6.2260, 106.8580],
-                'menteng' => [-6.1950, 106.8321],
-                'ragunan' => [-6.3039, 106.8267],
-                'ancol' => [-6.1244, 106.8335],
-                'senayan' => [-6.2185, 106.8021],
-                'pancoran' => [-6.2514, 106.8451],
+                'monas' => [-6.1754, 106.8272], 'cempaka putih' => [-6.1825, 106.8718],
+                'tebet' => [-6.2260, 106.8580], 'menteng' => [-6.1950, 106.8321],
+                'ragunan' => [-6.3039, 106.8267], 'ancol' => [-6.1244, 106.8335],
+                'senayan' => [-6.2185, 106.8021], 'pancoran' => [-6.2514, 106.8451],
                 'cipete' => [-6.2778, 106.8000]
             ];
 
             foreach ($daftarLokasi as $key => $coords) {
                 if (strpos($namaLokasiBersih, $key) !== false) {
-                    $lat = $coords[0];
-                    $lng = $coords[1];
-                    break;
+                    $lat = $coords[0]; $lng = $coords[1]; break;
                 }
             }
 
             if ($lat == -6.2088) {
                 try {
                     $queryCari = trim($namaLokasiBersih) . ', Jakarta, Indonesia'; 
-                    $response = Http::withoutVerifying()
-                        ->withHeaders(['User-Agent' => 'FoodLink-App/1.0'])
-                        ->timeout(5)
-                        ->get('https://nominatim.openstreetmap.org/search', [
-                            'format' => 'json',
-                            'q' => $queryCari,
-                            'limit' => 1
-                        ]);
+                    $response = Http::withoutVerifying()->withHeaders(['User-Agent' => 'FoodLink-App/1.0'])->timeout(5)
+                        ->get('https://nominatim.openstreetmap.org/search', ['format' => 'json', 'q' => $queryCari, 'limit' => 1]);
 
                     if ($response->successful()) {
                         $data = $response->json();
                         if (!empty($data) && isset($data[0])) {
-                            $lat = (float) $data[0]['lat'];
-                            $lng = (float) $data[0]['lon'];
+                            $lat = (float) $data[0]['lat']; $lng = (float) $data[0]['lon'];
                         }
                     }
                 } catch (\Exception $e) {}
             }
             
-            $newDropBox = [
-                'id' => $newId, 
-                'nama' => $nama, 
+            \App\Models\DropBox::create([
+                'nama' => $nama,
                 'status' => 'tersedia',
                 'lokasi' => $lokasiDetail, 
                 'mitra' => $request->input('mitra'), 
                 'kapasitas' => rand(2, 10) . '/20', 
-                'update' => 'Baru saja ditambahkan', 
+                'keterangan_status' => 'Baru saja ditambahkan', 
                 'lat' => $lat, 
                 'lng' => $lng, 
-                'history' => []
-            ];
-            
-            $dropboxes[] = $newDropBox;
-            session()->put('dropbox_data', $dropboxes);
+                'history' => [] 
+            ]);
             
             return redirect()->route('dropbox.index');
         })->name('dropbox.store');
 
         Route::post('/drop-box/{id}/jemput', function (Request $request, $id) {
-            $dropboxes = session('dropbox_data', []);
+            $box = \App\Models\DropBox::findOrFail($id);
             
             $petugas = $request->input('petugas');
             $waktuJemput = $request->input('waktu'); 
-
-            // Gudang Pusat (Titik Awal & Akhir)
             $latGudang = -6.1754; 
             $lngGudang = 106.8272; 
 
-            foreach ($dropboxes as $key => $box) {
-                if ($box['id'] == $id) {
-                    
-                    // Waktu animasi 2 Menit (120 Detik dibagi 2 rute)
-                    $waktuMulaiAnimasi = time();
-                    $durasiPerRute = 60; 
+            $waktuMulaiAnimasi = time();
+            $durasiPerRute = 60; 
 
-                    $dropboxes[$key]['active_task'] = [
-                        'petugas' => $petugas,
-                        'waktu_mulai' => $waktuMulaiAnimasi,
-                        'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute, // Tiba di Drop Box
-                        'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2), // Kembali ke Gudang
-                        'lat_gudang' => $latGudang,
-                        'lng_gudang' => $lngGudang,
-                        'lat_dropbox' => $box['lat'],
-                        'lng_dropbox' => $box['lng'],
-                    ];
+            $box->active_task = [
+                'petugas' => $petugas,
+                'waktu_mulai' => $waktuMulaiAnimasi,
+                'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute,
+                'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2),
+                'lat_gudang' => $latGudang,
+                'lng_gudang' => $lngGudang,
+                'lat_dropbox' => $box->lat,
+                'lng_dropbox' => $box->lng,
+            ];
 
-                    // Format History Lebih Lengkap
-                    $tanggal = date('d M Y');
-                    $estimasiSelesai = date('H:i', $waktuMulaiAnimasi + ($durasiPerRute * 2));
-                    
-                    $keteranganHistory = "<span style='font-size: 11px; color: #718096;'>{$tanggal} &bull; {$waktuJemput} - {$estimasiSelesai} WIB</span><br/>Relawan <b>{$petugas}</b> menjemput barang dari {$box['nama']} dan mengantarnya ke Gudang Pusat FoodLink.";
-                    
-                    if (!isset($dropboxes[$key]['history'])) {
-                        $dropboxes[$key]['history'] = [];
-                    }
-                    array_unshift($dropboxes[$key]['history'], $keteranganHistory);
-
-                    $dropboxes[$key]['status'] = 'tersedia';
-                    $dropboxes[$key]['kapasitas'] = '0/20';
-                    $dropboxes[$key]['update'] = 'Kurir ' . $petugas . ' sedang menjemput barang';
-                    break;
-                }
+            $tanggal = date('d M Y');
+            $estimasiSelesai = date('H:i', $waktuMulaiAnimasi + ($durasiPerRute * 2));
+            $keteranganHistory = "<span style='font-size: 11px; color: #718096;'>{$tanggal} &bull; {$waktuJemput} - {$estimasiSelesai} WIB</span><br/>Relawan <b>{$petugas}</b> menjemput barang dari {$box->nama} dan mengantarnya ke Gudang Pusat FoodLink.";
+            
+            $historyLama = $box->history ?? [];
+            array_unshift($historyLama, $keteranganHistory);
+            
+            $box->history = $historyLama;
+            $box->status = 'tersedia';
+            $box->kapasitas = '0/20';
+            $box->keterangan_status = 'Kurir ' . $petugas . ' sedang menjemput barang';
+            
+            $box->save(); 
+            
+            try {
+                \App\Models\Penugasan::create([
+                    'id_penugasan' => 'TGS-' . rand(1000, 9999), 
+                    'id_donasi' => $box->id, 
+                    'nama_donatur' => $box->mitra, 
+                    'relawan' => $petugas, 
+                    'lokasi_pengambilan' => $box->nama . ' (' . $box->lokasi . ')', 
+                    'lokasi_pengantaran' => 'Gudang Pusat FoodLink',
+                    'tanggal_penugasan' => date('Y-m-d') . ' ' . $waktuJemput . ':00',
+                ]);
+            } catch (\Exception $e) {
+                dd("GAGAL MENYIMPAN KE DATABASE PENUGASAN! Ini pesan error dari MySQL: " . $e->getMessage());
             }
             
-            session()->put('dropbox_data', $dropboxes);
             return redirect()->route('dropbox.index');
         })->name('dropbox.jemput');
+    });
 
-    }); // Penutup Route::prefix('admin')->group
-
-    // ================= PROFIL USER (SUDAH DISINKRONKAN) =================
+    // ================= PROFIL USER =================
     Route::get('/profil', function () {
         if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
         return view('profil'); 
-    })->name('profile.edit');
+    })->name('profil.index'); 
 
     Route::get('/profil/edit', function () {
         if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
@@ -529,18 +557,13 @@ Route::middleware('auth')->group(function () {
         $user->telepon = $request->telepon;
         $user->lokasi = $request->lokasi;
         $user->alamat = $request->alamat;
-
         $user->save();
 
-        return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->route('profil.index')->with('success', 'Profil berhasil diperbarui!');
     })->name('profil.update');
-
-    // ================= RETUR DONASI GLOBAL =================
-    Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
-    Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 }); // Penutup Route::middleware('auth')->group
-});
+
 

@@ -6,7 +6,6 @@
 
 <style>
 .main-content{
-    /* Mengubah padding atas menjadi 60px dan memberikan jarak aman margin-top */
     padding: 20px 40px 40px 40px; 
     margin-top: 20px; 
 }
@@ -22,28 +21,13 @@
     margin-top: -25px;
     color:#6B4F2A;
     font-size:28px;
-    line-height: 1.2; /* Menjaga teks tinggi font tetap stabil */
+    line-height: 1.2; 
 }
 
 .header-title p{
     margin-top:5px;
     color:#777;
     font-size:14px;
-}
-
-.btn-add{
-    background:#6B4F2A;
-    color:white;
-    padding:12px 18px;
-    border-radius:10px;
-    text-decoration:none;
-    font-size:14px;
-    font-weight:600;
-    transition:0.2s;
-}
-
-.btn-add:hover{
-    background:#5a4123;
 }
 
 .table-box{
@@ -105,16 +89,10 @@ tr:nth-child(even){
 <div class="main-content">
 
     <div class="header-section">
-
         <div class="header-title">
-            
+            <h2>Penugasan Relawan <span style="font-size: 14px; color: #888; font-weight: 500; margin-left: 10px;"><i class="fa-solid fa-robot"></i> Otomatis dari Drop Box</span></h2>
         </div>
-
-        <a href="{{ route('admin.penugasan.create') }}" class="btn-add">
-            Tambah Relawan
-        </a>
-
-    </div>
+        </div>
 
     @if(session('success'))
         <div class="alert">
@@ -147,30 +125,28 @@ tr:nth-child(even){
                     <td>{{ $item->relawan }}</td>
                     <td>{{ $item->lokasi_pengambilan }}</td>
                     <td>{{ $item->lokasi_pengantaran }}</td>
-                    <td>{{ \Carbon\Carbon::parse($item->tanggal_penugasan)->format('d-m-Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal_penugasan)->format('d-m-Y H:i') }}</td>
 
                     <td>
                         <div class="action-icons">
-
                             <a href="{{ route('admin.penugasan.edit', $item->id) }}">
-    <i class="fa-solid fa-pen"></i>
-</a>
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
 
                             <form action="{{ route('admin.penugasan.destroy', $item->id) }}" method="POST">
-    @csrf
-    @method('DELETE')
-    <button type="submit">
-        <i class="fa-solid fa-trash"></i>
-    </button>
-</form>
-
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
 
                 @empty
                 <tr>
-                    <td colspan="8">Belum ada data</td>
+                    <td colspan="8">Belum ada data penugasan dari Drop Box.</td>
                 </tr>
                 @endforelse
             </tbody>
