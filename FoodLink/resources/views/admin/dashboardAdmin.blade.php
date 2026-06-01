@@ -137,11 +137,13 @@
             </a>
             
             <div class="action-icons">
-                <a href="/admin/donasi/{{ $item->id }}/edit" class="btn-edit">
+                {{-- MENGGUNAKAN FUNGSI ROUTE UNTUK EDIT --}}
+                <a href="{{ route('admin.donasi.edit', $item->id) }}" class="btn-edit">
                     Edit
                 </a>
                 
-                <form action="/admin/donasi/{{ $item->id }}/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="display: inline; margin: 0; padding: 0;">
+                {{-- MENGGUNAKAN FUNGSI ROUTE UNTUK DELETE --}}
+                <form action="{{ route('admin.donasi.delete', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data donasi ini?');" style="display: inline; margin: 0; padding: 0;">
                     @csrf
                     <button type="submit" class="btn-delete">
                         Hapus
@@ -167,7 +169,8 @@
     </div>
 </div>
 
-<a href="/admin/donasi/baru" class="fab">
+{{-- MENJADI INI: --}}
+<a href="{{ route('admin.donasi.create') }}" class="fab">
     <i class="fa-solid fa-plus"></i>
 </a>
 
