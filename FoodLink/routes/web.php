@@ -11,6 +11,7 @@ use App\Models\Donation;
 use App\Models\Chat;
 use App\Models\Komunitas;
 use App\Models\KegiatanDonasi;
+use App\Models\Penugasan; // <-- SAYA TAMBAHKAN INI
 
 // Controllers
 use App\Http\Controllers\AuthController;
@@ -233,7 +234,6 @@ Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMes
         Route::post('/donasi/tambah', function (Request $request) {
             $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('donasi', 'public') : 'donasi/default.jpg';
 
-            // UBAH: Menggunakan model KegiatanDonasi
             KegiatanDonasi::create([
                 'judul_donasi' => $request->judul, 
                 'kategori_penerima' => $request->kategori, 
@@ -248,7 +248,6 @@ Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMes
         })->name('donasi.store');
 
         Route::post('/donasi/update-data/{id}', function (Request $request, $id) {
-            // UBAH: Menggunakan model KegiatanDonasi
             $donasi = KegiatanDonasi::findOrFail($id);
 
             if ($request->hasFile('foto')) {
@@ -274,20 +273,17 @@ Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMes
 
         Route::get('/donasi/detail/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            // UBAH: Menggunakan model KegiatanDonasi
             $data = KegiatanDonasi::findOrFail($id);
             return view('admin.detail-donasi', compact('data'));
         })->name('donasi.detail');
 
         Route::get('/donasi/edit/{id}', function ($id) {
             if (Auth::user()->role !== 'admin') { return redirect()->route('dashboard'); }
-            // UBAH: Menggunakan model KegiatanDonasi
             $data = KegiatanDonasi::findOrFail($id);
             return view('admin.edit-donasi', compact('data'));
         })->name('donasi.edit');
 
         Route::post('/donasi/hapus/{id}', function ($id) {
-            // UBAH: Menggunakan model KegiatanDonasi
             $donasi = KegiatanDonasi::findOrFail($id);
             if ($donasi->foto_kegiatan && $donasi->foto_kegiatan !== 'donasi/default.jpg') { Storage::disk('public')->delete($donasi->foto_kegiatan); }
             $donasi->delete();
@@ -387,94 +383,151 @@ Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMes
             return redirect()->route('mitra.index', ['status' => $statusBaru]);
         })->name('mitra.updateStatus');
 
-        // ===== FITUR DROP BOX =====
+        // ===== FITUR DROP BOX (SUDAH TERHUBUNG DATABASE) =====
         Route::get('/drop-box', function (Request $request) {
             date_default_timezone_set('Asia/Jakarta');
             
-            if (!session()->has('dropbox_data')) {
-                session()->put('dropbox_data', [
-                    [
-                        'id' => 1, 'nama' => 'Drop Box Sudirman', 'status' => 'tersedia', 'lokasi' => 'Jl. Jend. Sudirman No.1', 'mitra' => 'Gedung Artha', 'kapasitas' => '12/20', 'update' => '2 Jam yang lalu', 'lat' => -6.2250, 'lng' => 106.8100, 'history' => []
-                    ],
-                    [
-                        'id' => 2, 'nama' => 'Drop Box Matraman', 'status' => 'hampir_penuh', 'lokasi' => 'Jl. Matraman Raya', 'mitra' => 'Toko Segar', 'kapasitas' => '16/20', 'update' => '10 Menit yang lalu', 'lat' => -6.2023, 'lng' => 106.8646, 'history' => []
-                    ]
-                ]);
-            }
-            
-            $dropboxes = session('dropbox_data');
+            // Mengambil data dari tabel drop_boxes
+            $dropboxes = \App\Models\DropBox::all();
             $now = time();
-            $sessionUpdated = false;
+            
+            foreach ($dropboxes as $box) {
+                if ($box->active_task) {
+                    $task = $box->active_task;
+                    $updated = false;
 
-            foreach ($dropboxes as $key => $box) {
-                if (isset($box['active_task'])) {
-                    $task = $box['active_task'];
                     if ($now >= $task['waktu_selesai']) {
-                        $dropboxes[$key]['update'] = 'Selesai mengantar';
-                        unset($dropboxes[$key]['active_task']);
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Selesai mengantar';
+                        $box->active_task = null; 
+                        $updated = true;
                     } elseif ($now >= $task['waktu_sampai_dropbox']) {
-                        $dropboxes[$key]['update'] = 'Barang sudah dijemput dan sedang menuju alamat pengantaran';
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Barang sudah dijemput dan sedang menuju alamat pengantaran';
+                        $updated = true;
                     } else {
-                        $dropboxes[$key]['update'] = 'Kurir ' . $task['petugas'] . ' sedang menjemput barang';
-                        $sessionUpdated = true;
+                        $box->keterangan_status = 'Kurir ' . $task['petugas'] . ' sedang menjemput barang';
+                        $updated = true;
+                    }
+
+                    if ($updated) {
+                        $box->save(); 
                     }
                 }
             }
-
-            if ($sessionUpdated) { session()->put('dropbox_data', $dropboxes); }
-
-            $dropboxesObj = collect($dropboxes)->map(function($item) { return (object) $item; });
             
-            return view('admin.dropbox', [
-                'dropboxes' => $dropboxesObj,
-                'totalLokasi' => count($dropboxesObj),
-                'tersedia' => $dropboxesObj->where('status', 'tersedia')->count(),
-                'hampirPenuh' => $dropboxesObj->where('status', 'hampir_penuh')->count(),
-                'penuh' => $dropboxesObj->where('status', 'penuh')->count()
-            ]);
+            $totalLokasi = $dropboxes->count();
+            $tersedia = $dropboxes->where('status', 'tersedia')->count();
+            $hampirPenuh = $dropboxes->where('status', 'hampir_penuh')->count();
+            $penuh = $dropboxes->where('status', 'penuh')->count();
+            
+            return view('admin.dropbox', compact('dropboxes', 'totalLokasi', 'tersedia', 'hampirPenuh', 'penuh'));
         })->name('dropbox.index');
 
         Route::post('/drop-box/store', function (Request $request) {
-            $dropboxes = session('dropbox_data', []);
             $nama = $request->input('nama');
+            $lokasiDetail = $request->input('lokasi');
+
             $lat = -6.2088; 
             $lng = 106.8456; 
+            $namaLokasiBersih = str_ireplace(['Drop Box ', 'Dropbox ', 'Drop ', 'Box '], '', strtolower($nama));
+
+            $daftarLokasi = [
+                'monas' => [-6.1754, 106.8272], 'cempaka putih' => [-6.1825, 106.8718],
+                'tebet' => [-6.2260, 106.8580], 'menteng' => [-6.1950, 106.8321],
+                'ragunan' => [-6.3039, 106.8267], 'ancol' => [-6.1244, 106.8335],
+                'senayan' => [-6.2185, 106.8021], 'pancoran' => [-6.2514, 106.8451],
+                'cipete' => [-6.2778, 106.8000]
+            ];
+
+            foreach ($daftarLokasi as $key => $coords) {
+                if (strpos($namaLokasiBersih, $key) !== false) {
+                    $lat = $coords[0]; $lng = $coords[1]; break;
+                }
+            }
+
+            if ($lat == -6.2088) {
+                try {
+                    $queryCari = trim($namaLokasiBersih) . ', Jakarta, Indonesia'; 
+                    $response = Http::withoutVerifying()->withHeaders(['User-Agent' => 'FoodLink-App/1.0'])->timeout(5)
+                        ->get('https://nominatim.openstreetmap.org/search', ['format' => 'json', 'q' => $queryCari, 'limit' => 1]);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        if (!empty($data) && isset($data[0])) {
+                            $lat = (float) $data[0]['lat']; $lng = (float) $data[0]['lon'];
+                        }
+                    }
+                } catch (\Exception $e) {}
+            }
             
-            $newDropBox = [
-                'id' => rand(10, 100), 
-                'nama' => $nama, 
+            \App\Models\DropBox::create([
+                'nama' => $nama,
                 'status' => 'tersedia',
-                'lokasi' => $request->input('lokasi'), 
+                'lokasi' => $lokasiDetail, 
                 'mitra' => $request->input('mitra'), 
                 'kapasitas' => rand(2, 10) . '/20', 
-                'update' => 'Baru saja ditambahkan', 
+                'keterangan_status' => 'Baru saja ditambahkan', 
                 'lat' => $lat, 
                 'lng' => $lng, 
-                'history' => []
-            ];
-            
-            $dropboxes[] = $newDropBox;
-            session()->put('dropbox_data', $dropboxes);
+                'history' => [] 
+            ]);
             
             return redirect()->route('dropbox.index');
         })->name('dropbox.store');
 
         Route::post('/drop-box/{id}/jemput', function (Request $request, $id) {
-            $dropboxes = session('dropbox_data', []);
-            $petugas = $request->input('petugas');
+            $box = \App\Models\DropBox::findOrFail($id);
             
-            foreach ($dropboxes as $key => $box) {
-                if ($box['id'] == $id) {
-                    $dropboxes[$key]['status'] = 'tersedia';
-                    $dropboxes[$key]['kapasitas'] = '0/20';
-                    $dropboxes[$key]['update'] = 'Kurir ' . $petugas . ' sedang menjemput barang';
-                    break;
-                }
+            $petugas = $request->input('petugas');
+            $waktuJemput = $request->input('waktu'); 
+            $latGudang = -6.1754; 
+            $lngGudang = 106.8272; 
+
+            $waktuMulaiAnimasi = time();
+            $durasiPerRute = 60; 
+
+            $box->active_task = [
+                'petugas' => $petugas,
+                'waktu_mulai' => $waktuMulaiAnimasi,
+                'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute,
+                'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2),
+                'lat_gudang' => $latGudang,
+                'lng_gudang' => $lngGudang,
+                'lat_dropbox' => $box->lat,
+                'lng_dropbox' => $box->lng,
+            ];
+
+            $tanggal = date('d M Y');
+            $estimasiSelesai = date('H:i', $waktuMulaiAnimasi + ($durasiPerRute * 2));
+            $keteranganHistory = "<span style='font-size: 11px; color: #718096;'>{$tanggal} &bull; {$waktuJemput} - {$estimasiSelesai} WIB</span><br/>Relawan <b>{$petugas}</b> menjemput barang dari {$box->nama} dan mengantarnya ke Gudang Pusat FoodLink.";
+            
+            $historyLama = $box->history ?? [];
+            array_unshift($historyLama, $keteranganHistory);
+            
+            $box->history = $historyLama;
+            $box->status = 'tersedia';
+            $box->kapasitas = '0/20';
+            $box->keterangan_status = 'Kurir ' . $petugas . ' sedang menjemput barang';
+            
+            $box->save(); 
+            
+            // ==========================================
+            // KODE BARU: PELACAK ERROR DATABASE PENUGASAN
+            // ==========================================
+            try {
+                \App\Models\Penugasan::create([
+                    'id_penugasan' => 'TGS-' . rand(1000, 9999), 
+                    'id_donasi' => $box->id, // Murni angka, aman untuk integer
+                    'nama_donatur' => $box->mitra, 
+                    'relawan' => $petugas, 
+                    'lokasi_pengambilan' => $box->nama . ' (' . $box->lokasi . ')', 
+                    'lokasi_pengantaran' => 'Gudang Pusat FoodLink',
+                    'tanggal_penugasan' => date('Y-m-d') . ' ' . $waktuJemput . ':00',
+                ]);
+            } catch (\Exception $e) {
+                // Jika databasenya menolak, layar akan menampilkan pesan ini
+                dd("GAGAL MENYIMPAN KE DATABASE PENUGASAN! Ini pesan error dari MySQL: " . $e->getMessage());
             }
             
-            session()->put('dropbox_data', $dropboxes);
             return redirect()->route('dropbox.index');
         })->name('dropbox.jemput');
     });

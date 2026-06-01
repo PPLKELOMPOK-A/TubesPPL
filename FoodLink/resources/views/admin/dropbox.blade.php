@@ -144,7 +144,7 @@
                     @endif
 
                     <div class="dropbox-update">
-                        Status: {{ $item->update }}
+                        Status: {{ $item->keterangan_status }}
                     </div>
                 </div>
 
@@ -283,7 +283,7 @@
     });
 
     // 3. Ambil data dropbox dari PHP ke JS
-    var dropboxes = @json($dropboxes->values()); 
+    var dropboxes = @json($dropboxes); 
 
     // 4. Taruh Marker Drop Box & Logika Tracking Animasi Peta
     dropboxes.forEach(function(db) {
