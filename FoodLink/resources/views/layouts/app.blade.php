@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -36,7 +36,20 @@
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #FFF9EE; }
         .top-bar { height: 70px; background: #FFFFFF; display: flex; align-items: center; justify-content: flex-end; padding: 0 40px; gap: 25px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
         .top-bar i { font-size: 18px; color: #888; cursor: pointer; }
-        .profile-section { display: flex; align-items: center; gap: 12px; }
+        
+        /* --- PROFIL YANG BISA DIKLIK --- */
+        .profile-section { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            text-decoration: none; /* Hilangkan garis bawah link */
+            cursor: pointer; 
+            transition: opacity 0.2s ease;
+        }
+        .profile-section:hover { 
+            opacity: 0.7; /* Efek memudar sedikit saat di-hover */
+        }
+        
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #F8E7C1; }
         
         /* Reset padding canvas agar rapi di dalam main-panel */
@@ -76,25 +89,25 @@
                     <i class="fa-solid fa-house"></i> Beranda Admin
                 </a>
                 
-                {{-- Validasi Donasi (Link sudah diperbaiki) --}}
+                {{-- Validasi Donasi --}}
                 <a href="{{ route('admin.validasi.index') }}" class="nav-item {{ Request::is('admin/validasi-proses-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-check-to-slot"></i> Validasi Donasi
                 </a>
                 
-               <a href="{{ route('retur.index') }}" class="nav-item {{ request()->routeIs('retur.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.retur.index') }}" class="nav-item {{ request()->routeIs('admin.retur.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Retur Donasi
                 </a>
 
-                <a href="#" class="nav-item">
+                <a href="{{ route('admin.penugasan.index') }}" class="nav-item {{ request()->routeIs('admin.penugasan.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-users-gear"></i> Penugasan Relawan
                 </a>
                 
-                <a href="{{ route('admin.report.index') }}" class="nav-item {{ Request::is('admin/report') ? 'active' : '' }}">
+                <a href="{{ route('admin.report.index') }}" class="nav-item {{ request()->routeIs('admin.report.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i> Dashboard Laporan
                 </a>
 
                 {{-- MENU KERJASAMA MITRA --}}
-                <a href="{{ route('mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
+                <a href="{{ route('admin.mitra.index') }}" class="nav-item {{ Request::is('admin/kerjasama-mitra*') ? 'active' : '' }}">
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
 
@@ -118,7 +131,7 @@
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
-            <a href="#" class="nav-item">
+            <a href="{{ route('chat.user') }}" class="nav-item {{ Request::is('chat*') ? 'active' : '' }}">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
 
@@ -137,17 +150,18 @@
     <div class="main-panel">
         <div class="top-bar">
             
-            {{-- ICON LONCENG NOTIFIKASI YANG SUDAH DIBUNGKUS LINK --}}
+            {{-- ICON LONCENG NOTIFIKASI --}}
             <a href="{{ route('notifikasi.index') }}" class="notif-bell" title="Pusat Notifikasi">
                 <i class="fa-regular fa-bell"></i>
             </a>
 
-            <div class="profile-section">
+            {{-- BAGIAN PROFIL YANG SUDAH DIUBAH MENJADI LINK --}}
+            <a href="{{ route('profil.index') }}" class="profile-section" title="Edit Profil">
                 <span style="font-size: 13px; font-weight: 600; color: #444;">
                     {{ Auth::user() ? Auth::user()->name : 'User' }}
                 </span>
                 <img src="https://ui-avatars.com/api/?name={{ Auth::user() ? Auth::user()->name : 'User' }}&background=6B4F2A&color=fff" class="user-avatar" alt="User Avatar">
-            </div>
+            </a>
         </div>
 
         @yield('content')

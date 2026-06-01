@@ -63,23 +63,23 @@
             
             <div class="form-group">
                 <label>Judul</label>
-                <input type="text" name="judul" value="{{ $data->judul }}">
+                <input type="text" name="judul" value="{{ $data->judul_donasi ?? $data->judul }}">
             </div>
 
             <div class="form-group">
                 <label>Kategori Penerima</label>
                 <select name="kategori">
-                    <option value="Organisasi (Yayasan)" {{ $data->kategori == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
-                    <option value="Kegiatan Keagamaan" {{ $data->kategori == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
-                    <option value="Individu" {{ $data->kategori == 'Individu' ? 'selected' : '' }}>Individu</option>
+                    <option value="Organisasi (Yayasan)" {{ ($data->kategori_penerima ?? $data->kategori) == 'Organisasi (Yayasan)' ? 'selected' : '' }}>Organisasi (Yayasan)</option>
+                    <option value="Kegiatan Keagamaan" {{ ($data->kategori_penerima ?? $data->kategori) == 'Kegiatan Keagamaan' ? 'selected' : '' }}>Kegiatan Keagamaan</option>
+                    <option value="Individu" {{ ($data->kategori_penerima ?? $data->kategori) == 'Individu/Umum' ? 'selected' : '' }}>Individu/Umum</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Tanggal</label>
                 <div class="date-container">
-                    <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data->tanggal }}">
-                    <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data->tanggal)->translatedFormat('l, d F Y') }}" readonly>
+                    <input type="date" name="tanggal" id="real-date" onchange="updateDateDisplay(this.value)" value="{{ $data->tanggal_kegiatan ?? $data->tanggal }}">
+                    <input type="text" id="date-display" value="{{ \Carbon\Carbon::parse($data->tanggal_kegiatan ?? $data->tanggal)->translatedFormat('l, d F Y') }}" readonly>
                     <i class="fa-regular fa-calendar-days calendar-icon"></i>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                 <label>Foto Dokumentasi</label>
                 <div class="image-container">
                     <div class="preview-box">
-                        <img id="img-preview" src="{{ !empty($data->foto) ? asset('storage/' . $data->foto) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi' }}" alt="Preview">
+                        <img id="img-preview" src="{{ !empty($data->foto_kegiatan) ? asset('storage/' . $data->foto_kegiatan) : (!empty($data->foto) ? asset('storage/' . $data->foto) : 'https://via.placeholder.com/400x250/f5f5f5/cccccc?text=Foto+Donasi') }}" alt="Preview">
                     </div>
                     <input type="file" id="file-input" name="foto" accept="image/*">
                     <button type="button" class="btn-edit-foto" onclick="document.getElementById('file-input').click();">
@@ -104,7 +104,7 @@
 
             <div class="form-group">
                 <label>Alamat</label>
-                <input type="text" name="alamat" value="{{ $data->alamat }}">
+                <input type="text" name="alamat" value="{{ $data->alamat_penyaluran ?? $data->alamat }}">
             </div>
 
             <div class="footer-actions">

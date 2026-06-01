@@ -1,15 +1,14 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Bukti Penyelesaian Donasi')
 
 @section('styles')
 <style>
-    /* --- MEMAKSA KONTEN MEPEET KE KIRI & MELUAS PENUH SEPERTI MOCKUP --- */
     .page-content-container {
         width: 100%;
         max-width: 100%;
-        margin-left: -70px;
-        padding: 10px 40px 40px 0px;
+        margin-left: 0;
+        padding: 30px 40px;
         box-sizing: border-box;
     }
 
@@ -42,7 +41,6 @@
         border-radius: 8px 0 0 8px;
         border: 1px solid #e2e8f0;
         border-right: none;
-        font-family: 'Poppins', sans-serif;
         font-size: 14px;
         outline: none;
         box-sizing: border-box;
@@ -64,9 +62,7 @@
         transition: background 0.2s;
     }
 
-    .btn-search-icon:hover {
-        background: #422a16;
-    }
+    .btn-search-icon:hover { background: #422a16; }
 
     .card {
         display: flex;
@@ -119,13 +115,10 @@
         font-weight: 600;
         text-decoration: none;
         font-size: 13px;
-        box-shadow: 0 2px 4px rgba(91, 58, 30, 0.15);
         transition: background 0.2s;
     }
 
-    .btn-primary:hover {
-        background: #422a16;
-    }
+    .btn-primary:hover { background: #422a16; }
 
     .btn-secondary {
         background: #ffffff;
@@ -136,7 +129,6 @@
         font-weight: 600;
         font-size: 13px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         transition: all 0.2s;
     }
 
@@ -165,18 +157,20 @@
         padding: 6px 12px;
         border-radius: 6px;
         cursor: pointer;
-        font-family: 'Poppins', sans-serif;
         transition: all 0.2s;
     }
-    
+
     .pages button.active {
         background: #5b3a1e;
         color: white;
         border-color: #5b3a1e;
     }
 
-    .pages button:hover:not(.active) {
-        background: #f8f9fa;
+    .empty {
+        text-align: center;
+        padding: 40px;
+        color: #888888;
+        font-size: 14px;
     }
 </style>
 @endsection
@@ -191,7 +185,7 @@
         <div class="search-wrapper">
             <input type="text"
                    name="search"
-                   value="{{ request('search') }}"
+                   value="{{ $search ?? request('search') }}"
                    class="search"
                    placeholder="Search">
             <button type="submit" class="btn-search-icon">
@@ -200,19 +194,16 @@
         </div>
     </form>
 
-    @foreach($donasi as $item)
+    @forelse($donasi as $item)
     <div class="card">
-
         <div class="left">
-            <img src="{{ $item->foto ? asset('img/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb">
-
+            <img src="{{ $item->foto ? asset('img/'.$item->foto) : 'https://via.placeholder.com/90x65' }}" class="thumb" alt="Thumbnail">
             <div class="info">
                 <h4>{{ $item->judul }}</h4>
                 <p>{{ $item->kategori }}</p>
                 <p>{{ $item->tanggal }}</p>
             </div>
         </div>
-
         <div class="actions">
             <a href="{{ route('bukti-donasi.bukti', $item->id) }}" class="btn-primary">
                 Lihat Bukti
@@ -221,17 +212,25 @@
                 Detail
             </a>
         </div>
-
     </div>
-    @endforeach
+    @empty
+    <div class="empty">Data tidak ditemukan.</div>
+    @endforelse
 
     <div class="pagination">
-        <span>1-5 dari 10</span>
-
+        <span>
+            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $donasi->firstItem() }}-{{ $donasi->lastItem() }} dari {{ $donasi->total() }}
+            @else
+                {{ $donasi->count() }} data
+            @endif
+        </span>
         <div class="pages">
-            <button class="active">1</button>
-            <button>2</button>
-            <button>&gt;</button>
+            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $donasi->links('vendor.pagination.simple-tailwind') }}
+            @else
+                <button class="active">1</button>
+            @endif
         </div>
     </div>
 

@@ -108,8 +108,8 @@
 
         @forelse($donations as $item)
         <div class="donasi-item">
-            <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
-                @if(!empty($item->foto_kegiatan))
+            <a href="#" class="donasi-content">
+        @if(!empty($item->foto_kegiatan))
                     <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
                     <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb;">
@@ -125,7 +125,7 @@
             </a>
             
             <div>
-                <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="btn-action">Daftar Donasi</a>
+                <a href="#" class="btn-action">Daftar Donasi</a>
             </div>
         </div>
         @empty

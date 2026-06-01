@@ -56,12 +56,12 @@ class ReturDonasiController extends Controller
             'alasan'             => $request->alasan,
             'tanggal_pengajuan'  => $request->tanggal_pengajuan,
             'deskripsi'          => $request->deskripsi,
-            'bukti'              => $buktiPath,
+            'bukti'              => $request->bukti,
         ]);
 
-        // REDIRECT DENGAN PESAN SUKSES
+        // REDIRECT DENGAN PESAN SUKSES (SUDAH DIPERBAIKI)
         return redirect()
-            ->route('retur.index')
+            ->route('admin.retur.index')
             ->with('success', 'Retur berhasil diajukan dan disimpan!');
     }
 }

@@ -1,169 +1,258 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
-@section('title', 'Drop Box')
-
-@section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<style>
-    .leaflet-popup-content-wrapper { border-radius: 12px; }
-    .leaflet-popup-content { font-family: 'Plus Jakarta Sans', sans-serif; }
-</style>
-@endsection
+@section('title', 'Drop Box - Foodlink')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">Drop Box Live Tracking</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-[#FFF9F0] p-6 rounded-2xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800 mb-1">{{ $totalLokasi }}</div>
-            <div class="text-xs font-bold text-gray-600 uppercase tracking-widest">Total Lokasi</div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    /* Container Utama */
+    .dropbox-canvas { padding: 40px 50px; background-color: #FFF9EE; min-height: 100vh; width: 100%; }
+    .dropbox-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 28px; color: #1A1A1A; margin-bottom: 30px; }
+
+    /* Card Statistik */
+    .stats-container { display: flex; gap: 20px; margin-bottom: 30px; }
+    .stat-card { background-color: #FEF3D1; border-radius: 12px; padding: 24px; flex: 1; display: flex; flex-direction: column; justify-content: center; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.02); }
+    .stat-number { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 32px; color: #32220D; margin-bottom: 8px; }
+    .stat-label { font-size: 13px; font-weight: 700; color: #4E453D; text-transform: uppercase; letter-spacing: 0.8px; }
+
+    /* Map Container */
+    .map-container { width: 100%; height: 400px; background-color: #FFFFFF; border-radius: 16px; border: 1px solid rgba(209, 196, 185, 0.3); box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.03); margin-bottom: 30px; z-index: 0; position: relative; padding: 5px; }
+    #map { width: 100%; height: 100%; border-radius: 12px; z-index: 1; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; }
+    .leaflet-popup-content { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Baris Pencarian & Tombol */
+    .filter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; }
+    .search-box { position: relative; display: flex; align-items: center; flex: 1; max-width: 400px; }
+    .search-box i { position: absolute; left: 16px; color: #A0AEC0; font-size: 14px; }
+    .search-input { width: 100%; padding: 12px 16px 12px 40px; border-radius: 8px; border: 1px solid #E2E8F0; font-size: 13px; outline: none; color: #4A5568; }
+    .btn-add { padding: 12px 24px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px; font-weight: 700; color: #1A202C; cursor: pointer; box-shadow: 0px 1px 2px rgba(0,0,0,0.02); transition: 0.2s; }
+    .btn-add:hover { background-color: #F7FAFC; }
+
+    /* List Drop Box */
+    .dropbox-list { display: flex; flex-direction: column; gap: 20px; }
+    .dropbox-card { background-color: #FFFFFF; border-radius: 16px; padding: 24px; display: flex; gap: 24px; box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.04); border: 1px solid rgba(209, 196, 185, 0.2); align-items: center; }
+    
+    .dropbox-icon { width: 100px; height: 100px; background-color: #FEF3D1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #6B4F2A; flex-shrink: 0; }
+    
+    .dropbox-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .dropbox-header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .dropbox-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 18px; color: #1A202C; margin: 0; }
+    
+    /* Status Badges */
+    .badge-status { padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-tersedia { background-color: #C6F6D5; color: #2F855A; }
+    .status-hampir_penuh { background-color: #FEEBC8; color: #C05621; }
+    .status-penuh { background-color: #FED7D7; color: #C53030; }
+
+    .dropbox-meta { font-size: 13px; color: #718096; margin-bottom: 12px; }
+    .dropbox-kapasitas { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    .cap-tersedia { color: #48BB78; }
+    .cap-hampir { color: #ED8936; }
+    .cap-penuh { color: #F56565; }
+
+    .dropbox-update { font-size: 12px; font-weight: 700; color: #6B4F2A; background-color: #FDF4E3; padding: 6px 14px; border-radius: 8px; display: inline-block; width: fit-content; }
+
+    /* Tombol Aksi */
+    .action-buttons { display: flex; flex-direction: column; gap: 12px; width: 160px; }
+    .btn-action { width: 100%; padding: 12px 0; border-radius: 8px; font-weight: 700; font-size: 13px; border: none; color: #FFFFFF; cursor: pointer; text-align: center; text-decoration: none; transition: 0.2s; display: inline-block; }
+    .btn-dark { background-color: #555555; }
+    .btn-dark:hover { background-color: #333333; }
+    .btn-brown { background-color: #6B4F2A; }
+    .btn-brown:hover { background-color: #5A3D2B; }
+
+    /* Modal Styling */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+    .modal-content { background: #fff; padding: 35px; border-radius: 16px; width: 450px; max-width: 90%; display: flex; flex-direction: column; gap: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; color: #A0AEC0; cursor: pointer; }
+    
+    .modal-content input, .modal-content select { padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-family: inherit; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+    .modal-content label { font-size: 13px; font-weight: 700; color: #4A5568; margin-bottom: -8px; }
+    .modal-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 20px; color: #32220D; margin-bottom: 5px; border-bottom: 1px solid #FBEBCE; padding-bottom: 15px;}
+    .history-list { font-size: 13px; color: #4A5568; padding-left: 20px; max-height: 150px; overflow-y: auto; list-style-type: none; }
+</style>
+
+<div class="dropbox-canvas">
+    
+    <h1 class="dropbox-title">Drop Box Live Tracking</h1>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-number">{{ $totalLokasi ?? 0 }}</div>
+            <div class="stat-label">TOTAL LOKASI</div>
         </div>
-        <div class="bg-[#FFF9F0] p-6 rounded-2xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800 mb-1">{{ $tersedia }}</div>
-            <div class="text-xs font-bold text-gray-600 uppercase tracking-widest">Tersedia</div>
+        <div class="stat-card">
+            <div class="stat-number">{{ $tersedia ?? 0 }}</div>
+            <div class="stat-label">TERSEDIA</div>
         </div>
-        <div class="bg-[#FFF9F0] p-6 rounded-2xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800 mb-1">{{ $hampirPenuh }}</div>
-            <div class="text-xs font-bold text-gray-600 uppercase tracking-widest">Hampir Penuh</div>
+        <div class="stat-card">
+            <div class="stat-number">{{ $hampirPenuh ?? 0 }}</div>
+            <div class="stat-label">HAMPIR PENUH</div>
         </div>
-        <div class="bg-[#FFF9F0] p-6 rounded-2xl border border-[#FBEBCE]">
-            <div class="text-3xl font-bold text-gray-800 mb-1">{{ $penuh }}</div>
-            <div class="text-xs font-bold text-gray-600 uppercase tracking-widest">Penuh</div>
+        <div class="stat-card">
+            <div class="stat-number">{{ $penuh ?? 0 }}</div>
+            <div class="stat-label">PENUH</div>
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-200 h-96 relative mb-8 overflow-hidden shadow-sm z-0">
-        <div id="map" class="w-full h-full"></div>
+    <div class="map-container">
+        <div id="map"></div>
     </div>
 
-    <div class="flex justify-between items-center mb-6 gap-4">
-        <form action="{{ route('dropbox.index') }}" method="GET" class="relative flex-1 max-w-md">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </span>
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Lokasi Drop Box..." class="w-full pl-12 pr-6 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 shadow-sm bg-white">
+    <div class="filter-row">
+        <form action="{{ route('dropbox.index') }}" method="GET" class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="search" class="search-input" placeholder="Cari Lokasi Drop Box..." value="{{ request('search') }}">
         </form>
-        <button onclick="document.getElementById('modalTambah').classList.remove('hidden')" class="px-6 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 bg-white hover:bg-gray-50 shadow-sm transition">
+        <button onclick="document.getElementById('modalTambah').style.display='flex'" class="btn-add">
             + Tambah Lokasi
         </button>
     </div>
 
-    <div class="space-y-5">
+    <div class="dropbox-list">
         @forelse($dropboxes as $item)
-        <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-6">
-            <div class="w-28 h-28 bg-[#FFF9F0] rounded-xl flex items-center justify-center flex-shrink-0 border border-[#FBEBCE]">
-                <svg class="w-10 h-10 text-[#4299E1]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
-            </div>
-
-            <div class="flex-1 w-full">
-                <div class="flex items-center gap-3 mb-2">
-                    <h2 class="text-xl font-bold text-gray-800">{{ $item->nama }}</h2>
-                    @if($item->status == 'tersedia')
-                        <span class="bg-[#C6F6D5] text-[#2F855A] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">Tersedia</span>
-                    @elseif($item->status == 'hampir_penuh')
-                        <span class="bg-[#FEEBC8] text-[#C05621] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">Hampir Penuh</span>
-                    @else
-                        <span class="bg-[#FED7D7] text-[#C53030] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">Penuh</span>
-                    @endif
+            <div class="dropbox-card">
+                
+                <div class="dropbox-icon">
+                    <i class="fa-solid fa-box"></i>
                 </div>
-                
-                <p class="text-xs text-gray-600 mb-1">{{ $item->lokasi }} · Mitra: {{ $item->mitra }}</p>
-                
-                @if($item->status == 'tersedia')
-                    <p class="text-sm font-bold text-[#48BB78] mb-3">{{ $item->kapasitas }}%</p>
-                @elseif($item->status == 'hampir_penuh')
-                    <p class="text-sm font-bold text-[#ED8936] mb-3">{{ $item->kapasitas }}%</p>
-                @else
-                    <p class="text-sm font-bold text-[#F56565] mb-3">{{ $item->kapasitas }}%</p>
-                @endif
-                
-                <p class="text-xs text-[#6B4F2A] font-bold bg-[#FDF4E3] inline-block px-3 py-1 rounded-lg shadow-sm">Status: {{ $item->update }}</p>
-            </div>
 
-            <div class="flex flex-col gap-3 w-full md:w-40">
-                <button onclick="bukaDetail('{{ $item->nama }}', '{{ $item->lokasi }}', '{{ $item->mitra }}', '{{ $item->kapasitas }}', '{{ json_encode($item->history ?? []) }}')" class="bg-[#545454] text-white font-bold py-2.5 rounded-xl text-xs shadow-sm hover:bg-gray-700 transition">Detail</button>
-                <button type="button" onclick="bukaModalJemput('{{ $item->id }}', '{{ $item->nama }}')" class="bg-[#6B4F2A] w-full text-white font-bold py-2.5 rounded-xl text-xs shadow-sm hover:bg-[#5A3D2B] transition">Jadwalkan Jemput</button>
+                <div class="dropbox-content">
+                    <div class="dropbox-header-row">
+                        <h3 class="dropbox-name">{{ $item->nama }}</h3>
+                        
+                        @if($item->status == 'tersedia')
+                            <div class="badge-status status-tersedia">Tersedia</div>
+                        @elseif($item->status == 'hampir_penuh')
+                            <div class="badge-status status-hampir_penuh">Hampir Penuh</div>
+                        @else
+                            <div class="badge-status status-penuh">Penuh</div>
+                        @endif
+                    </div>
+
+                    <div class="dropbox-meta">
+                        {{ $item->lokasi }} &nbsp;&middot;&nbsp; Mitra: {{ $item->mitra }}
+                    </div>
+                    
+                    @if($item->status == 'tersedia')
+                        <div class="dropbox-kapasitas cap-tersedia">{{ $item->kapasitas }} Terisi</div>
+                    @elseif($item->status == 'hampir_penuh')
+                        <div class="dropbox-kapasitas cap-hampir">{{ $item->kapasitas }} Terisi</div>
+                    @else
+                        <div class="dropbox-kapasitas cap-penuh">{{ $item->kapasitas }} Terisi</div>
+                    @endif
+
+                    <div class="dropbox-update">
+                        Status: {{ $item->update }}
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn-action btn-dark" 
+                        data-nama="{{ $item->nama }}"
+                        data-lokasi="{{ $item->lokasi }}"
+                        data-mitra="{{ $item->mitra }}"
+                        data-history="{{ json_encode($item->history ?? []) }}"
+                        onclick="bukaDetail(this)">
+                        Detail Riwayat
+                    </button>
+                    <button type="button" class="btn-action btn-brown" 
+                        data-id="{{ $item->id }}"
+                        data-nama="{{ $item->nama }}"
+                        onclick="bukaModalJemput(this)">
+                        Jadwalkan Jemput
+                    </button>
+                </div>
+
             </div>
-        </div>
         @empty
-        <div class="text-center py-10 bg-white rounded-2xl border border-gray-100">
-            <p class="text-gray-400 font-bold">Pencarian tidak ditemukan atau belum ada Drop Box.</p>
-        </div>
+            <div style="text-align: center; padding: 40px; color: #888; background: #fff; border-radius: 12px; border: 1px solid #eee;">
+                Tidak ada data Drop Box yang ditemukan.
+            </div>
         @endforelse
     </div>
+
 </div>
 
-<div id="modalJemput" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden">
-        <div class="p-8 bg-[#FFF9F0] border-b border-[#FBEBCE] flex justify-between items-center">
-            <h3 class="text-xl font-black text-gray-800">Form Penjemputan</h3>
-            <button type="button" onclick="document.getElementById('modalJemput').classList.add('hidden')" class="text-gray-400 text-3xl">&times;</button>
-        </div>
-        <form id="formJemput" method="POST" class="p-8 space-y-5">
+
+<div id="modalJemput" class="modal-overlay">
+    <div class="modal-content">
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('modalJemput').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="modal-title">Form Penjemputan</h3>
+        
+        <p style="font-size: 13px; color: #718096; margin-bottom: 10px;">
+            Lokasi: <strong id="jemputNamaLoks" style="color: #6B4F2A;"></strong>
+        </p>
+
+        <form id="formJemput" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
             @csrf
-            <p class="text-sm text-gray-500 font-medium mb-4">Lokasi: <span id="jemputNamaLoks" class="font-bold text-[#6B4F2A]"></span></p>
-            
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nama Relawan / Petugas</label>
-                <input type="text" name="petugas" required placeholder="Cth: Relawan Budi" class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mulai Penjemputan Jam</label>
-                <p class="text-[10px] font-semibold text-orange-500 mb-2">*Trek animasi di peta akan otomatis berjalan mengikuti jalan asli</p>
-                <input type="time" name="waktu" required class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label>Nama Relawan / Petugas</label>
+                <input type="text" name="petugas" required placeholder="Cth: Relawan Budi">
             </div>
 
-            <button type="submit" class="w-full bg-[#6B4F2A] text-white font-bold py-4 rounded-2xl shadow-lg mt-2">Mulai Penjemputan Otomatis</button>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label>Mulai Penjemputan Jam</label>
+                <input type="time" name="waktu" required>
+                <small style="color: #ED8936; font-size: 11px;">*Trek animasi motor akan berjalan otomatis mengikuti jalan (2 Menit)</small>
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 12px; background: #6B4F2A; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+                Mulai Penjemputan Otomatis
+            </button>
         </form>
     </div>
 </div>
 
-<div id="modalTambah" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden">
-        <div class="p-8 bg-[#FFF9F0] border-b border-[#FBEBCE] flex justify-between items-center">
-            <h3 class="text-xl font-black text-gray-800">Tambah Lokasi Baru</h3>
-            <button type="button" onclick="document.getElementById('modalTambah').classList.add('hidden')" class="text-gray-400 text-3xl">&times;</button>
+
+<div id="modalTambah" class="modal-overlay">
+    <form action="{{ route('dropbox.store') }}" method="POST" class="modal-content">
+        @csrf
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('modalTambah').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="modal-title">Tambah Lokasi Baru</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label>Nama Drop Box</label>
+            <input type="text" name="nama" required placeholder="Cth: Drop Box Cempaka Putih">
         </div>
-        <form action="{{ route('dropbox.store') }}" method="POST" class="p-8 space-y-5">
-            @csrf
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nama Drop Box</label>
-                <input type="text" name="nama" required placeholder="Cth: Drop Box Monas" class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Lokasi Detail</label>
-                <input type="text" name="lokasi" required placeholder="Cth: Pintu Masuk Selatan" class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nama Mitra Terkait</label>
-                <input type="text" name="mitra" required placeholder="Cth: PT Makmur" class="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:outline-none">
-            </div>
-            <button type="submit" class="w-full bg-[#6B4F2A] text-white font-bold py-4 rounded-2xl shadow-lg mt-2">Simpan Lokasi</button>
-        </form>
-    </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label>Lokasi Detail</label>
+            <input type="text" name="lokasi" required placeholder="Cth: Pintu Masuk Selatan">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label>Nama Mitra Terkait</label>
+            <input type="text" name="mitra" required placeholder="Cth: PT Makmur">
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px; background: #6B4F2A; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+            Simpan Lokasi Baru
+        </button>
+    </form>
 </div>
 
-<div id="modalDetail" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl overflow-hidden">
-        <div class="p-8 text-center">
-            <div class="w-20 h-20 bg-[#FDF4E3] rounded-2xl mx-auto flex items-center justify-center mb-4">
-                <svg class="w-10 h-10 text-[#6B4F2A]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-            </div>
-            <h3 id="detNama" class="text-xl font-black text-gray-800 mb-2">Nama</h3>
-            <p id="detLokasi" class="text-sm text-gray-500 mb-1">Lokasi</p>
-            <p class="text-sm font-bold text-gray-700 mb-4">Mitra: <span id="detMitra"></span></p>
-            
-            <div class="bg-gray-50 rounded-xl p-4 mb-4 text-left">
-                <p class="text-xs text-gray-500 font-bold uppercase mb-2">Riwayat Penjemputan Selesai:</p>
-                <ul id="detHistory" class="text-xs text-gray-700 space-y-2 list-disc pl-4 max-h-32 overflow-y-auto">
-                </ul>
-            </div>
-            
-            <button type="button" onclick="document.getElementById('modalDetail').classList.add('hidden')" class="w-full bg-gray-200 text-gray-800 font-bold py-3 rounded-xl">Tutup</button>
+
+<div id="modalDetail" class="modal-overlay">
+    <div class="modal-content" style="align-items: center; text-align: center;">
+        <div style="width: 80px; height: 80px; background: #FEF3D1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #6B4F2A; margin-bottom: 10px;">
+            <i class="fa-solid fa-box"></i>
         </div>
+        
+        <h3 id="detNama" style="font-family: Montserrat; font-weight: 700; color: #1A1A1A; margin: 0; font-size: 20px;">Nama</h3>
+        <p id="detLokasi" style="font-size: 13px; color: #718096; margin-bottom: 10px;">Lokasi</p>
+        <p style="font-size: 14px; font-weight: 700; color: #4A5568; margin-bottom: 20px;">Mitra: <span id="detMitra"></span></p>
+        
+        <div style="background: #F7FAFC; width: 100%; border-radius: 12px; padding: 15px; text-align: left; border: 1px solid #E2E8F0;">
+            <p style="font-size: 12px; font-weight: 700; color: #A0AEC0; text-transform: uppercase; margin-bottom: 10px;">Riwayat Penjemputan Selesai:</p>
+            <ul id="detHistory" class="history-list">
+            </ul>
+        </div>
+        
+        <button type="button" onclick="document.getElementById('modalDetail').style.display='none'" style="width: 100%; padding: 12px; background: #E2E8F0; color: #1A202C; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+            Tutup
+        </button>
     </div>
 </div>
 
@@ -172,24 +261,20 @@
 
 <script>
     // 1. Inisialisasi Peta (Center Jakarta)
-    var map = L.map('map').setView([-6.2088, 106.8456], 11);
+    var map = L.map('map').setView([-6.2088, 106.8456], 12);
     
-    // Tampilan Peta OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     // 2. Definisi Ikon Kustom
-    
-    // Ikon Motor Kurir Bawa Box
     var motorIcon = L.icon({
         iconUrl: 'https://img.icons8.com/color/100/motorcycle-delivery-single-box.png', 
-        iconSize: [40, 40], // Ukuran diperbesar
-        iconAnchor: [20, 40], // Titik jangkar di ban motor
-        popupAnchor: [0, -40] // Posisi popup di atas motor
+        iconSize: [40, 40], 
+        iconAnchor: [20, 40], 
+        popupAnchor: [0, -40] 
     });
 
-    // Ikon Bendera Finish (Tujuan Antar)
     var finishIcon = L.icon({
         iconUrl: 'https://cdn-icons-png.flaticon.com/512/1053/1053155.png', 
         iconSize: [32, 32],
@@ -200,96 +285,101 @@
     // 3. Ambil data dropbox dari PHP ke JS
     var dropboxes = @json($dropboxes->values()); 
 
-    // 4. Taruh Marker Drop Box Statis & Jalankan Logika Tracking
+    // 4. Taruh Marker Drop Box & Logika Tracking Animasi Peta
     dropboxes.forEach(function(db) {
-        // Render Marker Drop Box Asli
         var color = db.status == 'tersedia' ? '#48BB78' : (db.status == 'hampir_penuh' ? '#ED8936' : '#F56565');
         L.circleMarker([db.lat, db.lng], {
             color: color, fillColor: color, fillOpacity: 0.8, radius: 8
         }).addTo(map)
-        .bindPopup("<div class='text-center'><b class='text-sm'>" + db.nama + "</b><br><span class='text-xs text-gray-500'>" + db.kapasitas + "% Terisi</span></div>");
+        .bindPopup("<div style='text-align:center;'><b>" + db.nama + "</b><br><span style='color:gray; font-size:12px;'>" + db.kapasitas + " Terisi</span></div>");
 
-        // === LOGIKA LIVE TRACKING PADA JALAN ASLI ===
         if (db.active_task) {
             let task = db.active_task;
-            let now = Math.floor(Date.now() / 1000); // Waktu saat ini (detik)
+            let now = Math.floor(Date.now() / 1000); 
 
-            // Hanya proses trek jika relawan belum selesai (masih dalam perjalanan)
             if (now >= task.waktu_mulai && now < task.waktu_selesai) {
-                
-                // Masukkan marker bendera finish di titik tujuan antar
-                L.marker([task.lat_tujuan, task.lng_tujuan], {icon: finishIcon}).addTo(map)
-                    .bindPopup("<b>Alamat Antar Donasi</b><br>Tujuan Akhir Relawan");
+                // Marker Gudang Pusat
+                L.marker([task.lat_gudang, task.lng_gudang], {icon: finishIcon}).addTo(map)
+                    .bindPopup("<b>Gudang Pusat FoodLink</b><br>Titik Awal & Akhir Relawan");
 
-                // === FUNGSI AMBIL RUTE JALAN ASLI (GRATIS OSRM) ===
-                let osrmUrl = `https://router.project-osrm.org/route/v1/driving/${task.lng_awal},${task.lat_awal};${db.lng},${db.lat};${task.lng_tujuan},${task.lat_tujuan}?overview=full`;
+                // Mengambil Rute 3 Titik (Gudang -> Drop Box -> Gudang)
+                let osrmUrl = `https://router.project-osrm.org/route/v1/driving/${task.lng_gudang},${task.lat_gudang};${task.lng_dropbox},${task.lat_dropbox};${task.lng_gudang},${task.lat_gudang}?overview=full`;
 
                 fetch(osrmUrl)
                 .then(response => response.json())
                 .then(data => {
                     if (data.code === 'Ok') {
-                        // Decode geometri rute yang rumit dari OSRM menjadi titik-titik koordinat Leaflet
                         let ruteCoords = L.Polyline.fromEncoded(data.routes[0].geometry).getLatLngs();
-                        
-                        // Gambar garis rute jalan asli (abu-abu putus-putus)
                         let routeLine = L.polyline(ruteCoords, {color: '#888', dashArray: '5, 10', weight: 3}).addTo(map);
 
-                        // Buat Marker Relawan dengan ikon MOTOR
-                        let motorMarker = L.marker([task.lat_awal, task.lng_awal], {icon: motorIcon}).addTo(map)
-                            .bindPopup("<b>Relawan: " + task.petugas + "</b><br>Sedang dalam perjalanan...");
+                        let motorMarker = L.marker([task.lat_gudang, task.lng_gudang], {icon: motorIcon}).addTo(map);
 
-                        // Loop Animasi real-time mengikuti trek jalan asli
                         setInterval(() => {
-                            let currentNow = Math.floor(Date.now() / 1000);
+                            let currentNow = Date.now() / 1000;
                             
-                            // Jika tugas sudah selesai (waktu komputermu melewati jam selesai)
                             if (currentNow >= task.waktu_selesai) {
-                                map.removeLayer(motorMarker); // Hapus motor
-                                map.removeLayer(routeLine);  // Hapus garis
+                                map.removeLayer(motorMarker); 
+                                map.removeLayer(routeLine);  
                             } else {
-                                // Hitung total durasi trek
                                 let totalTaskDuration = task.waktu_selesai - task.waktu_mulai;
-                                // Hitung berapa lama trek sudah berjalan
                                 let elapsed = currentNow - task.waktu_mulai;
-                                // Hitung % progres trek
                                 let progress = elapsed / totalTaskDuration;
 
-                                // Temukan indeks koordinat di dalam rute OSRM yang sesuai dengan progres % waktu
                                 let indexTarget = Math.floor(ruteCoords.length * progress);
                                 
-                                // Pastikan index valid
                                 if (indexTarget >= 0 && indexTarget < ruteCoords.length) {
-                                    // Pindahkan motor ke titik jalan asli yang sesuai waktu saat ini!
                                     motorMarker.setLatLng(ruteCoords[indexTarget]);
                                 }
+
+                                // Update keterangan Popup Motor secara live
+                                let statusKurir = currentNow < task.waktu_sampai_dropbox 
+                                    ? "Sedang menuju ke Drop Box" 
+                                    : "Membawa barang ke Gudang";
+                                motorMarker.getPopup() ? motorMarker.getPopup().setContent("<b>Relawan: " + task.petugas + "</b><br>" + statusKurir) : motorMarker.bindPopup("<b>Relawan: " + task.petugas + "</b><br>" + statusKurir);
                             }
-                        }, 1000); // Update setiap 1 detik
+                        }, 500); 
                     }
                 }).catch(e => console.error("OSRM Routing Error: ", e));
             }
         }
     });
 
-    // Buka Modal Detail (History tidak akan terhapus)
-    function bukaDetail(nama, lokasi, mitra, kapasitas, historyJson) {
+    // UPDATE: Scripts untuk Modals Riwayat & Penjemputan dengan parameter yang aman
+    function bukaDetail(btn) {
+        let nama = btn.getAttribute('data-nama');
+        let lokasi = btn.getAttribute('data-lokasi');
+        let mitra = btn.getAttribute('data-mitra');
+        let historyJson = btn.getAttribute('data-history');
+
         document.getElementById('detNama').textContent = nama;
         document.getElementById('detLokasi').textContent = lokasi;
         document.getElementById('detMitra').textContent = mitra;
         
         let history = JSON.parse(historyJson || "[]");
-        let historyHtml = history.length > 0 
-            ? history.map(h => "<li class='pb-1 font-semibold'>" + h + "</li>").join('') 
-            : "<li class='text-gray-400 italic'>Belum ada riwayat penjemputan selesai.</li>";
+        let historyHtml = "";
+        
+        if (history.length > 0) {
+            historyHtml = history.map(h => 
+                `<li style='margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #CBD5E0; line-height: 1.5; position: relative; padding-left: 15px;'>
+                    <span style='position: absolute; left: 0; top: 6px; width: 6px; height: 6px; background-color: #6B4F2A; border-radius: 50%;'></span>
+                    ${h}
+                </li>`
+            ).join('');
+        } else {
+            historyHtml = "<li style='color: #A0AEC0; font-style: italic; text-align: center; padding: 10px 0; margin: 0;'>Belum ada riwayat penjemputan dari lokasi ini.</li>";
+        }
             
         document.getElementById('detHistory').innerHTML = historyHtml;
-        document.getElementById('modalDetail').classList.remove('hidden');
+        document.getElementById('modalDetail').style.display = 'flex';
     }
 
-    // Buka Modal Jemput
-    function bukaModalJemput(id, namaLokasi) {
+    function bukaModalJemput(btn) {
+        let id = btn.getAttribute('data-id');
+        let namaLokasi = btn.getAttribute('data-nama');
+        
         document.getElementById('jemputNamaLoks').textContent = namaLokasi;
         document.getElementById('formJemput').action = "/admin/drop-box/" + id + "/jemput";
-        document.getElementById('modalJemput').classList.remove('hidden');
+        document.getElementById('modalJemput').style.display = 'flex';
     }
 </script>
 @endsection
