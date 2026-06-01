@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿app blade
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -116,6 +117,18 @@ main::-webkit-scrollbar-thumb {
                         <i class="fa-solid fa-handholding-heart text-base w-5 text-center {{ request()->is('riwayat-donasi*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
                         <span>Riwayat Donasi</span>
                     </a>
+
+                    <a href="{{ route('review.index') }}"
+                       class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('review*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
+                        <i class="fa-solid fa-star text-base w-5 text-center {{ request()->is('review*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
+                        <span>Rating & Review</span>
+                    </a>
+
+                    <a href="{{ route('admin.komunitas.index') }}" 
+                       class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/komunitas*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
+                        <i class="fa-solid fa-users text-base w-5 text-center {{ request()->is('admin/komunitas*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
+                        <span>Komunitas</span>
+                    </a>
                 @endif
 
                 <hr class="border-gray-300 my-4 opacity-50">
@@ -128,16 +141,10 @@ main::-webkit-scrollbar-thumb {
                 </a>
 
                 <a href="/admin/chat"
-   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/chat*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
-    <i class="fa-solid fa-message text-base w-5 text-center {{ request()->is('admin/chat*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
-    <span>Chat</span>
-</a>
-
-<a href="{{ route('admin.komunitas.index') }}" 
-   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/komunitas*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
-    <i class="fa-solid fa-users text-base w-5 text-center {{ request()->is('admin/komunitas*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
-    <span>Komunitas</span>
-</a>
+                   class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->is('admin/chat*') ? 'bg-[#6B4F2A] text-white font-semibold shadow-md' : 'text-gray-700 hover:bg-[rgba(107,79,42,0.1)]' }}">
+                    <i class="fa-solid fa-message text-base w-5 text-center {{ request()->is('admin/chat*') ? 'text-white' : 'text-[#6B4F2A]' }}"></i>
+                    <span>Chat</span>
+                </a>
 
             </nav>
         </div>

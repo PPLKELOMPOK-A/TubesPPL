@@ -24,6 +24,8 @@ use App\Http\Controllers\DonasiMakananController;
 use App\Http\Controllers\KegiatanDonasiController;
 use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\TipsController; 
+use App\Http\Controllers\ReviewController;
+
 // Import Controller Komunitas Anda di sini jika ada, contoh:
 // use App\Http\Controllers\KomunitasController; 
 
@@ -113,6 +115,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti-donasi.index');
     Route::get('/bukti-donasi/{id}', [BuktiDonasiController::class, 'show'])->name('bukti-donasi.show');
 
+    // ================= REVIEW (KHUSUS USER) =================
+Route::get('/review', function () {
+    // Proteksi: Jika admin nekat masuk lewat URL, arahkan ke dashboard admin
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    // Jika user biasa, panggil Controller Review
+    return app(ReviewController::class)->index();
+})->name('review.index');
+
+Route::post('/review/store', function (Request $request) {
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    return app(ReviewController::class)->store($request);
+})->name('review.store');
+
+Route::get('/review/success', function () {
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    return view('review.success');
+})->name('review.success');
+    
     // ================== ADMIN ==================
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/donasi/detail/{id}', [AdminController::class, 'detailDonasi'])->name('admin.donasi.detail');
@@ -150,7 +176,9 @@ Route::middleware('auth')->group(function () {
             // Gantilah view() ini dengan view asli halaman komunitas Anda
             return view('admin.komunitas.index'); 
         })->name('komunitas.index');
+
     });
+    
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

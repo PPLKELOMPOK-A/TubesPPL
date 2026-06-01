@@ -7,153 +7,167 @@
 <style>
 
 .main-content{
-    padding:20px 40px 40px;
+    padding: 20px 40px 40px;
 }
 
 /* CARD */
 .rating-container{
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-    max-width:700px;
-    margin:auto;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    background: white;
+    border-radius: 20px;
+    /* overflow: hidden;  <-- DIHAPUS agar efek meluap/pop-out gambar tidak terpotong */
+    max-width: 620px;
+    margin: auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    position: relative; /* Menjaga konteks tata letak */
 }
 
 /* HEADER */
 .rating-header{
-    background:#6B4F2A;
-    padding:25px 20px 35px;
-    text-align:center;
-    border-bottom-left-radius:50% 40px;
-    border-bottom-right-radius:50% 40px;
-}
-
-/* GAMBAR PLANET */
-.rating-img{
-    width:330px;
-    margin-top:20px;
-    margin-bottom:-20px;
-}
-
-/* BOX TRANSPARAN BELAKANG GAMBAR */
-.planet-box{
-    width:420px;
-    height:210px;
-
-    /* KOTAK DITURUNKAN */
-    margin:60px auto -120px;
-
-    background:rgba(255,255,255,0.55);
-
-    border-radius:30px;
-
-    backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,0.7);
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    box-shadow:0 10px 25px rgba(0,0,0,0.18);
+    background: #6B4F2A;
+    padding: 25px 20px 20px; /* Sedikit disesuaikan */
+    text-align: center;
+   border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    position: relative; /* Agar z-index bekerja jika dibutuhkan */
 }
 
 /* JUDUL */
 .rating-header h2{
-    color:white;
-    margin:0;
-    font-size:26px;
-    font-weight:bold;
+    color: white;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
 }
 
-/* FORM */
-.rating-form{
-    padding:30px;
+/* BOX GAMBAR (PLANET) */
+.planet-box{
+    width: 380px;
+    height: 180px;
+    margin: 25px auto -90px; /* Mengatur jarak bawah negatif agar melompati header */
+
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 28px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    
+    /* SOLUSI UTAMA: Mengangkat box ke paling depan */
+    position: relative;
+    z-index: 10; 
 }
 
-/* STAR */
-.star-rating{
-    display:flex;
-    justify-content:center;
-    flex-direction:row-reverse;
-    gap:8px;
+/* GAMBAR PLANET */
+.rating-img{
+    width: 250px;
+    transform: translateY(-50px); /* Disesuaikan posisi vertikal maskotnya */
+    margin-top: -20px;
+    margin-bottom: -10px;
 
-    /* BINTANG DITURUNKAN */
-    margin-top:90px;
+    filter: drop-shadow(
+        0 10px 20px rgba(0,0,0,.15)
+    );
+}
 
-    margin-bottom:25px;
+/* --- FORM --- */
+.rating-form {
+    /* Kembalikan padding atas menjadi normal agar tidak mendorong isi form terlalu jauh */
+    padding: 30px 30px 30px; 
+}
+
+/* --- STAR RATING --- */
+.star-rating {
+    display: flex;
+    justify-content: center;
+    flex-direction: row-reverse;
+    gap: 8px;
+
+    /* SOLUSI: Berikan margin-top negatif untuk menarik bintang ke atas */
+    margin-top: -30px; 
+    margin-bottom: 60px;
+
+    /* Pastikan bintang berada di lapisan atas agar tidak tertutup */
+    position: relative;
+    z-index: 15; 
 }
 
 .star-rating input{
-    display:none;
+    display: none;
 }
 
 .star-rating label{
-    font-size:40px;
-    color:#ccc;
-    cursor:pointer;
-    transition:0.2s;
+    font-size: 38px;
+    color: #d1d1d1;
+    cursor: pointer;
+    transition: .2s;
 }
 
 .star-rating input:checked ~ label,
 .star-rating label:hover,
 .star-rating label:hover ~ label{
-    color:gold;
+    color: #FFC107;
 }
 
 /* INPUT */
 .form-group{
-    margin-bottom:18px;
+    margin-bottom: 15px;
 }
 
 .form-control{
-    width:100%;
-    padding:12px 15px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    outline:none;
-    font-size:14px;
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    transition: .2s;
 }
 
 .form-control:focus{
-    border-color:#6B4F2A;
+    border-color: #6B4F2A;
+    box-shadow: 0 0 0 3px rgba(107,79,42,.08);
 }
 
 /* TEXTAREA */
 textarea{
-    resize:none;
-    height:100px;
+    resize: none;
+    height: 90px;
 }
 
 /* BUTTON */
 .btn-box{
-    text-align:center;
-    margin-top:10px;
+    text-align: center;
+    margin-top: 10px;
 }
 
 .btn-submit{
-    background:#6B4F2A;
-    color:white;
-    border:none;
-    padding:12px 28px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:bold;
-    transition:0.3s;
+    background: #6B4F2A;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .3s;
 }
 
 .btn-submit:hover{
-    background:#8A673A;
+    background: #8A673A;
+    transform: translateY(-2px);
 }
 
 /* ALERT */
 .success{
-    background:#d4edda;
-    color:#155724;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:20px;
+    background: #d4edda;
+    color: #155724;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 </style>
@@ -164,27 +178,24 @@ textarea{
 
         <div class="rating-header">
 
-    <h2>Rating dan Review FoodLink</h2>
+            <h2>Rating dan Review FoodLink</h2>
 
-    {{-- BOX TRANSPARAN --}}
-    <div class="planet-box">
+            <div class="planet-box">
 
-        <img src="{{ asset('img/gambar2.png') }}"
-             alt="Rating Mascot"
-             class="rating-img">
+                <img src="{{ asset('img/gambar2.png') }}"
+                     alt="Rating Mascot"
+                     class="rating-img">
 
-    </div>
+            </div>
 
-</div>
-        {{-- FORM --}}
+        </div>
+
         <div class="rating-form">
-
 
             <form action="{{ route('review.store') }}" method="POST">
 
                 @csrf
 
-                {{-- STAR --}}
                 <div class="star-rating">
 
                     <input type="radio" name="rating" id="star5" value="5">
@@ -204,55 +215,38 @@ textarea{
 
                 </div>
 
-                {{-- NAMA --}}
                 <div class="form-group">
-
                     <input type="text"
                            name="nama"
                            class="form-control"
                            placeholder="Nama Donatur">
-
                 </div>
 
-                {{-- KATEGORI --}}
                 <div class="form-group">
-
                     <select name="kategori" class="form-control">
-
                         <option value="">Pilih Kategori</option>
                         <option value="Pelayanan">Pelayanan</option>
                         <option value="Relawan">Relawan</option>
                         <option value="Pengiriman">Pengiriman</option>
-
                     </select>
-
                 </div>
 
-                {{-- REVIEW --}}
                 <div class="form-group">
-
                     <textarea name="review"
                               class="form-control"
                               placeholder="Tulis review"></textarea>
-
                 </div>
 
-                {{-- FEEDBACK --}}
                 <div class="form-group">
-
                     <textarea name="feedback"
                               class="form-control"
                               placeholder="Masukkan feedback"></textarea>
-
                 </div>
 
-                {{-- BUTTON --}}
                 <div class="btn-box">
-
                     <button type="submit" class="btn-submit">
                         Kirim
                     </button>
-
                 </div>
 
             </form>
