@@ -129,15 +129,25 @@
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
+                   <a href="{{ route('komunitas.index') }}" class="nav-item {{ Request::is('komunitas*') ? 'active' : '' }}">
+                     <i class="fa-solid fa-users"></i> Komunitas
+                </a>
             @endif
 
             {{-- MENU GLOBAL (BISA DIAKSES ADMIN & USER) --}}
             <a href="#" class="nav-item">
                 <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
             </a>
-            <a href="{{ route('chat.user') }}" class="nav-item {{ Request::is('chat*') ? 'active' : '' }}">
+            {{-- MENU GLOBAL CHAT --}}
+            @if(Auth::check() && Auth::user()->role == 'admin')
+            <a href="{{ route('admin.chat.index') }}" class="nav-item {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-comments"></i> Chat
             </a>
+@else
+    <a href="{{ route('chat.index') }}" class="nav-item {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+        <i class="fa-solid fa-comments"></i> Chat 
+    </a>
+@endif
         </div>
 
         <div class="logout-section">
