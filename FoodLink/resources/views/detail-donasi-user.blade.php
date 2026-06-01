@@ -60,8 +60,7 @@
         </div>
 
         <div class="footer-actions">
-            <a href="#
-            " class="btn-action-detail">Daftar Donasi</a>
+            <a href="{{ route('donasi.create') }}" class="btn-action-detail">Daftar Donasi</a>
         </div>
 
     </div>

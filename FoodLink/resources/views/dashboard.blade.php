@@ -125,7 +125,7 @@
             </a>
             
             <div>
-                <a href="#" class="btn-action">Daftar Donasi</a>
+                <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="btn-action">Daftar Donasi</a>
             </div>
         </div>
         @empty
