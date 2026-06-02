@@ -88,9 +88,11 @@
             <div class="filter-wrapper">
                 <button type="button" class="filter-btn" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
                 
-                <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
+                <div class="filter-dropdown {{ (request()->has('kategori') || request()->has('waktu')) ? 'show' : '' }}" id="filterDropdown">
                     <div class="filter-header">-Pilihan-</div>
                     <div class="filter-options">
+                        
+                        <div style="padding: 6px 20px 4px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Kategori Penerima</div>
                         <label class="filter-option">
                             <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
                                    onchange="document.getElementById('filterForm').submit();"
@@ -109,6 +111,26 @@
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
                         </label>
+
+                        <hr style="border: 0; border-top: 1px solid rgba(209, 196, 185, 0.3); margin: 10px 0;">
+
+                        <div style="padding: 4px 20px 6px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Urutan Waktu</div>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terbaru" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A;"
+                                   {{ request('waktu') == 'terbaru' ? 'checked' : '' }}> 
+                            Terbaru 
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terlama" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A;"
+                                   {{ request('waktu') == 'terlama' ? 'checked' : '' }}> 
+                            Terlama 
+                        </label>
+                       
+
                     </div>
                 </div>
             </div>
@@ -169,7 +191,6 @@
     </div>
 </div>
 
-{{-- MENJADI INI: --}}
 <a href="{{ route('admin.donasi.create') }}" class="fab">
     <i class="fa-solid fa-plus"></i>
 </a>
