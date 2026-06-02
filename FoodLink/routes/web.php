@@ -87,7 +87,28 @@ Route::middleware('auth')->group(function () {
             $query->whereIn('kategori_penerima', (array) $request->kategori);
         }
 
-        $donations = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Logika Filter Waktu Pelaksanaan / Urutan Data di Sisi User (BARU)
+        if ($request->filled('waktu')) {
+            switch ($request->waktu) {
+                case 'terbaru':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'terlama':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'akan_datang':
+                    $query->where('tanggal_kegiatan', '>', now()->toDateString())
+                          ->orderBy('tanggal_kegiatan', 'asc');
+                    break;
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $donations = $query->paginate(10);
         return view('dashboard', compact('donations'));
     })->name('dashboard');
 
@@ -232,7 +253,28 @@ Route::middleware('auth')->group(function () {
                 $query->whereIn('kategori_penerima', (array) $request->kategori);
             }
 
-            return view('admin.dashboardAdmin', ['semuaDonasi' => $query->latest()->get()]);
+            // Logika Filter Waktu Pelaksanaan / Urutan Data di Sisi Admin (BARU)
+            if ($request->filled('waktu')) {
+                switch ($request->waktu) {
+                    case 'terbaru':
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                    case 'terlama':
+                        $query->orderBy('created_at', 'asc');
+                        break;
+                    case 'akan_datang':
+                        $query->where('tanggal_kegiatan', '>', now()->toDateString())
+                              ->orderBy('tanggal_kegiatan', 'asc');
+                        break;
+                    default:
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                }
+            } else {
+                $query->orderBy('created_at', 'desc');
+            }
+
+            return view('admin.dashboardAdmin', ['semuaDonasi' => $query->get()]);
         })->name('dashboard');
 
         // Kegiatan Baru
