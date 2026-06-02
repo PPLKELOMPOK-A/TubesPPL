@@ -37,7 +37,8 @@ class AuthController extends Controller {
             return redirect('/dashboard');
         }
 
-        return back()->with('error', 'Email atau password salah');
+        // Disesuaikan dengan Blade Login yang menggunakan $errors->first()
+        return back()->withErrors(['email' => 'Email atau password salah'])->withInput($request->only('email'));
     }
 
     public function register(Request $request) {
@@ -68,9 +69,19 @@ class AuthController extends Controller {
         }
 
         // Simpan di session agar edit-password tahu user mana yang direset
-        session(['reset_user_id' => $user->id]);
+        session([
+            'reset_user_id' => $user->id,
+            'reset_email' => $user->email
+        ]);
 
         return redirect()->route('profil.edit-password');
+    }
+
+    // ===== MENAMPILKAN HALAMAN EDIT/RESET PASSWORD =====
+    public function showEditPasswordForm()
+    {
+        // Disesuaikan agar mengarah ke file auth/edit-password.blade.php
+        return view('auth.edit-password'); 
     }
 
     // --- FUNGSI UPDATE PASSWORD ---
@@ -82,10 +93,10 @@ class AuthController extends Controller {
 
         // 1. Logika untuk User yang BELUM LOGIN (Lupa Password)
         if (!Auth::check()) {
-            // Ambil ID dari session jika ada, atau dari input email
+            // Ambil ID dari session jika ada
             $userId = session('reset_user_id');
             if (!$userId) {
-                return back()->withErrors(['email' => 'Silakan masukkan email Anda kembali.']);
+                return redirect()->route('password.request')->withErrors(['email' => 'Sesi reset habis. Silakan masukkan email Anda kembali.']);
             }
             $user = User::find($userId);
         } 
@@ -102,12 +113,12 @@ class AuthController extends Controller {
             'password' => Hash::make($request->password)
         ]);
 
-        // Hapus session reset jika ada
-        session()->forget('reset_user_id');
+        // Hapus session reset setelah berhasil diganti
+        session()->forget(['reset_user_id', 'reset_email']);
 
         return Auth::check() 
             ? back()->with('success', 'Password berhasil diubah!')
-            : redirect('/login')->with('success', 'Password berhasil direset! Silakan login.');
+            : redirect()->route('login')->with('success', 'Password berhasil direset! Silakan login.');
     }
 
     public function logout(Request $request) {

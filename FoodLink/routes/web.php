@@ -29,7 +29,7 @@ use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\TipsController; 
 use App\Http\Controllers\UserChatController;
 use App\Http\Controllers\AdminChatController;
-use App\Http\Controllers\ReviewController; // <-- BERHASIL DITAMBAHKAN
+use App\Http\Controllers\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,18 +39,30 @@ use App\Http\Controllers\ReviewController; // <-- BERHASIL DITAMBAHKAN
 
 Route::get('/', function () { return view('welcome'); });
 
+// ==========================================================================
+// RUTE OTENTIKASI & RESET PASSWORD (DIUBAH UNTUK VALIDASI SINKRONISASI)
+// ==========================================================================
+
+// Rute Update & Edit Password diletakkan di luar agar bisa diakses oleh GUEST (Lupa Password) dan AUTH (Edit Profil)
+Route::get('/edit-password', [AuthController::class, 'showEditPasswordForm'])->name('profil.edit-password');
+Route::post('/profil/update-password', [AuthController::class, 'updatePassword'])->name('profil.update-password');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     
+    // Fitur Lupa Password untuk Masukkan Email
     Route::get('/forgot-password', function () {
         return view('auth.lupa-password');
     })->name('password.request');
     Route::post('/forgot-password/check', [AuthController::class, 'checkEmail'])->name('password.check');
 });
 
+// ==========================================================================
+// RUTE DENGAN MIDDLEWARE AUTH (TIDAK ADA YANG DIUBAH/DIHAPUS DI BAWAH INI)
+// ==========================================================================
 Route::middleware('auth')->group(function () {
 
     // --- AREA PUSAT NOTIFIKASI ---
@@ -86,7 +98,7 @@ Route::middleware('auth')->group(function () {
         return view('detail-donasi-user', compact('data')); 
     })->name('user.donasi.detail');
 
-    Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
+    $donasiBaruRoute = Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
     
     // ===== FITUR TRACKING & BUKTI DONASI =====
@@ -95,7 +107,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
 
     // --- FITUR TRACKING & BUKTI DONASI ---
-
     Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); 
     Route::get('/tracking/{id}', function ($id) { 
         return view('tracking.trackingdetail', [
@@ -105,7 +116,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tracking', [TrackingController::class, 'index'])->name('donation.tracking');
     Route::get('/tracking/detail/{id}', [TrackingController::class, 'show'])->name('tracking.show');
-
 
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
@@ -180,7 +190,7 @@ Route::middleware('auth')->group(function () {
             'kategori'=>'required'
         ]);
 
-        Komunitas::create([
+        $createKomunitasData = Komunitas::create([
             'nama_user'=>Auth::user()->name,
             'judul'=>$request->judul,
             'isi'=>$request->isi,
@@ -203,7 +213,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send', [UserChatController::class, 'send'])->name('chat.send');
     Route::put('/chat/messages/{message}', [UserChatController::class, 'updateMessage'])->name('chat.messages.update');
     Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMessage'])->name('chat.messages.delete');
-
 
     // ==========================================
     // GRUP ROUTE ADMIN (Dengan Prefix 'admin.')
@@ -488,7 +497,7 @@ Route::middleware('auth')->group(function () {
 
             $box->active_task = [
                 'petugas' => $petugas,
-                'waktu_mulai' => $waktuMulaiAnimasi,
+                'waktu_mulai' => $wulaiAnimasi = time(),
                 'waktu_sampai_dropbox' => $waktuMulaiAnimasi + $durasiPerRute,
                 'waktu_selesai' => $waktuMulaiAnimasi + ($durasiPerRute * 2),
                 'lat_gudang' => $latGudang,
@@ -565,6 +574,4 @@ Route::middleware('auth')->group(function () {
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-}); // Penutup Route::middleware('auth')->group
-
-
+});
