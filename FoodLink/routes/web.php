@@ -11,7 +11,7 @@ use App\Models\Donation;
 use App\Models\Chat;
 use App\Models\Komunitas;
 use App\Models\KegiatanDonasi;
-use App\Models\Penugasan; // <-- SAYA TAMBAHKAN INI
+use App\Models\Penugasan; 
 
 // Controllers
 use App\Http\Controllers\AuthController;
@@ -19,6 +19,7 @@ use App\Http\Controllers\ValidasiProsesDonasiController;
 use App\Http\Controllers\BuktiDonasiController;
 use App\Http\Controllers\ReturDonasiController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DonasiMakananController;
@@ -26,6 +27,9 @@ use App\Http\Controllers\KegiatanDonasiController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\RiwayatDonationController;
 use App\Http\Controllers\TipsController; 
+use App\Http\Controllers\UserChatController;
+use App\Http\Controllers\AdminChatController;
+use App\Http\Controllers\ReviewController; // <-- BERHASIL DITAMBAHKAN
 
 /*
 |--------------------------------------------------------------------------
@@ -89,12 +93,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
 
     // --- FITUR TRACKING & BUKTI DONASI ---
-    Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); 
-    Route::get('/tracking/{id}', function ($id) { 
-        return view('tracking.trackingdetail', [
-            'donation' => Donation::findOrFail($id)
-        ]);
-    })->name('tracking.detail');
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('donation.tracking');
+    Route::get('/tracking/detail/{id}', [TrackingController::class, 'show'])->name('tracking.show');
 
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
@@ -105,38 +105,92 @@ Route::middleware('auth')->group(function () {
     Route::get('/riwayat-donasi/bukti/{id}', [RiwayatDonationController::class, 'showBukti'])->name('riwayat-donasi.bukti');
     Route::post('/riwayat-donasi/rating/{id}', [RiwayatDonationController::class, 'updateRating'])->name('riwayat-donasi.update-rating'); 
 
+    // ==========================================
+    // ===== FITUR REVIEW (KHUSUS USER) =========
+    // ==========================================
+    Route::get('/review', function () {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return app(ReviewController::class)->index();
+    })->name('review.index');
+
+    Route::post('/review/store', function (Request $request) {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return app(ReviewController::class)->store($request);
+    })->name('review.store');
+
+    Route::get('/review/success', function () {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return view('review.success');
+    })->name('review.success');
+
     // ===== FITUR BARU: TIPS & KOMUNITAS =====
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
+
+    // ======================
+    // KOMUNITAS
+    // ======================
+    Route::get('/komunitas', function (Request $request) {
+        $query = Komunitas::query();
+
+        // search
+        if ($request->search) {
+            $query->where(function($q) use ($request){
+                $q->where('judul', 'like', '%' . $request->search . '%')
+                  ->orWhere('isi', 'like', '%' . $request->search . '%')
+                  ->orWhere('nama_user', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // filter kategori
+        if ($request->kategori) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        $posts = $query->latest()->get();
+        return view('komunitas', compact('posts'));
+    })->name('komunitas.index');
+
+    Route::get('/komunitas/create', function () {
+        return view('tambah-komunitas');
+    })->name('komunitas.create');
+
+    Route::post('/komunitas/store', function(Request $request){
+        $request->validate([
+            'judul'=>'required',
+            'isi'=>'required',
+            'kategori'=>'required'
+        ]);
+
+        Komunitas::create([
+            'nama_user'=>Auth::user()->name,
+            'judul'=>$request->judul,
+            'isi'=>$request->isi,
+            'kategori'=>$request->kategori,
+        ]);
+
+        return redirect()
+            ->route('komunitas.index')
+            ->with('success','Posting berhasil dibuat');
+    })->name('komunitas.store');
+
     Route::get('/komunitas/{id}', function ($id) {
-        return view('komunitas-detail', ['post' => Komunitas::findOrFail($id)]);
+        $post = Komunitas::findOrFail($id);
+        return view('komunitas-detail', compact('post'));
     })->name('komunitas.detail');
 
-    // ===== FITUR BARU: CHAT =====
-    Route::get('/chat', function () {
-        $admin = \App\Models\User::where('role', 'admin')->first();
-        if (!$admin) abort(500, 'Admin tidak ada');
-
-        $chats = Chat::where(function ($q) use ($admin) {
-            $q->where('sender_id', auth()->id())->where('receiver_id', $admin->id);
-        })
-        ->orWhere(function ($q) use ($admin) {
-            $q->where('sender_id', $admin->id)->where('receiver_id', auth()->id());
-        })
-        ->latest()->get();
-
-        return view('chat.user', compact('chats', 'admin'));
-    })->name('chat.user');
-
-    Route::post('/chat/send', function (Request $request) {
-        $admin = \App\Models\User::where('role', 'admin')->first();
-        Chat::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $admin->id,
-            'message' => $request->message,
-        ]);
-        return back();
-    })->name('chat.send');
+    // ================= CHAT USER KE ADMIN =================
+    Route::get('/chat', [UserChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/messages', [UserChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chat/send', [UserChatController::class, 'send'])->name('chat.send');
+    Route::put('/chat/messages/{message}', [UserChatController::class, 'updateMessage'])->name('chat.messages.update');
+    Route::delete('/chat/messages/{message}', [UserChatController::class, 'deleteMessage'])->name('chat.messages.delete');
 
 
     // ==========================================
@@ -244,6 +298,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/retur-donasi', [ReturDonasiController::class, 'index'])->name('retur.index');
         Route::post('/retur-donasi', [ReturDonasiController::class, 'store'])->name('retur.store');
+        
         //Penugasan Relawan
         Route::get('/penugasan', [PenugasanController::class, 'index'])->name('penugasan.index');
         Route::get('/penugasan/create', [PenugasanController::class, 'create'])->name('penugasan.create');
@@ -252,6 +307,16 @@ Route::middleware('auth')->group(function () {
         Route::put('/penugasan/{id}', [PenugasanController::class, 'update'])->name('penugasan.update');
         Route::delete('/penugasan/{id}', [PenugasanController::class, 'destroy'])->name('penugasan.destroy');
         Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+    });
+
+    // ================= CHAT ADMIN KE USER =================
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
+        Route::get('/chat/{conversation}/messages', [AdminChatController::class, 'messages'])->name('chat.messages');
+        Route::post('/chat/{conversation}/send', [AdminChatController::class, 'send'])->name('chat.send');
+        Route::put('/chat/{conversation}/messages/{message}', [AdminChatController::class, 'updateMessage'])->name('chat.messages.update');
+        Route::delete('/chat/{conversation}/messages/{message}', [AdminChatController::class, 'deleteMessage'])->name('chat.messages.delete');
     });
 
     // ==========================================
@@ -321,7 +386,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/drop-box', function (Request $request) {
             date_default_timezone_set('Asia/Jakarta');
             
-            // Mengambil data dari tabel drop_boxes
             $dropboxes = \App\Models\DropBox::all();
             $now = time();
             
@@ -444,13 +508,10 @@ Route::middleware('auth')->group(function () {
             
             $box->save(); 
             
-            // ==========================================
-            // KODE BARU: PELACAK ERROR DATABASE PENUGASAN
-            // ==========================================
             try {
                 \App\Models\Penugasan::create([
                     'id_penugasan' => 'TGS-' . rand(1000, 9999), 
-                    'id_donasi' => $box->id, // Murni angka, aman untuk integer
+                    'id_donasi' => $box->id, 
                     'nama_donatur' => $box->mitra, 
                     'relawan' => $petugas, 
                     'lokasi_pengambilan' => $box->nama . ' (' . $box->lokasi . ')', 
@@ -458,7 +519,6 @@ Route::middleware('auth')->group(function () {
                     'tanggal_penugasan' => date('Y-m-d') . ' ' . $waktuJemput . ':00',
                 ]);
             } catch (\Exception $e) {
-                // Jika databasenya menolak, layar akan menampilkan pesan ini
                 dd("GAGAL MENYIMPAN KE DATABASE PENUGASAN! Ini pesan error dari MySQL: " . $e->getMessage());
             }
             

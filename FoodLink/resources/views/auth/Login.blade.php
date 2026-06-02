@@ -136,7 +136,7 @@
                             <input type="checkbox" name="remember"> Remember me
                         </label>
                         {{-- Fitur Reset Password Tetap Dipertahankan --}}
-                        <a href="{{ route('password.request') }}">Forgot Password</a>
+                      <a href="/forgot-password">Forgot Password</a>
                     </div>
 
                     <button type="submit">Login</button>
