@@ -143,6 +143,7 @@ Route::middleware('auth')->group(function () {
     // ===== FITUR BARU: TIPS & KOMUNITAS =====
     Route::get('/tips', [TipsController::class, 'index'])->name('tips.index');
     Route::post('/tips/proses', [TipsController::class, 'prosesPembayaran'])->name('tips.proses');
+    Route::post('/tips/checkout', [TipsController::class, 'checkoutMidtrans'])->name('tips.checkout');
 
     // ======================
     // KOMUNITAS
