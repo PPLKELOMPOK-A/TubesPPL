@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DonasiMakanan;
+use App\Models\User; // Tambahan untuk memanggil data User (Donatur)
+use App\Notifications\SistemNotifikasi; // Tambahan untuk memanggil class Notifikasi
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -47,6 +49,15 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'disetujui'
         ]);
 
+        // ==========================================
+        // FITUR NOTIFIKASI: Kirim ke Donatur
+        // ==========================================
+        $donatur = User::find($donasi->user_id);
+        if ($donatur) {
+            $pesan = "Terima kasih! Donasi makanan Anda telah divalidasi dan siap dijemput.";
+            $donatur->notify(new SistemNotifikasi("Donasi Disetujui", $pesan, "validasi"));
+        }
+
         return redirect()->route('admin.validasi.disetujui')
             ->with('success', 'Donasi berhasil disetujui');
     }
@@ -68,6 +79,15 @@ class ValidasiProsesDonasiController extends Controller
         $donasi->update([
             'status' => 'ditolak'
         ]);
+
+        // ==========================================
+        // FITUR NOTIFIKASI: Kirim ke Donatur
+        // ==========================================
+        $donatur = User::find($donasi->user_id);
+        if ($donatur) {
+            $pesan = "Mohon maaf, donasi Anda belum memenuhi kriteria validasi dan terpaksa ditolak.";
+            $donatur->notify(new SistemNotifikasi("Donasi Ditolak", $pesan, "validasi"));
+        }
 
         return redirect()->route('admin.validasi.ditolak')
             ->with('success', 'Donasi berhasil ditolak');

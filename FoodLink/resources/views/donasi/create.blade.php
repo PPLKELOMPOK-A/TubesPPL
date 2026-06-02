@@ -56,8 +56,6 @@
         <nav class="nav-breadcrumb">
             <span>Beranda</span>
             <div class="breadcrumb-icon"></div>
-            <span>Hari Anak Nasional - Panti Bunda Kasih</span>
-            <div class="breadcrumb-icon"></div>
             <span class="active">Buat Donasi Baru</span>
         </nav>
         
@@ -110,9 +108,22 @@
                     <div class="form-group">
                         <label class="label-uppercase">KATEGORI WILAYAH</label>
                         <select name="kategori_wilayah">
-                            <option value="">Pilih Wilayah Operasional</option>
-                            <option value="Bandung Utara">Bandung Utara</option>
-                            <option value="Bandung Tengah">Bandung Tengah</option>
+                            <option value="">Pilih Wilayah</option>
+                            @foreach($dropboxes as $box)
+                                @php
+                                    $bagianAlamat = explode(',', $box->lokasi);
+                                    $kota = "Wilayah Lain"; 
+                                    foreach($bagianAlamat as $bagian) {
+                                        if (str_contains(trim($bagian), 'Kota')) {
+                                            $kota = trim($bagian);
+                                            break;
+                                        }
+                                    }
+                                @endphp
+                                <option value="{{ $kota }}" {{ old('kategori_wilayah') == $kota ? 'selected' : '' }}>
+                                    {{ $kota }}
+                                </option>
+                            @endforeach
                         </select>
                         @error('kategori_wilayah') <span style="color: #dc3545; font-size: 12px; margin-top:-8px;">{{ $message }}</span> @enderror
                     </div>
@@ -142,11 +153,17 @@
                         <label class="label-uppercase">LOKASI DROPBOX</label>
                         <select name="lokasi_dropbox">
                             <option value="">Pilih Lokasi Dropbox</option>
-                            <option value="Dropbox Pusat - Jl. Merdeka">Dropbox Pusat - Jl. Merdeka</option>
+                            @foreach($dropboxes as $box)
+                                @php $namaJalan = explode(',', $box->lokasi)[0]; @endphp
+                                <option value="{{ $box->nama }} - {{ $namaJalan }}" 
+                                    {{ old('lokasi_dropbox') == ($box->nama . ' - ' . $namaJalan) ? 'selected' : '' }}>
+                                    {{ $box->nama }} - {{ $namaJalan }}
+                                </option>
+                            @endforeach
                         </select>
                         @error('lokasi_dropbox') <span style="color: #dc3545; font-size: 12px; margin-top:-8px;">{{ $message }}</span> @enderror
                     </div>
-
+                    
                     <div class="form-row">
                         <div class="form-group">
                             <label class="label-uppercase">KATEGORI MAKANAN</label>
@@ -170,7 +187,7 @@
 
                     <div class="form-group">
                         <label class="label-uppercase">DESKRIPSI KEGIATAN / CATATAN</label>
-                        <textarea name="deskripsi" placeholder="Berikan deskripsi singkat mengenai asal makanan atau instruksi khusus penanganan...">{{ old('deskripsi') }}</textarea>
+                        <textarea name="deskripsi" placeholder="Berikan deskripsi singkat...">{{ old('deskripsi') }}</textarea>
                     </div>
                 </div>
             </div>
@@ -181,7 +198,7 @@
             </div>
         </form>
     </div>
-
+    
     <div class="contextual-footer">
         <div class="info-card">
             <div class="info-header">

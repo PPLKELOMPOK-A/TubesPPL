@@ -8,15 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('kegiatan_donasis', function (Blueprint $table) {
-            $table->string('status')->default('dalam_perjalanan');
-        });
+        // Cek apakah kolom 'status' BELUM ada sebelum menambahkannya
+        if (!Schema::hasColumn('kegiatan_donasis', 'status')) {
+            Schema::table('kegiatan_donasis', function (Blueprint $table) {
+                $table->string('status')->default('dalam_perjalanan');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('kegiatan_donasis', function (Blueprint $table) {
-            $table->dropColumn('status');
-        });
+        // Cek apakah kolom 'status' SUDAH ada sebelum menghapusnya
+        if (Schema::hasColumn('kegiatan_donasis', 'status')) {
+            Schema::table('kegiatan_donasis', function (Blueprint $table) {
+                $table->dropColumn('status');
+            });
+        }
     }
 };

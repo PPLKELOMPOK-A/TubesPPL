@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ReturDonasi;
+use App\Models\DonasiMakanan; // Ditambahkan untuk mencari data donatur dari relasi
+use App\Models\User; // Ditambahkan untuk mencari data Admin & Donatur
+use App\Notifications\SistemNotifikasi; // Ditambahkan untuk mengirim notifikasi
 
 class ReturDonasiController extends Controller
 {
@@ -56,8 +59,29 @@ class ReturDonasiController extends Controller
             'alasan'             => $request->alasan,
             'tanggal_pengajuan'  => $request->tanggal_pengajuan,
             'deskripsi'          => $request->deskripsi,
-            'bukti'              => $request->bukti,
+            'bukti'              => $request->bukti, // Anda mungkin perlu menyimpan $buktiPath di sini jika memakai sistem storage
         ]);
+
+        // ==========================================
+        // FITUR NOTIFIKASI: Saat Retur Terjadi
+        // ==========================================
+        
+        // 1. Notifikasi ke Donatur
+        $donasi = DonasiMakanan::find($request->id_donasi);
+        if ($donasi) {
+            $donatur = User::find($donasi->user_id);
+            if ($donatur) {
+                $pesanDonatur = "Perhatian: Terdapat kendala teknis pada donasi Anda (ID: {$request->id_donasi}) sehingga proses harus diretur. Alasan: {$request->alasan}";
+                $donatur->notify(new SistemNotifikasi($pesanDonatur));
+            }
+        }
+
+        // 2. Notifikasi Darurat ke Admin (Asumsi Anda memiliki kolom 'role' atau 'is_admin' di tabel users)
+        $admin = User::where('role', 'admin')->first(); 
+        if ($admin) {
+            $pesanAdmin = "Darurat: Terdapat pengajuan Retur Donasi baru untuk Donasi ID: {$request->id_donasi}.";
+            $admin->notify(new SistemNotifikasi($pesanAdmin));
+        }
 
         // REDIRECT DENGAN PESAN SUKSES (SUDAH DIPERBAIKI)
         return redirect()

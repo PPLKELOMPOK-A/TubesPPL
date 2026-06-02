@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Penugasan;
+use App\Models\User; // Tambahan untuk memanggil data User (Donatur/Komunitas)
+use App\Notifications\SistemNotifikasi; // Tambahan untuk mengirim Notifikasi
 
 class TrackingController extends Controller
 {
@@ -76,5 +78,43 @@ class TrackingController extends Controller
             'pickupMapUrl' => $pickupMapUrl,
             'deliveryMapUrl' => $deliveryMapUrl,
         ]);
+    }
+
+    // =========================================================================
+    // FUNGSI BARU: Untuk Mengubah Status Tracking dan Mengirim Notifikasi
+    // =========================================================================
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string' // Contoh: 'menunggu_penjemputan', 'dalam_perjalanan', 'selesai'
+        ]);
+
+        $tracking = Penugasan::where('id_penugasan', $id)
+            ->orWhere('id', $id)
+            ->firstOrFail();
+
+        // Menyimpan update status ke database (sesuaikan nama kolom di DB Anda, misal: 'status' atau 'status_pengiriman')
+        $tracking->status = $request->status; 
+        $tracking->save();
+
+        // ==========================================
+        // FITUR NOTIFIKASI: Kirim Update ke Donatur
+        // ==========================================
+        // Mencari akun donatur berdasarkan namanya dari tabel penugasan
+        $donatur = User::where('name', $tracking->nama_donatur)->first();
+
+        if ($donatur) {
+            if ($request->status == 'menunggu_penjemputan') {
+                $donatur->notify(new SistemNotifikasi("Kurir/Relawan sedang menuju ke lokasi Anda untuk menjemput donasi (ID: {$tracking->id_penugasan})."));
+            } elseif ($request->status == 'dalam_perjalanan') {
+                $donatur->notify(new SistemNotifikasi("Donasi Anda (ID: {$tracking->id_penugasan}) sedang dalam perjalanan menuju lokasi penerima."));
+            } elseif ($request->status == 'selesai') {
+                $donatur->notify(new SistemNotifikasi("Alhamdulillah! Donasi Anda (ID: {$tracking->id_penugasan}) telah sampai dengan selamat di tangan penerima. Terima kasih atas kebaikan Anda!"));
+            }
+        }
+
+        // Anda juga bisa menambahkan notifikasi untuk Komunitas/Penerima di sini jika ada datanya
+
+        return back()->with('success', 'Status pengiriman berhasil diperbarui dan notifikasi telah dikirim ke Donatur.');
     }
 }

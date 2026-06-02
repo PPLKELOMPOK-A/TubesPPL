@@ -111,10 +111,7 @@
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
 
-                {{-- MENU DROP BOX --}}
-                <a href="{{ route('dropbox.index') }}" class="nav-item {{ Request::is('admin/drop-box*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-box"></i> Drop Box
-                </a>
+                
 
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
             @else
