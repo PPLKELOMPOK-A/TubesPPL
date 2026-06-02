@@ -28,11 +28,22 @@
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; }
         .container { padding: 30px 60px; max-width: 1200px; width: 100%; }
         .announcement { background: white; border: 1px solid #eee; border-radius: 12px; padding: 30px; text-align: center; color: #666; font-size: 13px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .action-bar { display: flex; gap: 15px; margin-bottom: 30px; }
+        
+        /* --- CORE CSS REVISION FOR ACTION BAR AND DROPDOWN --- */
+        .action-bar { display: flex; gap: 15px; margin-bottom: 30px; width: 100%; }
         .search-wrapper { flex: 1; position: relative; }
         .search-wrapper input { width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
         .search-wrapper i { position: absolute; left: 15px; top: 14px; color: #aaa; }
-        .btn-filter { padding: 0 20px; border: 1px solid #ddd; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .filter-wrapper { position: relative; }
+        .btn-filter { height: 100%; padding: 0 20px; border: 1px solid #ddd; border-radius: 8px; background: white; display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; color: #444; }
+        .filter-dropdown { display: none; position: absolute; top: 115%; right: 0; width: 250px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 100; overflow: hidden; }
+        .filter-dropdown.show { display: block; }
+        .filter-header { background-color: #563e21; color: #ffffff; text-align: center; padding: 12px; font-size: 13px; font-weight: 600; }
+        .filter-options { padding: 10px 0; }
+        .filter-option { display: flex; align-items: center; padding: 12px 20px; gap: 12px; font-size: 13px; color: #444; cursor: pointer; transition: 0.2s; }
+        .filter-option:hover { background-color: #f9f9f9; }
+        .filter-option input[type="checkbox"], .filter-option input[type="radio"] { width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A; }
+
         .donation-card-wrapper { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding: 15px 0; }
         .donation-card { display: flex; align-items: center; gap: 25px; text-decoration: none; color: inherit; flex: 1; }
         .donation-thumb { width: 140px; height: 100px; border-radius: 10px; object-fit: cover; background: #f5f5f5; }
@@ -50,7 +61,6 @@
 </head>
 <body>
 
-    <!-- Sidebar Modular -->
     <div class="sidebar">
         <div class="nav-group">
             <div class="brand">Foodlink</div>
@@ -85,21 +95,65 @@
         </div>
 
         <div class="container">
-            <!-- Pengumuman Statis -->
             <div class="announcement">
                 Pengajuan donasi makanan dapat dilakukan setiap hari melalui aplikasi. Jam operasional layanan konfirmasi dan penjemputan oleh relawan tersedia setiap hari <strong>SENIN s.d. MINGGU Pukul 08.00–20.00 WIB</strong>.
             </div>
 
-            <!-- Toolbar Pencarian -->
-            <div class="action-bar">
+            <form action="/admin/dashboard" method="GET" class="action-bar" id="filterForm">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Cari donasi...">
+                    <input type="text" name="search" placeholder="Cari donasi..." value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
                 </div>
-                <button class="btn-filter">Filter <i class="fa-solid fa-chevron-down"></i></button>
-            </div>
+                
+                <div class="filter-wrapper">
+                    <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
+                    
+                    <div class="filter-dropdown {{ (request()->has('kategori') || request()->has('waktu')) ? 'show' : '' }}" id="filterDropdown">
+                        <div class="filter-header">- Pilihan Filter -</div>
+                        <div class="filter-options">
+                            
+                            <div style="padding: 6px 20px 4px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Kategori Penerima</div>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                                Organisasi (Yayasan)
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                                Kegiatan Keagamaan
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="kategori[]" value="Individu/Umum" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                                Individu/Umum
+                            </label>
 
-            <!-- Loop Data Donasi -->
+                            <hr style="border: 0; border-top: 1px solid rgba(209, 196, 185, 0.3); margin: 10px 0;">
+
+                            <div style="padding: 4px 20px 6px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Urutan Waktu</div>
+                            <label class="filter-option">
+                                <input type="radio" name="waktu" value="terbaru" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ request('waktu') == 'terbaru' ? 'checked' : '' }}> 
+                                Terbaru 
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="waktu" value="terlama" 
+                                       onchange="document.getElementById('filterForm').submit();"
+                                       {{ request('waktu') == 'terlama' ? 'checked' : '' }}> 
+                                Terlama 
+                            </label>
+                           
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+
             @forelse($donations as $item)
                 <div class="donation-card-wrapper">
                     <a href="{{ route('admin.donasi.detail', ['id' => $item['id']]) }}" class="donation-card">
@@ -125,7 +179,6 @@
                 <div class="announcement">Belum ada data donasi terbaru.</div>
             @endforelse
 
-            <!-- Navigasi Halaman -->
             <div class="pagination-area">
                 <span>Menampilkan {{ count($donations) }} data</span>
                 <a href="#" class="page-link active">1</a>
@@ -139,5 +192,22 @@
         </a>
     </div>
 
+    <script>
+        function toggleFilter() {
+            document.getElementById("filterDropdown").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-wrapper')) {
+                var dropdowns = document.getElementsByClassName("filter-dropdown");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

@@ -77,33 +77,64 @@
                 <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" onchange="document.getElementById('filterForm').submit();">
             </div>
             
-            <div class="filter-wrapper">
-                <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
+           <div class="filter-wrapper">
+                <button type="button" class="filter-btn" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down"></i></button>
                 
-                <div class="filter-dropdown {{ request()->has('kategori') ? 'show' : '' }}" id="filterDropdown">
-                    <div class="filter-header">-Pilihan-</div>
+                <div class="filter-dropdown {{ (request()->has('kategori') || request()->has('waktu')) ? 'show' : '' }}" id="filterDropdown">
+                    <div class="filter-header">- Pilihan Filter -</div>
                     <div class="filter-options">
+                        
+                        <div style="padding: 6px 20px 4px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Kategori Penerima</div>
+                        
                         <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)"
+                            <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
                                    onchange="document.getElementById('filterForm').submit();"
                                    {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
                             Organisasi (Yayasan)
                         </label>
                         <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan"
+                            <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan" 
                                    onchange="document.getElementById('filterForm').submit();"
                                    {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
                             Kegiatan Keagamaan
                         </label>
                         <label class="filter-option">
-                            <input type="checkbox" name="kategori[]" value="Individu/Umum"
+                            <input type="checkbox" name="kategori[]" value="Individu/Umum" 
                                    onchange="document.getElementById('filterForm').submit();"
                                    {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
                             Individu/Umum
                         </label>
+
+                        <hr style="border: 0; border-top: 1px solid rgba(209, 196, 185, 0.3); margin: 10px 0;">
+
+                        <div style="padding: 4px 20px 6px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Urutan Waktu</div>
+
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terbaru" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A;"
+                                   {{ request('waktu') == 'terbaru' ? 'checked' : '' }}> 
+                            Terbaru 
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terlama" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A;"
+                                   {{ request('waktu') == 'terlama' ? 'checked' : '' }}> 
+                            Terlama 
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="akan_datang" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #6B4F2A;"
+                                   {{ request('waktu') == 'akan_datang' ? 'checked' : '' }}> 
+                            Akan Datang 
+                        </label>
+                        
                     </div>
                 </div>
             </div>
+        </form>
         </form>
 
         @forelse($donations as $item)
