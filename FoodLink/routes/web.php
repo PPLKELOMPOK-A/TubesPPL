@@ -88,13 +88,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
+    
+    // ===== FITUR TRACKING & BUKTI DONASI =====
     Route::get('/donasi/{id}/edit', [DonasiMakananController::class, 'edit'])->name('donasi.edit');
     Route::put('/donasi/update/{id}', [DonasiMakananController::class, 'update'])->name('donasi.update');
     Route::delete('/donasi/batal/{id}', [DonasiMakananController::class, 'cancel'])->name('donasi.cancel');
 
     // --- FITUR TRACKING & BUKTI DONASI ---
+
+    Route::get('/tracking', [DonationController::class, 'index'])->name('donation.tracking'); 
+    Route::get('/tracking/{id}', function ($id) { 
+        return view('tracking.trackingdetail', [
+            'donation' => Donation::findOrFail($id)
+        ]);
+    })->name('tracking.detail');
+
     Route::get('/tracking', [TrackingController::class, 'index'])->name('donation.tracking');
     Route::get('/tracking/detail/{id}', [TrackingController::class, 'show'])->name('tracking.show');
+
 
     Route::get('/bukti-donasi', [BuktiDonasiController::class, 'index'])->name('bukti.donasi');
     Route::get('/bukti-donasi/detail/{id}', [BuktiDonasiController::class, 'show'])->name('bukti.donasi.detail');
@@ -313,9 +324,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/chat/{conversation}/messages/{message}', [AdminChatController::class, 'deleteMessage'])->name('chat.messages.delete');
     });
 
-    // ==========================================
-    // GRUP ROUTE TANPA PREFIX NAMA ADMIN
-    // ==========================================
     Route::prefix('admin')->group(function () {
         
         // ===== FITUR KERJASAMA MITRA =====
@@ -556,4 +564,6 @@ Route::middleware('auth')->group(function () {
 
     // LOGOUT
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-});
+}); // Penutup Route::middleware('auth')->group
+
+

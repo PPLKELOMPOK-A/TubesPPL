@@ -1,44 +1,232 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Bukti Donasi')
-
-@section('styles')
-<style>
-    .title { font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 30px; }
-    .info-box { background: white; padding: 25px; border-radius: 12px; border-left: 6px solid #5b3a1e; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
-    .info-box h3 { margin-top: 0; color: #5b3a1e; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-    .info-item { margin: 12px 0; font-size: 15px; display: flex; align-items: center; }
-    .status-box { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: #28a745; font-weight: bold; }
-    .status-final { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #ddd; font-weight: bold; }
-    .badge { background: #28a745; color: white; padding: 5px 15px; border-radius: 50px; font-size: 13px; margin-left: 10px; }
-    .btn-kembali { display: inline-flex; align-items: center; background: #5b3a1e; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; transition: 0.3s; width: fit-content; }
-</style>
-@endsection
+@section('title', 'Foodlink - Detail Penyelesaian Donasi')
 
 @section('content')
-<div style="padding: 30px 40px;">
-    <div class="title">Bukti Penyelesaian Donasi</div>
+<style>
+    /* Container utama dibuat lebar dan merapat ke kiri */
+    .content-container {
+        padding: 40px 50px;
+        max-width: 1000px; 
+        margin-left: 0; 
+        margin-right: auto;
+        box-sizing: border-box;
+    }
 
-    <div class="info-box">
-        <h3>Informasi Penyelesaian Donasi</h3>
-        <div class="status-box">
-            ✔ Status: <b>{{ ucfirst($donasi->status ?? 'Selesai') }}</b>
+    /* Tombol Kembali */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #6B4F2A;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 25px;
+        transition: color 0.2s;
+    }
+
+    .btn-back:hover {
+        color: #523B1F;
+    }
+
+    /* Card Box Utama */
+    .detail-card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        border: 1px solid #E2E8F0;
+        width: 100%;
+    }
+
+    /* Bagian Header Card */
+    .card-header {
+        background-color: #F8E7C1;
+        padding: 26px 35px;
+        border-bottom: 1px solid #E2E8F0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h2 {
+        font-size: 22px;
+        color: #6B4F2A;
+        font-weight: 700;
+        margin: 0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Badge Status */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background-color: #DEF7EC;
+        color: #03543F;
+    }
+
+    /* Body Card */
+    .card-body {
+        padding: 20px 35px;
+    }
+
+    /* Struktur Baris Baru: Menggunakan Block-Flex untuk Mengunci Elemen Agar Tidak Tabrakan */
+    .info-row {
+        display: flex;
+        padding: 22px 0;
+        border-bottom: 1px solid #EDF2F7;
+        width: 100%;
+        clear: both; /* Memastikan tidak ada float liar */
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    /* Mengunci lebar kolom label kiri */
+    .info-label-column {
+        flex: 0 0 280px; /* Lebar absolut 280px agar ruang judul teks sangat lapang */
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #718096;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .info-label-column i {
+        color: #6B4F2A;
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+    }
+
+    /* Kolom nilai data kanan mengambil sisa seluruh ruang card */
+    .info-value-column {
+        flex: 1; 
+        font-size: 16px;
+        color: #2D3748;
+        font-weight: 600;
+        line-height: 1.6;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Box Deskripsi */
+    .description-box {
+        background-color: #F8FAFC;
+        padding: 18px;
+        border-radius: 8px;
+        border-left: 4px solid #6B4F2A;
+        color: #4A5568;
+        font-style: italic;
+        font-weight: 500;
+        width: 100%;
+        box-sizing: border-box;
+    }
+</style>
+
+<div class="content-container">
+    
+    <a href="{{ route('bukti.donasi') }}" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Daftar Bukti
+    </a>
+
+    <div class="detail-card">
+        <div class="card-header">
+            <h2>Informasi Penyelesaian Donasi</h2>
+            <span class="badge-status badge-success">
+                <i class="fa-solid fa-circle-check"></i> {{ $donasi->status }}
+            </span>
         </div>
-        <div class="info-item">📅 &nbsp; <b>Tanggal Donasi:</b> &nbsp; {{ $donasi->created_at ? \Carbon\Carbon::parse($donasi->created_at)->translatedFormat('d F Y') : '-' }}</div>
-        <div class="info-item">🏷️ &nbsp; <b>Kategori Penerima:</b> &nbsp; {{ $donasi->kategori_penerima ?? '-' }}</div>
-        <div class="info-item">🍚 &nbsp; <b>Kategori Makanan:</b> &nbsp; {{ $donasi->kategori_makanan ?? '-' }}</div>
-        <div class="info-item">📍 &nbsp; <b>Lokasi Dropbox:</b> &nbsp; {{ $donasi->lokasi_dropbox ?? '-' }}</div>
-        <div class="info-item">🗺️ &nbsp; <b>Wilayah:</b> &nbsp; {{ $donasi->kategori_wilayah ?? '-' }}</div>
-        <div class="info-item">⏰ &nbsp; <b>Waktu Layak:</b> &nbsp; {{ $donasi->waktu_layak ?? '-' }}</div>
-        <div class="info-item">📝 &nbsp; <b>Deskripsi:</b> &nbsp; {{ $donasi->deskripsi ?? '-' }}</div>
-        <div class="status-final">
-            ✔ Status Penyelesaian:
-            <span class="badge">{{ ucfirst($donasi->status ?? 'Selesai') }}</span>
+        
+        <div class="card-body">
+            
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Tanggal Donasi</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->created_at ? $donasi->created_at->format('d F Y') : '-' }}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                    <span>Penerima</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->kategori_penerima }}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Kategori Makanan</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->kategori_makanan }}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>Lokasi Dropbox</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->lokasi_dropbox ?? 'Dropbox Pusat - Jl. Merdeka' }}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Wilayah Penyaluran</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->wilayah ?? 'Bandung Tengah' }}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label-column">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Waktu Layak</span>
+                </div>
+                <div class="info-value-column">
+                    {{ $donasi->waktu_layak ?? '6 - 12 Jam' }}
+                </div>
+            </div>
+
+            <div class="info-row" style="align-items: flex-start;">
+                <div class="info-label-column" style="padding-top: 5px;">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <span>Deskripsi</span>
+                </div>
+                <div class="info-value-column">
+                    <div class="description-box">
+                        {{ $donasi->deskripsi ?? 'Tidak ada deskripsi tambahan.' }}
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <a href="{{ route('bukti.donasi') }}" class="btn-kembali">
-        ← Kembali
-    </a>
 </div>
 @endsection
