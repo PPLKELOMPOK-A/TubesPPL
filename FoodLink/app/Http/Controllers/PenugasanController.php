@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Penugasan;
+use App\Models\User; // Ditambahkan untuk mencari data kurir/relawan
+use App\Notifications\SistemNotifikasi; // Ditambahkan untuk mengirim notifikasi
 
 class PenugasanController extends Controller
 {
@@ -41,12 +43,45 @@ class PenugasanController extends Controller
             'tanggal_penugasan'  => $request->tanggal_penugasan,
         ]);
 
+        // ==========================================
+        // FITUR NOTIFIKASI: Kirim ke Relawan/Kurir
+        // ==========================================
+        try {
+            // Mencari user berdasarkan nama yang diinputkan di form
+            $kurir = User::where('name', $request->relawan)->first();
+            
+            if ($kurir) {
+                $kurir->notify(new SistemNotifikasi(
+                    "Tugas Baru", 
+                    "Anda ditugaskan untuk mengambil/mengantar donasi (ID: {$request->id_penugasan}).", 
+                    "penugasan"
+                ));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Notifikasi Penugasan Baru Gagal: ' . $e->getMessage());
+        }
+
         return redirect()->route('admin.penugasan.index')->with('success', 'Data berhasil ditambahkan');
     }
 
     public function destroy($id)
     {
         $data = Penugasan::findOrFail($id);
+        
+        // ==========================================
+        // FITUR NOTIFIKASI: Pembatalan Tugas
+        // ==========================================
+        try {
+            $kurir = User::where('name', $data->relawan)->first();
+            
+            if ($kurir) {
+                $pesan = "Penugasan (ID: {$data->id_penugasan}) yang diberikan kepada Anda telah dibatalkan oleh Admin.";
+                $kurir->notify(new SistemNotifikasi("Pembatalan Tugas", $pesan, "penugasan"));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Notifikasi Pembatalan Tugas Gagal: ' . $e->getMessage());
+        }
+
         $data->delete();
 
         return redirect()->route('admin.penugasan.index')->with('success', 'Data berhasil dihapus');
@@ -112,6 +147,31 @@ class PenugasanController extends Controller
                 $box->history = $history;
                 
                 $box->save();
+            }
+
+            // =======================================================
+            // FITUR NOTIFIKASI: Beri tahu kedua relawan (Lama & Baru)
+            // =======================================================
+            try {
+                $kurirLama = User::where('name', $relawanLama)->first();
+                if ($kurirLama) {
+                    $kurirLama->notify(new SistemNotifikasi(
+                        "Perhatian", 
+                        "Tugas donasi (ID: {$request->id_penugasan}) telah dialihkan ke relawan lain.", 
+                        "penugasan"
+                    ));
+                }
+
+                $kurirBaru = User::where('name', $relawanBaru)->first();
+                if ($kurirBaru) {
+                    $kurirBaru->notify(new SistemNotifikasi(
+                        "Tugas Baru", 
+                        "Anda ditugaskan untuk menggantikan relawan sebelumnya pada donasi (ID: {$request->id_penugasan}).", 
+                        "penugasan"
+                    ));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Notifikasi Update Tugas Gagal: ' . $e->getMessage());
             }
         }
 
