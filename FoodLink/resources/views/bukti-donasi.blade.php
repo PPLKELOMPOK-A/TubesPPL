@@ -1,215 +1,268 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Bukti Penyelesaian Donasi')
+@section('title', 'Foodlink - Bukti Penyelesaian Donasi')
 
-@section('styles')
+@section('content')
 <style>
-    .page-content-container {
-        width: 100%;
-        max-width: 100%;
-        margin-left: 0;
-        padding: 30px 40px;
-        box-sizing: border-box;
+    .content-container {
+        padding: 40px 50px;
+        max-width: 1200px;
+        margin-left: 0; 
+        margin-right: auto;
     }
 
-    h2 {
-        font-size: 26px;
-        font-weight: 700;
-        margin: 0 0 5px 0;
-        color: #111111;
-    }
-
-    .sub {
-        color: #888888;
-        margin: 0 0 25px 0;
-        font-size: 14px;
-    }
-
-    .search-wrapper {
-        display: flex;
-        gap: 0;
-        align-items: center;
-        width: 100%;
+    .page-header {
         margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        border-radius: 8px;
     }
 
-    .search {
-        flex: 1;
-        padding: 12px 18px;
-        border-radius: 8px 0 0 8px;
-        border: 1px solid #e2e8f0;
-        border-right: none;
+    .page-header h1 {
+        font-size: 28px;
+        color: #6B4F2A;
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .page-header p {
+        color: #718096;
         font-size: 14px;
-        outline: none;
-        box-sizing: border-box;
-        background: #ffffff;
     }
 
-    .btn-search-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 47px;
-        width: 48px;
-        background: #5b3a1e;
-        color: white;
-        border: 1px solid #5b3a1e;
-        border-radius: 0 8px 8px 0;
-        cursor: pointer;
-        font-size: 15px;
-        transition: background 0.2s;
+    /* Search Bar Styling */
+    .search-section {
+        background: #FFFFFF;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        margin-bottom: 25px;
     }
 
-    .btn-search-icon:hover { background: #422a16; }
-
-    .card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 0;
-        border-bottom: 1px solid #ededed;
-        width: 100%;
-    }
-
-    .left {
-        display: flex;
-        align-items: center;
-    }
-
-    .info h4 {
-        margin: 0 0 4px 0;
-        font-size: 16px;
-        font-weight: 600;
-        color: #111111;
-    }
-
-    .info p {
-        margin: 2px 0;
-        color: #888888;
-        font-size: 13px;
-    }
-
-    .actions {
+    .search-form {
         display: flex;
         gap: 12px;
     }
 
-    .btn-primary {
-        background: #5b3a1e;
-        color: white;
-        padding: 10px 20px;
+    .search-input-wrapper {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #A0AEC0;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 12px 12px 45px;
+        border: 1px solid #E2E8F0;
         border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 13px;
-        transition: background 0.2s;
-    }
-
-    .btn-primary:hover { background: #422a16; }
-
-    .btn-secondary {
-        background: #ffffff;
-        color: #46854d;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        border: 1px solid #e2e8f0;
-        transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-        background: #fcfdfc;
-        border-color: #46854d;
-    }
-
-    .pagination-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 30px;
-        font-size: 13px;
-        color: #666666;
-    }
-
-    .empty {
-        text-align: center;
-        padding: 40px;
-        color: #888888;
         font-size: 14px;
+        transition: all 0.3s ease;
+        background-color: #F8FAFC;
     }
 
-    .status-badge {
-        display: inline-block;
-        padding: 3px 10px;
+    .search-input:focus {
+        outline: none;
+        border-color: #6B4F2A;
+        background-color: #FFFFFF;
+        box-shadow: 0 0 0 3px rgba(107, 79, 42, 0.1);
+    }
+
+    .btn-search {
+        background-color: #6B4F2A;
+        color: #FFFFFF;
+        border: none;
+        padding: 0 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-search:hover {
+        background-color: #523B1F;
+    }
+
+    /* Table & Card Layout */
+    .table-container {
+        background: #FFFFFF;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .custom-table th {
+        background-color: #F8E7C1;
+        color: #6B4F2A;
+        padding: 16px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 2px solid #E2E8F0;
+    }
+
+    .custom-table td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #EDF2F7;
+        font-size: 14px;
+        color: #4A5568;
+        vertical-align: middle;
+    }
+
+    .custom-table tr:hover {
+        background-color: #FFF9EE;
+    }
+
+    /* Status Badge */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
-        background: #d4edda;
-        color: #155724;
-        margin-top: 4px;
+        text-transform: capitalize;
+    }
+
+    .badge-success {
+        background-color: #DEF7EC;
+        color: #03543F;
+    }
+
+    /* Action Button */
+    .btn-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #FFFFFF;
+        color: #6B4F2A;
+        border: 1px solid #6B4F2A;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+        background-color: #6B4F2A;
+        color: #FFFFFF;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #718096;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: #CBD5E0;
+        margin-bottom: 15px;
+    }
+
+    /* Pagination Wrapper */
+    .pagination-wrapper {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #EDF2F7;
     }
 </style>
-@endsection
 
-@section('content')
-<div class="page-content-container">
+<div class="content-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Bukti Penyelesaian Donasi</h1>
+        <p>Lihat dan verifikasi hasil distribusi donasi makanan yang telah Anda lakukan.</p>
+    </div>
 
-    <h2>Bukti Penyelesaian Donasi</h2>
-    <p class="sub">Lihat dan Verifikasi hasil distribusi donasi makanan</p>
-
-    <form method="GET" action="{{ route('bukti.donasi') }}">
-        <div class="search-wrapper">
-            <input type="text"
-                   name="search"
-                   value="{{ $search ?? request('search') }}"
-                   class="search"
-                   placeholder="Cari bukti donasi...">
-            <button type="submit" class="btn-search-icon">
+    <!-- Fitur Pencarian -->
+    <div class="search-section">
+        <form action="{{ route('bukti.donasi') }}" method="GET" class="search-form">
+            <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </div>
-    </form>
-
-    @forelse($donasi as $item)
-    <div class="card">
-        <div class="left">
-            <div class="info">
-                <h4>Donasi ke {{ $item->kategori_penerima }}</h4>
-                <p>{{ $item->kategori_makanan }}</p>
-                <p>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</p>
-                <span class="status-badge">✅ {{ ucfirst($item->status) }}</span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="search-input" 
+                    placeholder="Cari berdasarkan kategori makanan atau penerima..." 
+                    value="{{ request('search') }}"
+                >
             </div>
-        </div>
-        <div class="actions">
-            <a href="{{ route('bukti-donasi.bukti', $item->id) }}" class="btn-primary">
-                Detail
-            </a>
-        </div>
-    </div>
-    @empty
-    <div class="empty">Belum ada donasi yang selesai.</div>
-    @endforelse
-
-    <div class="pagination-wrapper">
-        <span>
-            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                {{ $donasi->firstItem() ?? 0 }}-{{ $donasi->lastItem() ?? 0 }} dari {{ $donasi->total() }}
-            @else
-                {{ $donasi->count() }} data
+            <button type="submit" class="btn-search">Cari</button>
+            @if(request('search'))
+                <a href="{{ route('bukti.donasi') }}" class="btn-detail" style="line-height: 38px; height: 42px; box-sizing: border-box;">Reset</a>
             @endif
-        </span>
-        <div>
-            @if($donasi instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                {{ $donasi->links() }}
-            @endif
-        </div>
+        </form>
     </div>
 
+    <!-- List Data Bukti Donasi -->
+    <div class="table-container">
+        @if($donasi->count() > 0)
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Tujuan Penerima</th>
+                        <th>Kategori Makanan</th>
+                        <th>Tanggal Update</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($donasi as $item)
+                        <tr>
+                            <td>
+                                <strong>{{ $item->kategori_penerima }}</strong>
+                            </td>
+                            <td>{{ $item->kategori_makanan }}</td>
+                            <td>{{ $item->updated_at ? $item->updated_at->format('d F Y') : '-' }}</td>
+                            <td>
+                                <span class="badge-status badge-success">
+                                    <i class="fa-solid fa-circle-check"></i> {{ $item->status }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="{{ route('bukti.donasi.detail', $item->id) }}" class="btn-detail">
+                                    <i class="fa-solid fa-eye"></i> Detail Bukti
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <!-- Navigasi Paginasi Laravel -->
+            <div class="pagination-wrapper">
+                <div style="font-size: 13px; color: #718096;">
+                    Menampilkan {{ $donasi->firstItem() }} - {{ $donasi->lastItem() }} dari {{ $donasi->total() }} data
+                </div>
+                <div>
+                    {{ $donasi->appends(request()->input())->links() }}
+                </div>
+            </div>
+        @else
+            <div class="empty-state">
+                <i class="fa-solid fa-folder-open"></i>
+                <h3>Belum Ada Bukti Donasi</h3>
+                <p>Data donasi dengan status 'Selesai' atau 'Disetujui' belum ditemukan.</p>
+            </div>
+        @endif
+    </div>
 </div>
 @endsection

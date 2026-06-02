@@ -123,6 +123,12 @@
                 <a href="{{ route('riwayat-donasi.index') }}" class="nav-item {{ Request::is('riwayat-donasi*') ? 'active' : '' }}">
                     <i class="fa-solid fa-hand-holding-heart"></i> Riwayat Donasi
                 </a>
+                <a href="{{ route('bukti.donasi') }}" class="nav-item {{ Request::is('bukti-donasi*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file-invoice"></i> Bukti Donasi
+                </a>
+                <a href="{{ route('tips.index') }}" class="nav-item {{ Request::is('tips*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-coins"></i> Beri Tips
+                </a>
                 <a href="{{ route('donation.tracking') }}" class="nav-item {{ Request::is('tracking*') ? 'active' : '' }}">
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
@@ -152,6 +158,7 @@
                     <i class="fa-solid fa-comments"></i> Chat 
                 </a>
             @endif
+
         </div>
 
         <div class="logout-section">
