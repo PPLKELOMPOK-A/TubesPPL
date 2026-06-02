@@ -128,15 +128,15 @@
 
                 <form method="POST" action="/login">
                     @csrf
-                    <input type="email" name="email" placeholder="Enter your email" required>
+                    <input type="email" name="email" placeholder="Enter your email" value="{{ old('email') }}" required>
                     <input type="password" name="password" placeholder="Enter your password" required>
 
                     <div class="remember">
                         <label>
                             <input type="checkbox" name="remember"> Remember me
                         </label>
-                        {{-- Fitur Reset Password Tetap Dipertahankan --}}
-                      <a href="/forgot-password">Forgot Password</a>
+                        {{-- Menggunakan route name agar terhubung secara aman dengan rute lupa-password --}}
+                        <a href="{{ route('password.request') }}">Forgot Password</a>
                     </div>
 
                     <button type="submit">Login</button>
