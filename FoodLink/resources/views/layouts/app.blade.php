@@ -111,7 +111,12 @@
                     <i class="fa-solid fa-handshake"></i> Kerjasama Mitra
                 </a>
 
-                
+                {{-- ======================================================== --}}
+                {{-- PERBAIKAN: MENU DROP BOX UNTUK ADMIN DITAMBAHKAN DI SINI --}}
+                {{-- ======================================================== --}}
+                <a href="{{ route('dropbox.index') }}" class="nav-item {{ request()->routeIs('dropbox.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-box"></i> Drop Box
+                </a>
 
             {{-- JIKA YANG LOGIN ADALAH USER BIASA --}}
             @else
@@ -133,7 +138,7 @@
                     <i class="fa-solid fa-location-dot"></i> Tracking
                 </a>
                 
-                {{-- MENU RATING & REVIEW (BERHASIL DISISIPKAN DI SINI) --}}
+                {{-- MENU RATING & REVIEW --}}
                 <a href="{{ route('review.index') }}" class="nav-item {{ Request::is('review*') ? 'active' : '' }}">
                     <i class="fa-solid fa-star"></i> Rating & Review
                 </a>

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DonasiMakanan;
-use App\Models\User; // Tambahan untuk memanggil data User (Donatur)
-use App\Notifications\SistemNotifikasi; // Tambahan untuk memanggil class Notifikasi
+use App\Models\User; 
+use App\Notifications\SistemNotifikasi; 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -18,7 +18,6 @@ class ValidasiProsesDonasiController extends Controller
         // Menghitung statistik untuk ditampilkan di Card Atas
         $stats = [
             'hari_ini' => DonasiMakanan::whereDate('created_at', Carbon::today())->count(),
-            // Ditambahkan 'Pending' kapital agar aman di berbagai jenis database
             'menunggu' => DonasiMakanan::whereIn('status', ['menunggu', 'pending', 'Pending'])->count(),
             'diproses' => DonasiMakanan::whereIn('status', ['disetujui', 'ditolak'])->count(),
         ];
@@ -34,11 +33,11 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     // SETUJUI
     // ===============================
-    public function setujui($id)
+    // Perbaikan: Tambahkan Request agar sesuai format POST standar Laravel
+    public function setujui(Request $request, $id) 
     {
         $donasi = DonasiMakanan::findOrFail($id);
 
-        // PENYELESAIAN: Ubah status dari database menjadi huruf kecil semua agar aman
         $statusAman = strtolower(trim($donasi->status ?? ''));
 
         if (!in_array($statusAman, ['menunggu', 'pending'])) {
@@ -49,9 +48,7 @@ class ValidasiProsesDonasiController extends Controller
             'status' => 'disetujui'
         ]);
 
-        // ==========================================
-        // FITUR NOTIFIKASI: Kirim ke Donatur
-        // ==========================================
+        // FITUR NOTIFIKASI
         $donatur = User::find($donasi->user_id);
         if ($donatur) {
             $pesan = "Terima kasih! Donasi makanan Anda telah divalidasi dan siap dijemput.";
@@ -65,27 +62,34 @@ class ValidasiProsesDonasiController extends Controller
     // ===============================
     // TOLAK
     // ===============================
-    public function tolak($id)
+    // Perbaikan Penting: Menerima Request untuk menangkap alasan dari Modal Pop-Up
+    public function tolak(Request $request, $id)
     {
+        // Validasi input dari textarea Modal
+        $request->validate([
+            'keterangan_tolak' => 'required|string'
+        ]);
+
         $donasi = DonasiMakanan::findOrFail($id);
 
-        // PENYELESAIAN: Ubah status dari database menjadi huruf kecil semua agar aman
         $statusAman = strtolower(trim($donasi->status ?? ''));
 
         if (!in_array($statusAman, ['menunggu', 'pending'])) {
             return back()->with('error', 'Donasi sudah diproses');
         }
 
+        // Simpan status ditolak beserta alasannya
+        // Pastikan kolom database bernama 'keterangan_tolak' atau sesuaikan dengan skema tabelmu.
+        // Jika nama kolommu 'alasan_penolakan', ganti kodenya jadi: 'alasan_penolakan' => $request->keterangan_tolak
         $donasi->update([
-            'status' => 'ditolak'
+            'status' => 'ditolak',
+            'keterangan_tolak' => $request->keterangan_tolak 
         ]);
 
-        // ==========================================
-        // FITUR NOTIFIKASI: Kirim ke Donatur
-        // ==========================================
+        // FITUR NOTIFIKASI
         $donatur = User::find($donasi->user_id);
         if ($donatur) {
-            $pesan = "Mohon maaf, donasi Anda belum memenuhi kriteria validasi dan terpaksa ditolak.";
+            $pesan = "Mohon maaf, donasi Anda belum memenuhi kriteria validasi dan terpaksa ditolak. Alasan: " . $request->keterangan_tolak;
             $donatur->notify(new SistemNotifikasi("Donasi Ditolak", $pesan, "validasi"));
         }
 
@@ -115,7 +119,7 @@ class ValidasiProsesDonasiController extends Controller
     }
 
     // ===============================
-    // DISETUJUI
+    // DISETUJUI (Menampilkan Halaman Disetujui)
     // ===============================
     public function halamanDisetujui()
     {
@@ -129,11 +133,12 @@ class ValidasiProsesDonasiController extends Controller
             ->latest()
             ->paginate(5);
 
-        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
+        // Perbaikan: View diarahkan ke file disetujui.blade.php
+        return view('admin.validasi_proses_donasi.disetujui', compact('donations', 'stats'));
     }
 
     // ===============================
-    // DITOLAK
+    // DITOLAK (Menampilkan Halaman Ditolak)
     // ===============================
     public function halamanDitolak()
     {
@@ -147,6 +152,7 @@ class ValidasiProsesDonasiController extends Controller
             ->latest()
             ->paginate(5);
 
-        return view('admin.validasi_proses_donasi.index', compact('donations', 'stats'));
-   }
+        // Perbaikan: View diarahkan ke file ditolak.blade.php
+        return view('admin.validasi_proses_donasi.ditolak', compact('donations', 'stats'));
+    }
 }
