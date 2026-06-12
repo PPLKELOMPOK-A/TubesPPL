@@ -12,12 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Menambahkan kolom-kolom profil baru setelah kolom 'email'
-            // nullable() digunakan agar tidak error jika user lama belum mengisi data ini
-            $table->string('nik')->nullable()->after('email');
-            $table->string('telepon')->nullable()->after('nik');
-            $table->string('lokasi')->nullable()->after('telepon');
-            $table->text('alamat')->nullable()->after('lokasi');
+            // Cek dan tambah kolom NIK
+            if (!Schema::hasColumn('users', 'nik')) {
+                $table->string('nik')->nullable()->after('email');
+            }
+            
+            // Cek dan tambah kolom Telepon
+            if (!Schema::hasColumn('users', 'telepon')) {
+                $table->string('telepon')->nullable()->after('nik');
+            }
+            
+            // Cek dan tambah kolom Lokasi
+            if (!Schema::hasColumn('users', 'lokasi')) {
+                $table->string('lokasi')->nullable()->after('telepon');
+            }
+            
+            // Cek dan tambah kolom Alamat
+            if (!Schema::hasColumn('users', 'alamat')) {
+                $table->text('alamat')->nullable()->after('lokasi');
+            }
         });
     }
 
@@ -27,8 +40,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Menghapus kolom jika migration di-rollback
-            $table->dropColumn(['nik', 'telepon', 'lokasi', 'alamat']);
+            if (Schema::hasColumn('users', 'nik')) { $table->dropColumn('nik'); }
+            if (Schema::hasColumn('users', 'telepon')) { $table->dropColumn('telepon'); }
+            if (Schema::hasColumn('users', 'lokasi')) { $table->dropColumn('lokasi'); }
+            if (Schema::hasColumn('users', 'alamat')) { $table->dropColumn('alamat'); }
         });
     }
 };

@@ -114,12 +114,12 @@ Route::middleware('auth')->group(function () {
 
     // ===== FITUR PENGAJUAN DONASI & DETAIL =====
     Route::get('/donasi/detail/{id}', function ($id) {
-        if (Auth::user()->role === 'admin') { return redirect()->route('admin.dashboard'); }
+        // PERBAIKAN: Proteksi redirect role admin dihapus agar admin bisa melihat detail halaman
         $data = KegiatanDonasi::findOrFail($id);
         return view('detail-donasi-user', compact('data')); 
     })->name('user.donasi.detail');
 
-    $donasiBaruRoute = Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
+    Route::get('/donasi/baru', [DonasiMakananController::class, 'create'])->name('donasi.create');
     Route::post('/donasi/simpan', [DonasiMakananController::class, 'store'])->name('donasi.store');
     
     // ===== FITUR TRACKING & BUKTI DONASI =====

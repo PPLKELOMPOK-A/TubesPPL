@@ -37,13 +37,10 @@
     .btn-action { background-color: #6B4F2A; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-decoration: none; display: inline-block; }
     .btn-action:hover { background-color: #5a4223; }
     
-    /* --- PAGINATION --- */
-    .pagination-footer { display: flex; justify-content: flex-end; align-items: center; margin-top: 30px; gap: 10px; font-size: 12px; color: #888; }
-    .page-node { padding: 5px 10px; border: 1px solid #E0E0E0; border-radius: 4px; text-decoration: none; color: #444; }
-    .page-node.active { background: #6B4F2A; color: white; border-color: #6B4F2A; }
+    /* --- PAGINATION AREA --- */
+    .pagination-footer { display: flex; justify-content: flex-end; align-items: center; margin-top: 30px; }
 </style>
 
-<!-- Bungkus konten dengan class dari Master Layout -->
 <div class="main-content-canvas">
     <div class="container">
         
@@ -70,7 +67,6 @@
             </script>
         @endif
 
-        <!-- FORM FILTER & SEARCH -->
         <form action="{{ route('dashboard') }}" method="GET" class="action-bar" id="filterForm">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -78,56 +74,56 @@
             </div>
             
             <div class="filter-wrapper">
-                    <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i></button>
-                    
-                    <div class="filter-dropdown {{ (request()->has('kategori') || request()->has('waktu')) ? 'show' : '' }}" id="filterDropdown">
-                        <div class="filter-header">- Pilihan Filter -</div>
-                        <div class="filter-options">
-                            
-                            <div style="padding: 6px 20px 4px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Kategori Penerima</div>
-                            <label class="filter-option">
-                                <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
-                                       onchange="document.getElementById('filterForm').submit();"
-                                       {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
-                                Organisasi (Yayasan)
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan" 
-                                       onchange="document.getElementById('filterForm').submit();"
-                                       {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
-                                Kegiatan Keagamaan
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="kategori[]" value="Individu/Umum" 
-                                       onchange="document.getElementById('filterForm').submit();"
-                                       {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
-                                Individu/Umum
-                            </label>
+                <button type="button" class="btn-filter" onclick="toggleFilter()">Filter <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i></button>
+                
+                <div class="filter-dropdown {{ (request()->has('kategori') || request()->has('waktu')) ? 'show' : '' }}" id="filterDropdown">
+                    <div class="filter-header">- Pilihan Filter -</div>
+                    <div class="filter-options">
+                        
+                        <div style="padding: 6px 20px 4px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Kategori Penerima</div>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Organisasi (Yayasan)" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Organisasi (Yayasan)', request('kategori', [])) ? 'checked' : '' }}> 
+                            Organisasi (Yayasan)
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Kegiatan Keagamaan" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Kegiatan Keagamaan', request('kategori', [])) ? 'checked' : '' }}> 
+                            Kegiatan Keagamaan
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="kategori[]" value="Individu/Umum" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ in_array('Individu/Umum', request('kategori', [])) ? 'checked' : '' }}> 
+                            Individu/Umum
+                        </label>
 
-                            <hr style="border: 0; border-top: 1px solid rgba(209, 196, 185, 0.3); margin: 10px 0;">
+                        <hr style="border: 0; border-top: 1px solid rgba(209, 196, 185, 0.3); margin: 10px 0;">
 
-                            <div style="padding: 4px 20px 6px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Urutan Waktu</div>
-                            <label class="filter-option">
-                                <input type="radio" name="waktu" value="terbaru" 
-                                       onchange="document.getElementById('filterForm').submit();"
-                                       {{ request('waktu') == 'terbaru' ? 'checked' : '' }}> 
-                                Terbaru 
-                            </label>
-                            <label class="filter-option">
-                                <input type="radio" name="waktu" value="terlama" 
-                                       onchange="document.getElementById('filterForm').submit();"
-                                       {{ request('waktu') == 'terlama' ? 'checked' : '' }}> 
-                                Terlama 
-                            </label>
-                        </div>
+                        <div style="padding: 4px 20px 6px 20px; font-weight: 800; font-size: 11px; color: #80756C; letter-spacing: 0.5px; text-transform: uppercase;">Urutan Waktu</div>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terbaru" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ request('waktu') == 'terbaru' || !request()->has('waktu') ? 'checked' : '' }}> 
+                            Terbaru 
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="waktu" value="terlama" 
+                                   onchange="document.getElementById('filterForm').submit();"
+                                   {{ request('waktu') == 'terlama' ? 'checked' : '' }}> 
+                            Terlama 
+                        </label>
                     </div>
                 </div>
+            </div>
         </form>
 
         @forelse($donations as $item)
         <div class="donasi-item">
-            <a href="#" class="donasi-content">
-        @if(!empty($item->foto_kegiatan))
+            <a href="{{ route('user.donasi.detail', ['id' => $item->id]) }}" class="donasi-content">
+                @if(!empty($item->foto_kegiatan))
                     <img src="{{ asset('storage/' . $item->foto_kegiatan) }}" class="donasi-img" alt="Foto Donasi">
                 @else
                     <div class="donasi-img" style="display:flex; align-items:center; justify-content:center; color:#bbb;">
@@ -152,20 +148,14 @@
         </div>
         @endforelse
 
-        <!-- PAGINATION DUMMY -->
         <div class="pagination-footer">
-            <span>1-5 dari 200</span>
-            <a href="#" class="page-node active">1</a>
-            <a href="#" class="page-node">2</a>
-            <span>...</span>
-            <a href="#" class="page-node">9</a>
-            <a href="#" class="page-node">10</a>
-            <a href="#" class="page-node"><i class="fa-solid fa-chevron-right"></i></a>
+            @if(method_exists($donations, 'links'))
+                {{ $donations->appends(request()->query())->links() }}
+            @endif
         </div>
     </div>
 </div>
 
-<!-- SCRIPT UNTUK MENGATUR MUNCUL/HILANGNYA KOTAK FILTER -->
 <script>
     function toggleFilter() {
         document.getElementById("filterDropdown").classList.toggle("show");

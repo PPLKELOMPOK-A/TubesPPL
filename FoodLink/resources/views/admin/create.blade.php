@@ -44,10 +44,13 @@
     input:focus, select:focus, textarea:focus { border-color: #6B4F2A; }
     textarea { height: 122px; resize: vertical; }
 
+    /* Input border merah khusus error tanggal lampau */
+    input.is-invalid { border-color: #dc3545; background-color: #fff5f5; }
+
     /* Input Group for Icon */
     .input-icon-wrapper { position: relative; display: flex; align-items: center; }
     .input-icon-wrapper i { position: absolute; left: 16px; color: #4E453D; font-size: 16px; }
-    .input-icon-wrapper input { width: 100%; padding-left: 44px; } /* Memberi ruang untuk icon di kiri */
+    .input-icon-wrapper input { width: 100%; padding-left: 44px; } 
 
     /* Custom Upload Box (Admin Style) */
     .upload-area { 
@@ -75,6 +78,9 @@
     .btn-cancel { background: none; border: none; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; color: #201B07; text-transform: uppercase; cursor: pointer; padding: 12px 32px; text-decoration: none; }
     .btn-submit { background: #4A3721; color: #FFFFFF; padding: 12px 32px; border: none; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; border-radius: 2px; box-shadow: 0px 4px 6px -4px rgba(50, 34, 13, 0.1); cursor: pointer; transition: 0.3s; }
     .btn-submit:hover { background: #32220D; }
+    
+    /* Style Tombol saat Terkunci (Disabled) */
+    .btn-submit:disabled { background-color: #a8a096; color: #f0ebd9; cursor: not-allowed; opacity: 0.7; box-shadow: none; }
 
     /* Footer Cards */
     .contextual-footer { display: flex; gap: 24px; margin-top: 40px; }
@@ -115,7 +121,7 @@
     @endif
 
     <div class="form-container">
-        <form action="{{ route('admin.kegiatan.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.kegiatan.store') }}" method="POST" enctype="multipart/form-data" id="kegiatanForm">
             @csrf
             <div class="form-grid">
                 
@@ -123,7 +129,7 @@
                     <div class="form-group">
                         <label class="label-uppercase">FOTO KEGIATAN / BARANG</label>
                         <div class="upload-area">
-                            <input type="file" name="foto_kegiatan" id="foto_kegiatan" class="input-hidden" onchange="previewName(this)">
+                            <input type="file" name="foto_kegiatan" id="foto_kegiatan" class="input-hidden" onchange="previewName(this)" required>
                             <label for="foto_kegiatan" class="upload-label">
                                 <div class="upload-icon-container">
                                     <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -140,14 +146,14 @@
                 <div class="right-column">
                     <div class="form-group">
                         <label class="label-uppercase">JUDUL DONASI</label>
-                        <input type="text" name="judul_donasi" value="{{ old('judul_donasi') }}" placeholder="Contoh: Donasi Sembako untuk Panti Asuhan Cahaya">
+                        <input type="text" name="judul_donasi" value="{{ old('judul_donasi') }}" placeholder="Contoh: Donasi Sembako untuk Panti Asuhan Cahaya" required>
                         @error('judul_donasi') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label class="label-uppercase">KATEGORI PENERIMA</label>
-                            <select name="kategori_penerima">
+                            <select name="kategori_penerima" required>
                                 <option value="">Pilih Kategori</option>
                                 <option value="Organisasi (Yayasan)">Organisasi (Yayasan)</option>
                                 <option value="Kegiatan Keagamaan">Kegiatan Keagamaan</option>
@@ -157,14 +163,17 @@
                         </div>
                         <div class="form-group">
                             <label class="label-uppercase">TANGGAL KEGIATAN</label>
-                            <input type="date" name="tanggal_kegiatan" value="{{ old('tanggal_kegiatan') }}">
+                            <input type="date" name="tanggal_kegiatan" id="tanggal_kegiatan" value="{{ old('tanggal_kegiatan') }}" required>
+                            <span id="date-error-text" style="color: #dc3545; font-size: 12px; font-weight: 600; display: none;">
+                                <i class="fa-solid fa-circle-exclamation"></i> Tanggal tidak boleh di masa lampau!
+                            </span>
                             @error('tanggal_kegiatan') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="label-uppercase">DESKRIPSI KEGIATAN</label>
-                        <textarea name="deskripsi" placeholder="Jelaskan secara rinci mengenai tujuan donasi dan barang apa saja yang dibutuhkan...">{{ old('deskripsi') }}</textarea>
+                        <textarea name="deskripsi" placeholder="Jelaskan secara rinci mengenai tujuan donasi dan barang apa saja yang dibutuhkan..." required>{{ old('deskripsi') }}</textarea>
                         @error('deskripsi') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
                     </div>
 
@@ -172,7 +181,7 @@
                         <label class="label-uppercase">ALAMAT PENYALURAN</label>
                         <div class="input-icon-wrapper">
                             <i class="fa-solid fa-location-dot"></i>
-                            <input type="text" name="alamat_penyaluran" value="{{ old('alamat_penyaluran') }}" placeholder="Masukkan alamat lengkap lokasi penyerahan">
+                            <input type="text" name="alamat_penyaluran" value="{{ old('alamat_penyaluran') }}" placeholder="Masukkan alamat lengkap lokasi penyerahan" required>
                         </div>
                         @error('alamat_penyaluran') <span style="color: #dc3545; font-size: 12px;">{{ $message }}</span> @enderror
                     </div>
@@ -181,7 +190,7 @@
 
             <div class="action-bar">
                 <a href="{{ url('/admin/dashboard') }}" class="btn-cancel">BATALKAN</a>
-                <button type="submit" class="btn-submit">POSTING DONASI</button>
+                <button type="submit" id="btnSubmitKegiatan" class="btn-submit">POSTING DONASI</button>
             </div>
         </form>
     </div>
@@ -219,5 +228,57 @@
             document.getElementById('file-name-text').innerHTML = fileName;
         }
     }
+
+    // REAL-TIME VALIDATION TANGGAL LAMPAU
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputTanggal = document.getElementById("tanggal_kegiatan");
+        const txtError = document.getElementById("date-error-text");
+        const btnSubmit = document.getElementById("btnSubmitKegiatan");
+        const formKegiatan = document.getElementById("kegiatanForm");
+
+        // Set batasan minimal kalender HTML5 ke tanggal hari ini
+        const hariIni = new Date();
+        const yyyy = hariIni.getFullYear();
+        let mm = hariIni.getMonth() + 1; 
+        let dd = hariIni.getDate();
+
+        if (mm < 10) mm = '0' + mm;
+        if (dd < 10) dd = '0' + dd;
+
+        const formatHariIni = yyyy + '-' + mm + '-' + dd;
+        inputTanggal.setAttribute('min', formatHariIni);
+
+        // Fungsi Validasi Setiap Kali Input Diubah
+        function validasiTanggal() {
+            const tanggalPilihan = inputTanggal.value;
+            
+            if (tanggalPilihan) {
+                // Bandingkan murni string tanggal (YYYY-MM-DD) agar presisi
+                if (tanggalPilihan < formatHariIni) {
+                    inputTanggal.classList.add("is-invalid");
+                    txtError.style.display = "block";
+                    btnSubmit.disabled = true; // Kunci tombol posting
+                    return false;
+                }
+            }
+            
+            // Jika tanggal valid / hari ini / masa depan
+            inputTanggal.classList.remove("is-invalid");
+            txtError.style.display = "none";
+            btnSubmit.disabled = false; // Buka tombol posting
+            return true;
+        }
+
+        // Jalankan fungsi validasi saat user mengetik/memilih tanggal
+        inputTanggal.addEventListener("input", validasiTanggal);
+        inputTanggal.addEventListener("change", validasiTanggal);
+
+        // Proteksi Tambahan: Cegah submit paksa lewat tombol Enter di keyboard
+        formKegiatan.addEventListener("submit", function (e) {
+            if (!validasiTanggal()) {
+                e.preventDefault(); // Batalkan pengiriman form
+            }
+        });
+    });
 </script>
 @endsection

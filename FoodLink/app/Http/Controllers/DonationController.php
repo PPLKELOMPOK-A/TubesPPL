@@ -66,29 +66,48 @@ class DonationController extends Controller
      * Menyimpan donasi baru
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'judul_donasi'        => 'required|string|max:255',
-            'kategori_penerima'   => 'required|string|max:255',
-            'tanggal_kegiatan'    => 'required|date',
-            'foto_kegiatan'       => 'nullable|image',
-            'deskripsi'           => 'required|string',
-            'alamat_penyaluran'   => 'required|string',
-            'status'              => 'nullable|string',
-        ]);
+{
+    // 1. Validasi disesuaikan dengan field yang ada di Model $fillable
+    $validated = $request->validate([
+        'judul'          => 'required|string|max:255',
+        'kategori'       => 'required|string|max:255',
+        'tanggal'        => 'required|date',
+        'foto'           => 'nullable|image',
+        'deskripsi'      => 'required|string',
+        'alamat'         => 'required|string',
+        'nama_makanan'   => 'nullable|string',
+        'donatur'        => 'nullable|string',
+        'porsi'          => 'nullable|string',
+        'quantity'       => 'nullable|integer',
+        'food_type'      => 'nullable|string',
+        'estimated_time' => 'nullable|string',
+        'status'         => 'nullable|string',
+    ]);
 
-        if ($request->hasFile('foto_kegiatan')) {
-            $validated['foto_kegiatan'] = $request
-                ->file('foto_kegiatan')
-                ->store('donation_photos', 'public');
-        }
-
-        $donation = Donation::create($validated);
-
-        broadcast(new \App\Events\DonationUpdated($donation))->toOthers();
-
-        return response()->json($donation);
+    // 2. Proses simpan foto disesuaikan ke kolom 'foto'
+    if ($request->hasFile('foto')) {
+        $validated['foto'] = $request
+            ->file('foto')
+            ->store('donation_photos', 'public');
     }
+
+    // 3. Selipkan user_id otomatis dari admin/user yang sedang login
+    $validated['user_id'] = auth()->id();
+    
+    // Set status default jika tidak diisi dari form
+    if (!isset($validated['status'])) {
+        $validated['status'] = 'menunggu';
+    }
+
+    // 4. Simpan ke database menggunakan nama field yang sudah sinkron
+    $donation = Donation::create($validated);
+
+    if (class_exists('\App\Events\DonationUpdated')) {
+        broadcast(new \App\Events\DonationUpdated($donation))->toOthers();
+    }
+
+    return response()->json($donation);
+}
 
     /**
      * Mengembalikan semua donasi dalam format JSON.

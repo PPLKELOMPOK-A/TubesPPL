@@ -13,11 +13,12 @@ class KegiatanDonasi extends Model
     protected $table = 'kegiatan_donasis';
 
     protected $fillable = [
-        'judul_donasi',
-        'kategori_penerima',
-        'tanggal_kegiatan',
-        'deskripsi',
-        'alamat_penyaluran',
-        'foto_kegiatan',
-    ];
+    'judul_donasi',
+    'kategori_penerima',
+    'tanggal_kegiatan',
+    'deskripsi',
+    'alamat_penyaluran',
+    'foto_kegiatan',
+    'user_id', // <-- Bagian ini wajib ada!
+];
 }
