@@ -37,6 +37,9 @@ class KegiatanDonasiController extends Controller
             $validatedData['foto_kegiatan'] = $path;
         }
 
+        // PERBAIKAN SINKRONISASI: Ambil ID admin/user yang sedang login secara otomatis
+        $validatedData['user_id'] = auth()->id();
+
         // 3. Masukkan ke Database
         KegiatanDonasi::create($validatedData);
 

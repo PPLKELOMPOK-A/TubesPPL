@@ -6,26 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        // Cek apakah kolom 'user_id' BELUM ada sebelum menambahkannya
+        // MODIFIKASI: Hanya tambah user_id jika kolom belum ada di tabel kegiatan_donasis
         if (!Schema::hasColumn('kegiatan_donasis', 'user_id')) {
             Schema::table('kegiatan_donasis', function (Blueprint $table) {
-                $table->foreignId('user_id')
-                      ->after('id')
-                      ->constrained()
-                      ->onDelete('cascade');
+                $table->bigInteger('user_id')->unsigned()->nullable();
             });
         }
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        // Cek apakah kolom 'user_id' SUDAH ada sebelum menghapusnya
         if (Schema::hasColumn('kegiatan_donasis', 'user_id')) {
             Schema::table('kegiatan_donasis', function (Blueprint $table) {
-                $table->dropForeign(['user_id']); // Hapus foreign key constraint terlebih dahulu
-                $table->dropColumn('user_id');    // Baru kemudian hapus kolomnya
+                $table->dropColumn('user_id');
             });
         }
     }

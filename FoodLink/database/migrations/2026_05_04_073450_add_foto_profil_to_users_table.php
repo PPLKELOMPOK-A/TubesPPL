@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -12,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-
-            $table->string('foto_profil')->nullable()->after('email'); 
-        });
+        // MODIFIKASI: Ditambahkan pengecekan agar tidak error jika kolom sudah ada
+        if (!Schema::hasColumn('users', 'foto_profil')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('foto_profil')->nullable()->after('email');
+            });
+        }
     }
 
     /**
@@ -23,9 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // Menghapus kolom jika kita melakukan rollback
-            $table->dropColumn('foto_profil');
-        });
+        // MODIFIKASI: Ditambahkan pengecekan saat rollback agar aman
+        if (Schema::hasColumn('users', 'foto_profil')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('foto_profil');
+            });
+        }
     }
 };
