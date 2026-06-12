@@ -27,24 +27,33 @@
     
     .form-input { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; color: #111; font-weight: 600; outline: none; transition: 0.2s; background: #fafafa; }
     .form-input:focus { border-color: #6B4F2A; background: #ffffff; }
+    
+    /* Input border merah saat error */
+    .form-input.is-invalid { border-color: #e53e3e; background: #fff5f5; }
+
+    /* Style Pesan Error Merah */
+    .error-text { display: none; color: #e53e3e; font-size: 12px; font-weight: 600; margin-top: 5px; grid-column: 2; }
 
     /* Tombol Aksi Bawah */
     .action-buttons { display: flex; gap: 15px; }
     .btn-batal { background-color: #ffffff; color: #444; border: 1px solid #ddd; padding: 12px 30px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; display: inline-block; }
     .btn-batal:hover { background-color: #f5f5f5; }
+    
     .btn-simpan { background-color: #5C4322; color: #ffffff; border: none; padding: 12px 45px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .btn-simpan:hover { background-color: #4a351a; }
+    
+    /* Style tombol saat terkunci (disabled) */
+    .btn-simpan:disabled { background-color: #a8a096; color: #f0ebd9; cursor: not-allowed; opacity: 0.7; }
 </style>
 
 <div class="main-content-canvas">
     <div class="container-profil">
         <div class="profile-header-title">
-            {{-- SUDAH DIPERBAIKI: Mengarah ke profil.index --}}
             <a href="{{ route('profil.index') }}" class="back-nav"><i class="fa-solid fa-arrow-left"></i></a>
             <h1 class="page-title">Edit Profil</h1>
         </div>
 
-        <form action="{{ route('profil.update') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('profil.update') }}" method="POST" enctype="multipart/form-data" id="editProfilForm">
             @csrf
             
             <div class="profile-hero">
@@ -65,33 +74,39 @@
             <div class="profile-details-list">
                 <div class="detail-row">
                     <div class="detail-label">Nama</div>
-                    <input type="text" name="name" class="form-input" value="{{ Auth::user()->name ?? '' }}" required>
+                    <input type="text" name="name" class="form-input" value="{{ Auth::user()->name ?? '' }}" placeholder="Masukkan Nama" required>
                 </div>
+                
                 <div class="detail-row">
                     <div class="detail-label">NIK</div>
-                    <input type="text" name="nik" class="form-input" value="{{ Auth::user()->nik ?? '' }}">
+                    <input type="text" name="nik" id="nikInput" class="form-input" value="{{ Auth::user()->nik ?? '' }}" placeholder="Masukkan NIK">
+                    <div id="nikError" class="error-text"><i class="fa-solid fa-triangle-exclamation"></i> NIK hanya boleh berisi angka!</div>
                 </div>
+                
                 <div class="detail-row">
                     <div class="detail-label">Email</div>
-                    <input type="email" name="email" class="form-input" value="{{ Auth::user()->email ?? '' }}" required>
+                    <input type="email" name="email" class="form-input" value="{{ Auth::user()->email ?? '' }}" placeholder="Masukkan Email" required>
                 </div>
+                
                 <div class="detail-row">
                     <div class="detail-label">Telepon</div>
-                    <input type="text" name="telepon" class="form-input" value="{{ Auth::user()->telepon ?? '' }}">
+                    <input type="text" name="telepon" id="teleponInput" class="form-input" value="{{ Auth::user()->telepon ?? '' }}" placeholder="Masukkan No. Telepon">
+                    <div id="teleponError" class="error-text"><i class="fa-solid fa-triangle-exclamation"></i> No. Telepon hanya boleh berisi angka!</div>
                 </div>
+                
                 <div class="detail-row">
                     <div class="detail-label">Lokasi</div>
-                    <input type="text" name="lokasi" class="form-input" value="{{ Auth::user()->lokasi ?? '' }}">
+                    <input type="text" name="lokasi" class="form-input" value="{{ Auth::user()->lokasi ?? '' }}" placeholder="Masukkan Lokasi Anda">
                 </div>
+                
                 <div class="detail-row">
                     <div class="detail-label">Alamat</div>
-                    <input type="text" name="alamat" class="form-input" value="{{ Auth::user()->alamat ?? '' }}">
+                    <input type="text" name="alamat" class="form-input" value="{{ Auth::user()->alamat ?? '' }}" placeholder="Masukkan Alamat Anda">
                 </div>
             </div>
 
             <div class="action-buttons">
-                <button type="submit" class="btn-simpan">Simpan Perubahan</button>
-                {{-- SUDAH DIPERBAIKI: Mengarah ke profil.index --}}
+                <button type="submit" id="btnSimpan" class="btn-simpan">Simpan Perubahan</button>
                 <a href="{{ route('profil.index') }}" class="btn-batal">Batal</a>
             </div>
         </form>
@@ -99,6 +114,7 @@
 </div>
 
 <script>
+    // Preview Foto Profil
     const fotoInput = document.getElementById('foto_profil');
     const avatarPreview = document.getElementById('avatarPreview');
 
@@ -108,5 +124,48 @@
             avatarPreview.src = URL.createObjectURL(file);
         }
     }
+
+    // REAL-TIME VALIDATION
+    const nikInput = document.getElementById('nikInput');
+    const teleponInput = document.getElementById('teleponInput');
+    
+    const nikError = document.getElementById('nikError');
+    const teleponError = document.getElementById('teleponError');
+    const btnSimpan = document.getElementById('btnSimpan');
+
+    function checkValidation() {
+        const regexAngka = /^[0-9]*$/;
+
+        let statusNikValid = regexAngka.test(nikInput.value);
+        let statusTeleponValid = regexAngka.test(teleponInput.value);
+
+        // 1. Validasi Kolom NIK
+        if (!statusNikValid) {
+            nikInput.classList.add('is-invalid');
+            nikError.style.display = 'block';
+        } else {
+            nikInput.classList.remove('is-invalid');
+            nikError.style.display = 'none';
+        }
+
+        // 2. Validasi Kolom Telepon
+        if (!statusTeleponValid) {
+            teleponInput.classList.add('is-invalid');
+            teleponError.style.display = 'block';
+        } else {
+            teleponInput.classList.remove('is-invalid');
+            teleponError.style.display = 'none';
+        }
+
+        // 3. Kunci atau Buka Tombol Simpan
+        if (!statusNikValid || !statusTeleponValid) {
+            btnSimpan.disabled = true;
+        } else {
+            btnSimpan.disabled = false;
+        }
+    }
+
+    nikInput.addEventListener('input', checkValidation);
+    teleponInput.addEventListener('input', checkValidation);
 </script>
 @endsection

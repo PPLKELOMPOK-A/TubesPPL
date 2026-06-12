@@ -148,10 +148,7 @@
                 </a>
             @endif
 
-            {{-- MENU GLOBAL (BISA DIAKSES ADMIN & USER) --}}
-            <a href="#" class="nav-item">
-                <i class="fa-solid fa-comments"></i> Riwayat Koordinasi
-            </a>
+
             
             {{-- MENU GLOBAL CHAT --}}
             @if(Auth::check() && Auth::user()->role == 'admin')
