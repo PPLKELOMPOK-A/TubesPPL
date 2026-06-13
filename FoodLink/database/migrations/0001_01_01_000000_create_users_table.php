@@ -15,16 +15,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('role')->default('user'); // Kolom role ditaruh di sini
-            
-            // ==========================================
-            // TAMBAHAN KOLOM UNTUK FITUR PROFIL
-            // ==========================================
-            $table->string('foto_profil')->nullable();
-            $table->string('nik')->nullable();
-            $table->string('telepon')->nullable();
-            $table->string('lokasi')->nullable();
-            $table->string('alamat')->nullable();
+            $table->string('role')->default('user'); 
+
+            // HAPUS kolom foto_profil, nik, telepon, lokasi, alamat dari sini
+            // karena sudah ditangani oleh migration terpisah (2026_05_04_...)
 
             $table->rememberToken();
             $table->timestamps();
@@ -37,7 +31,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        // 3. Tabel Sessions (PENTING: Agar login tidak hilang-hilang)
+        // 3. Tabel Sessions
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();

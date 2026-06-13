@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Donation extends Model 
-{
+class Donation extends Model {
     use HasFactory;
 
+    // Nama tabel sesuai phpMyAdmin kamu
     protected $table = 'donations'; 
 
+    // Kolom yang ada di gambar phpMyAdmin kamu
     protected $fillable = [
         'judul',
         'kategori',
@@ -21,32 +22,27 @@ class Donation extends Model
         'nama_makanan',
         'donatur',
         'porsi',
-        'quantity',
-        'food_type',
-        'estimated_time',
         'status',
+        'quantity',
         'validated_by',
         'user_id'
     ];
 
     /*
     |--------------------------------------------------------------------------
-    | HELPER VALIDASI / SCOPES
+    | HELPER SCOPES
     |--------------------------------------------------------------------------
     */
 
-    public function scopeMenunggu($query) 
-    { 
+    public function scopeMenunggu($query) { 
         return $query->where('status', 'menunggu'); 
     }
 
-    public function scopeDisetujui($query) 
-    { 
+    public function scopeDisetujui($query) { 
         return $query->where('status', 'disetujui'); 
     }
 
-    public function scopeDitolak($query) 
-    { 
+    public function scopeDitolak($query) { 
         return $query->where('status', 'ditolak'); 
     }
 
@@ -56,14 +52,11 @@ class Donation extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function user() 
-    { 
-        return $this->belongsTo(User::class, 'user_id'); 
+    public function user() { 
+        return $this->belongsTo(User::class); 
     }
 
-    public function validator() 
-    { 
+    public function validator() { 
         return $this->belongsTo(User::class, 'validated_by'); 
     }
 }
-
