@@ -179,15 +179,7 @@
         </div>
         @endforelse
 
-        <div class="pagination-footer">
-            <span>1-5 dari 200</span>
-            <a href="#" class="page-node active">1</a>
-            <a href="#" class="page-node">2</a>
-            <span>...</span>
-            <a href="#" class="page-node">9</a>
-            <a href="#" class="page-node">10</a>
-            <a href="#" class="page-node"><i class="fa-solid fa-chevron-right"></i></a>
-        </div>
+        
     </div>
 </div>
 
